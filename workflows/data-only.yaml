@@ -1,0 +1,39 @@
+name: PR must only change /data
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  guard:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Identify what changed
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            data:
+              - 'data/**'
+            nondata:
+              - '**'
+              - '!data/**'
+              - '!.github/**'   # allow CI/config tweaks if you want
+              - '!README.md'    # allow readme edits if you want
+
+      # Hard-fail if anything outside /data changed
+      - name: Fail if non-data files changed
+        if: steps.filter.outputs.nondata == 'true'
+        run: |
+          echo "::error::This repository only accepts changes under /data/** in this PR."
+          echo "Please revert changes to files outside /data and try again."
+          exit 1
+
+      # Quick JSON sanity check (simple but effective)
+      - name: Validate JSON (poles & permits)
+        if: steps.filter.outputs.data == 'true'
+        run: |
+          jq -e . data/poles.json > /dev/null
+          jq -e . data/permits.json > /dev/null
