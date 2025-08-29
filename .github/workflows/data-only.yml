@@ -1,0 +1,42 @@
+name: PR must only change /data
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch: {}   # lets you run it manually once on main
+
+jobs:
+  # Manual run just to register the workflow on main
+  register:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Registering workflow on default branch"
+
+  # Real guard that runs on PRs
+  check-data-paths:
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List changed files
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed.txt || true
+          echo "Changed files:"; cat changed.txt
+
+      - name: Fail if non-data files changed
+        run: |
+          if grep -Ev '^(data/|README\.md$|\.github/)' changed.txt | grep . ; then
+            echo "::error::This PR must only change files under /data/** (README.md and .github/ allowed)."
+            exit 1
+          fi
+
+      - name: Validate JSON (if present)
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          test -f data/poles.json && jq -e . data/poles.json >/dev/null || true
+          test -f data/permits.json && jq -e . data/permits.json >/dev/null || true
