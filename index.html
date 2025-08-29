@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pole & Permit Viewer (Phase 0)</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+    .muted { color: #666; font-size: 0.9rem; }
+    .error { color: #b00020; }
+    code { background: #f5f5f5; padding: 0.15rem 0.35rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Pole & Permit Viewer</h1>
+  <p class="muted">Static page reading <code>/data/poles.json</code> and <code>/data/permits.json</code>.</p>
+
+  <div id="status" class="muted">Loading…</div>
+  <div id="list"></div>
+
+  <script>
+    async function loadData() {
+      const status = document.getElementById('status');
+      try {
+        // Fetch JSON files from the SAME repo (works on GitHub Pages)
+        const [polesRes, permitsRes] = await Promise.all([
+          fetch('./data/poles.json', { cache: 'no-store' }),
+          fetch('./data/permits.json', { cache: 'no-store' })
+        ]);
+
+        if (!polesRes.ok) throw new Error('poles.json not found (' + polesRes.status + ')');
+        if (!permitsRes.ok) throw new Error('permits.json not found (' + permitsRes.status + ')');
+
+        const [poles, permits] = await Promise.all([polesRes.json(), permitsRes.json()]);
+
+        // Join permits by pole_id for display
+        const permitsByPole = permits.reduce((acc, p) => {
+          (acc[p.pole_id] ||= []).push(p);
+          return acc;
+        }, {});
+
+        const container = document.getElementById('list');
+        container.innerHTML = '';
+
+        poles.forEach(pole => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const related = permitsByPole[pole.pole_id] || [];
+          const permitList = related.length
+            ? `<ul>${related.map(p => `<li><strong>${p.permit_id}</strong> — <em>${p.status}</em> (by ${p.requested_by})</li>`).join('')}</ul>`
+            : '<em>No permits</em>';
+
+          card.innerHTML = `
+            <h3>${pole.pole_id} — ${pole.location_label || ''}</h3>
+            <div class="muted">
+              Owner: ${pole.owner || '—'} · Class: ${pole.class || '—'} · Height: ${pole.height_ft || '—'} ft
+            </div>
+            <div>Coords: ${pole.lat ?? '—'}, ${pole.lon ?? '—'}</div>
+            <h4>Permits</h4>
+            ${permitList}
+          `;
+          container.appendChild(card);
+        });
+
+        status.textContent = `Loaded ${poles.length} poles, ${permits.length} permits.`;
+      } catch (err) {
+        status.innerHTML = `<span class="error">Error: ${err.message}. If this is your first deploy, wait for GitHub Pages to build, then refresh.</span>`;
+      }
+    }
+    loadData();
+  </script>
+</body>
+</html>

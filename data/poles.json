@@ -1,0 +1,20 @@
+[
+  {
+    "pole_id": "BPUB-000123",
+    "location_label": "Location 22 NT6",
+    "owner": "BPUB",
+    "class": "Class 4",
+    "height_ft": 45,
+    "lat": 26.00612,
+    "lon": -97.54631
+  },
+  {
+    "pole_id": "OMNI-54270",
+    "location_label": "Location 10 NT6",
+    "owner": "Omni Fiber",
+    "class": "Class 5",
+    "height_ft": 40,
+    "lat": 26.01002,
+    "lon": -97.54011
+  }
+]

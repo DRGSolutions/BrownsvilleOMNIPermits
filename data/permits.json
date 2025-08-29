@@ -1,0 +1,20 @@
+[
+  {
+    "permit_id": "PERM-1001",
+    "pole_id": "BPUB-000123",
+    "status": "submitted",
+    "requested_by": "jdoe",
+    "submitted_at": "2025-08-20T14:30:00Z",
+    "notes": "New ISP attachment at 22 NT6.",
+    "attachments": []
+  },
+  {
+    "permit_id": "PERM-1002",
+    "pole_id": "OMNI-54270",
+    "status": "approved",
+    "requested_by": "kmiller",
+    "submitted_at": "2025-08-21T16:05:00Z",
+    "notes": "Make-ready complete; ready to schedule.",
+    "attachments": []
+  }
+]
