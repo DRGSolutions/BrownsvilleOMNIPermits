@@ -10,7 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Identify what changed
+      # (Optional) ensure jq is present
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -20,18 +23,15 @@ jobs:
             nondata:
               - '**'
               - '!data/**'
-              - '!.github/**'   # allow CI/config tweaks if you want
-              - '!README.md'    # allow readme edits if you want
+              - '!.github/**'   # allow CI/config tweaks
+              - '!README.md'    # allow readme edits
 
-      # Hard-fail if anything outside /data changed
       - name: Fail if non-data files changed
         if: steps.filter.outputs.nondata == 'true'
         run: |
-          echo "::error::This repository only accepts changes under /data/** in this PR."
-          echo "Please revert changes to files outside /data and try again."
+          echo "::error::This repo only accepts changes under /data/** in this PR."
           exit 1
 
-      # Quick JSON sanity check (simple but effective)
       - name: Validate JSON (poles & permits)
         if: steps.filter.outputs.data == 'true'
         run: |
