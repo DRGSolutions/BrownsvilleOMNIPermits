@@ -259,10 +259,12 @@
     let poles=[], permits=[];
     function fmt(n){ return new Intl.NumberFormat().format(n); }
 
-    async function loadData() {
-      const bust = `?v=${Date.now()}`; // cache-buster so we always hit the network
-      elStatus.textContent = 'Loading…';
-      try {
+      // make sure this config exists near the top of the script
+      const DATA_WEB_PATH = './data';
+
+      // replace your loader with this:
+      async function loadData() {
+        const bust = `?v=${Date.now()}`; // prevent cached JSON
         const [r1, r2] = await Promise.all([
           fetch(`${DATA_WEB_PATH}/poles.json${bust}`,   { cache: 'no-store' }),
           fetch(`${DATA_WEB_PATH}/permits.json${bust}`, { cache: 'no-store' })
@@ -271,7 +273,6 @@
         if (!r2.ok) throw new Error(`permits.json ${r2.status}`);
         poles = await r1.json();
         permits = await r2.json();
-
         elKPoles.textContent = Intl.NumberFormat().format(poles.length);
         elKPerms.textContent = Intl.NumberFormat().format(permits.length);
         elKLoaded.textContent = new Date().toLocaleString();
