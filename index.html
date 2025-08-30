@@ -221,6 +221,8 @@
     // ======= CONFIG =======
     const API_URL   = 'https://permits-api.vercel.app/api/propose-change'; // <-- replace
     const SHARED_KEY = 'BrownsvilleOMNIPermits'; // <-- replace (must match FORM_SHARED_KEY in Vercel)
+    const DATA_WEB_PATH  = './data';  // how the page fetches JSON
+    const DATA_REPO_PATH = 'data';    // where the files are in the repo for the "Open poles.json" links
 
     // Try to auto-derive OWNER/REPO for fallback "Open poles.json/permits.json" links
     function deriveOwnerRepo(){
