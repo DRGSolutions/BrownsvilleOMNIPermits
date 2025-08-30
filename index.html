@@ -218,6 +218,9 @@
 
     const DATA_WEB_PATH  = './data';  // fetch JSON from here
     const DATA_REPO_PATH = 'data';    // repo path for "Open poles/permits" links
+    const OWNER = 'DRGSolutions';
+    const REPO  = 'BrownsvilleOMNIPermits';
+    const DATA_WEB_PATH = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/data`;
 
     // Show script errors on the page instead of silently hanging
     window.addEventListener('error', (e) => {
