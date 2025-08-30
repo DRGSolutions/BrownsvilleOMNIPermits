@@ -321,7 +321,7 @@
 
     function ensureWatcher() {
       if (watcher) return;
-      watcher = setInterval(checkPending, 7000); // poll every 7s
+      watcher = setInterval(checkPending, 2000); // poll every 2s
     }
 
     async function checkPending() {
