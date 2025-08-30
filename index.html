@@ -245,8 +245,8 @@
       return { owner:'', repo:'' };
     }
     const guessed = deriveOwnerRepo();
-    const OWNER = guessed.owner || 'YOUR_OWNER_HERE';
-    const REPO  = guessed.repo  || 'YOUR_REPO_HERE';
+    //const OWNER = guessed.owner || 'YOUR_OWNER_HERE';
+    //const REPO  = guessed.repo  || 'YOUR_REPO_HERE';
 
     function ghEditUrl(path){
       if (!OWNER || !REPO) return null;
