@@ -3,73 +3,426 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pole & Permit Viewer (Phase 0)</title>
+  <title>Pole & Permit Manager (Web Editor)</title>
+
+  <!--
+    Replace the two placeholders below before deploying:
+      1) API_URL: your Vercel function URL (e.g., https://your-project.vercel.app/api/propose-change)
+      2) SHARED_KEY: the same value you set in Vercel as FORM_SHARED_KEY
+  -->
+
   <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
-    .muted { color: #666; font-size: 0.9rem; }
-    .error { color: #b00020; }
-    code { background: #f5f5f5; padding: 0.15rem 0.35rem; border-radius: 4px; }
+    :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; }
+    * { box-sizing:border-box }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--fg); }
+    header { padding:20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, #0b0c10 0%, #0d0f14 100%); position:sticky; top:0; z-index:10 }
+    h1 { margin:0 0 6px 0; font-size:22px }
+    .sub { color:var(--muted); font-size:13px }
+    main { max-width:1100px; margin:24px auto 56px; padding:0 16px }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px }
+    .muted { color:var(--muted) }
+    .btn { appearance:none; border:1px solid var(--border); background:#161922; color:var(--fg); padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
+    .btn:hover { background:#1a1f2b }
+    .btn:disabled { opacity:.6; cursor:not-allowed }
+    .btn-ghost { background:transparent; border-color:#2a3242 }
+    .btn-accent { border-color:#1f3b2f; background:#0f2b22 }
+    .btn-danger { border-color:#3a1e1e; background:#2a1515 }
+    input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3242; background:#0f1219; color:var(--fg); }
+    label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px }
+    .row { display:grid; grid-template-columns: repeat(12, 1fr); gap:12px }
+    .col-6 { grid-column: span 6 }
+    .col-4 { grid-column: span 4 }
+    .col-3 { grid-column: span 3 }
+    .col-12 { grid-column: span 12 }
+    .kpi { display:flex; gap:14px; flex-wrap:wrap; margin:14px 0 0 }
+    .kpi div { background:#0f1219; border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; color:var(--muted) }
+    .list { display:grid; grid-template-columns: 1fr; gap:12px; max-height:520px; overflow:auto; padding-right:4px }
+    .title { font-weight:700; font-size:16px; margin-bottom:2px }
+    .small { font-size:12px }
+    .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520; color:#c7d2fe }
+    .ok { color:var(--accent) }
+    .err { color:var(--danger) }
+    .note { background:#0f2b22; border:1px solid #1f3b2f; padding:10px 12px; border-radius:10px; color:#b7f7da; font-size:13px }
+    .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .spacer { height:10px }
+    .link { color:#7dd3fc; text-decoration:none }
+    .link:hover { text-decoration:underline }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr } .list { max-height:none } }
   </style>
 </head>
 <body>
-  <h1>Pole & Permit Viewer</h1>
-  <p class="muted">Static page reading <code>/data/poles.json</code> and <code>/data/permits.json</code>.</p>
+  <header>
+    <h1>Pole & Permit Manager</h1>
+    <div class="sub">View data from <code>/data/poles.json</code> and <code>/data/permits.json</code>. Edit via the web forms below — changes open a Pull Request automatically.</div>
+  </header>
 
-  <div id="status" class="muted">Loading…</div>
-  <div id="list"></div>
+  <main>
+    <div class="grid">
+      <!-- Left: Data viewer -->
+      <section class="card">
+        <div class="flex" style="justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div class="title">Current Data</div>
+            <div id="status" class="muted small">Loading…</div>
+            <div class="kpi">
+              <div>Poles: <b id="kPoles">—</b></div>
+              <div>Permits: <b id="kPermits">—</b></div>
+              <div>Last loaded: <b id="kLoaded">—</b></div>
+            </div>
+          </div>
+          <div class="flex">
+            <button class="btn btn-ghost" id="btnReload">Reload</button>
+            <a class="btn btn-ghost" id="btnEditPoles" target="_blank" rel="noopener">Open <code>poles.json</code></a>
+            <a class="btn btn-ghost" id="btnEditPermits" target="_blank" rel="noopener">Open <code>permits.json</code></a>
+          </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="row">
+          <div class="col-6">
+            <label>Search Poles</label>
+            <input id="searchPoles" placeholder="pole_id, owner, location_label…" />
+          </div>
+          <div class="col-6">
+            <label>Filter by Status (permits)</label>
+            <select id="filterStatus">
+              <option value="">All</option>
+              <option>submitted</option>
+              <option>approved</option>
+              <option>issued</option>
+              <option>closed</option>
+              <option>rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="list" class="list"></div>
+      </section>
+
+      <!-- Right: Editor forms -->
+      <section class="card">
+        <div class="title">Web Editor</div>
+        <div class="note">Edits here create a branch and Pull Request via your GitHub App. Only files in <code>/data/**</code> are modified. Your branch protection & CI still apply.</div>
+
+        <div class="spacer"></div>
+
+        <!-- Update or upsert a Pole -->
+        <form id="formPole" class="card" style="padding:14px;">
+          <div class="title" style="margin-bottom:8px;">Update / Upsert Pole</div>
+          <div class="row">
+            <div class="col-6">
+              <label>Pole ID (required)</label>
+              <input name="pole_id" required />
+            </div>
+            <div class="col-6">
+              <label>Mode</label>
+              <select name="mode">
+                <option value="update">Update existing</option>
+                <option value="upsert">Upsert (create if missing)</option>
+              </select>
+            </div>
+
+            <div class="col-4">
+              <label>Owner</label>
+              <input name="owner" placeholder="e.g., BPUB" />
+            </div>
+            <div class="col-4">
+              <label>Class</label>
+              <input name="class" placeholder="e.g., Class 4" />
+            </div>
+            <div class="col-4">
+              <label>Height (ft)</label>
+              <input name="height_ft" type="number" min="1" max="150" />
+            </div>
+
+            <div class="col-6">
+              <label>Latitude</label>
+              <input name="lat" type="number" step="any" />
+            </div>
+            <div class="col-6">
+              <label>Longitude</label>
+              <input name="lon" type="number" step="any" />
+            </div>
+
+            <div class="col-12">
+              <label>Location Label</label>
+              <input name="location_label" placeholder="e.g., Location 22 NT6" />
+            </div>
+
+            <div class="col-12">
+              <label>Reason</label>
+              <input name="reason" placeholder="Why are you making this change?" />
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <div class="flex">
+            <button class="btn btn-accent" type="submit">Save Pole</button>
+            <span id="msgPole" class="muted small"></span>
+          </div>
+        </form>
+
+        <div class="spacer"></div>
+
+        <!-- Upsert a Permit -->
+        <form id="formPermit" class="card" style="padding:14px;">
+          <div class="title" style="margin-bottom:8px;">Upsert Permit</div>
+          <div class="row">
+            <div class="col-6">
+              <label>Permit ID (required)</label>
+              <input name="permit_id" required />
+            </div>
+            <div class="col-6">
+              <label>Pole ID (required)</label>
+              <input name="pole_id" required />
+            </div>
+
+            <div class="col-6">
+              <label>Status</label>
+              <select name="status">
+                <option>submitted</option>
+                <option>approved</option>
+                <option>issued</option>
+                <option>closed</option>
+                <option>rejected</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label>Requested By</label>
+              <input name="requested_by" />
+            </div>
+
+            <div class="col-12">
+              <label>Submitted At (ISO 8601)</label>
+              <input name="submitted_at" placeholder="2025-08-29T15:00:00Z" />
+            </div>
+
+            <div class="col-12">
+              <label>Notes</label>
+              <input name="notes" />
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <div class="flex">
+            <button class="btn btn-accent" type="submit">Save Permit</button>
+            <span id="msgPermit" class="muted small"></span>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
 
   <script>
-    async function loadData() {
-      const status = document.getElementById('status');
+    // ======= CONFIG =======
+    const API_URL   = 'https://<your-vercel-project>.vercel.app/api/propose-change'; // <-- replace
+    const SHARED_KEY = '<your-shared-passcode>'; // <-- replace (must match FORM_SHARED_KEY in Vercel)
+
+    // Try to auto-derive OWNER/REPO for fallback "Open poles.json/permits.json" links
+    function deriveOwnerRepo(){
       try {
-        // Fetch JSON files from the SAME repo (works on GitHub Pages)
-        const [polesRes, permitsRes] = await Promise.all([
-          fetch('./data/poles.json', { cache: 'no-store' }),
-          fetch('./data/permits.json', { cache: 'no-store' })
+        const host = location.hostname;
+        const parts = location.pathname.split('/').filter(Boolean);
+        if (host.endsWith('github.io') && parts.length >= 1) {
+          return { owner: host.split('.')[0], repo: parts[0] };
+        }
+      } catch {}
+      return { owner:'', repo:'' };
+    }
+    const guessed = deriveOwnerRepo();
+    const OWNER = guessed.owner || 'YOUR_OWNER_HERE';
+    const REPO  = guessed.repo  || 'YOUR_REPO_HERE';
+
+    function ghEditUrl(path){
+      if (!OWNER || !REPO) return null;
+      return `https://github.com/${OWNER}/${REPO}/edit/main/${path}`;
+    }
+
+    // ======= DATA VIEWER =======
+    const elStatus = document.getElementById('status');
+    const elList   = document.getElementById('list');
+    const elKPoles = document.getElementById('kPoles');
+    const elKPerms = document.getElementById('kPermits');
+    const elKLoaded= document.getElementById('kLoaded');
+    const elBtnReload = document.getElementById('btnReload');
+    const elBtnEditPoles = document.getElementById('btnEditPoles');
+    const elBtnEditPerms = document.getElementById('btnEditPermits');
+    const elSearch = document.getElementById('searchPoles');
+    const elFilter = document.getElementById('filterStatus');
+
+    let poles=[], permits=[];
+    function fmt(n){ return new Intl.NumberFormat().format(n); }
+
+    async function loadData(){
+      elStatus.textContent = 'Loading…';
+      try{
+        const [r1, r2] = await Promise.all([
+          fetch('./data/poles.json', { cache:'no-store' }),
+          fetch('./data/permits.json', { cache:'no-store' })
         ]);
+        if(!r1.ok) throw new Error(`poles.json ${r1.status}`);
+        if(!r2.ok) throw new Error(`permits.json ${r2.status}`);
+        poles = await r1.json();
+        permits = await r2.json();
 
-        if (!polesRes.ok) throw new Error('poles.json not found (' + polesRes.status + ')');
-        if (!permitsRes.ok) throw new Error('permits.json not found (' + permitsRes.status + ')');
+        elKPoles.textContent = fmt(poles.length);
+        elKPerms.textContent = fmt(permits.length);
+        elKLoaded.textContent = new Date().toLocaleString();
+        elStatus.innerHTML = `<span class="ok">Loaded successfully.</span>`;
 
-        const [poles, permits] = await Promise.all([polesRes.json(), permitsRes.json()]);
+        elBtnEditPoles.href = ghEditUrl('data/poles.json') || '#';
+        elBtnEditPerms.href = ghEditUrl('data/permits.json') || '#';
 
-        // Join permits by pole_id for display
-        const permitsByPole = permits.reduce((acc, p) => {
-          (acc[p.pole_id] ||= []).push(p);
-          return acc;
-        }, {});
-
-        const container = document.getElementById('list');
-        container.innerHTML = '';
-
-        poles.forEach(pole => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          const related = permitsByPole[pole.pole_id] || [];
-          const permitList = related.length
-            ? `<ul>${related.map(p => `<li><strong>${p.permit_id}</strong> — <em>${p.status}</em> (by ${p.requested_by})</li>`).join('')}</ul>`
-            : '<em>No permits</em>';
-
-          card.innerHTML = `
-            <h3>${pole.pole_id} — ${pole.location_label || ''}</h3>
-            <div class="muted">
-              Owner: ${pole.owner || '—'} · Class: ${pole.class || '—'} · Height: ${pole.height_ft || '—'} ft
-            </div>
-            <div>Coords: ${pole.lat ?? '—'}, ${pole.lon ?? '—'}</div>
-            <h4>Permits</h4>
-            ${permitList}
-          `;
-          container.appendChild(card);
-        });
-
-        status.textContent = `Loaded ${poles.length} poles, ${permits.length} permits.`;
-      } catch (err) {
-        status.innerHTML = `<span class="error">Error: ${err.message}. If this is your first deploy, wait for GitHub Pages to build, then refresh.</span>`;
+        renderList();
+      }catch(err){
+        elStatus.innerHTML = `<span class="err">Error: ${err.message}</span>`;
       }
     }
-    loadData();
+
+    function renderList(){
+      const q = (elSearch.value||'').toLowerCase().trim();
+      const fStatus = elFilter.value || '';
+      const byPole = {};
+      for(const p of permits){
+        (byPole[p.pole_id] ||= []).push(p);
+      }
+      const filtered = poles.filter(p=>{
+        const hay = [p.pole_id, p.owner, p.location_label, p.class].join(' ').toLowerCase();
+        const matchQ = !q || hay.includes(q);
+        const matchStatus = !fStatus || (byPole[p.pole_id]||[]).some(x=>x.status===fStatus);
+        return matchQ && matchStatus;
+      });
+
+      elList.innerHTML = '';
+      for (const p of filtered){
+        const rel = (byPole[p.pole_id]||[]).slice().sort((a,b)=>a.permit_id.localeCompare(b.permit_id));
+        const li = document.createElement('div'); li.className='card';
+        li.innerHTML = `
+          <div class="flex" style="justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="title">${p.pole_id} <span class="muted small">— ${p.location_label||''}</span></div>
+              <div class="small muted">Owner: ${p.owner||'—'} · Class: ${p.class||'—'} · Height: ${p.height_ft||'—'} ft</div>
+              <div class="small muted">Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'}</div>
+            </div>
+            <button class="btn btn-ghost" onclick="prefillPole('${p.pole_id}')">Edit in form</button>
+          </div>
+          <div class="spacer"></div>
+          <div class="small muted">Permits:</div>
+          ${rel.length? `<ul style="margin:.4rem 0 .2rem 1rem;">
+              ${rel.map(r=>`<li class="small">
+                <code>${r.permit_id}</code>
+                <span class="status">${r.status}</span>
+                ${r.requested_by?` · by ${r.requested_by}`:''}
+              </li>`).join('')}
+            </ul>` : `<div class="small muted"><em>No permits</em></div>`}
+        `;
+        elList.appendChild(li);
+      }
+    }
+
+    elBtnReload.addEventListener('click', loadData);
+    elSearch.addEventListener('input', renderList);
+    elFilter.addEventListener('change', renderList);
+
+    function prefillPole(poleId){
+      const form = document.getElementById('formPole');
+      form.pole_id.value = poleId;
+      form.mode.value = 'update';
+      form.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    // ======= API CALL HELPER =======
+    async function callApi(payload){
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'X-Permits-Key': SHARED_KEY },
+        body: JSON.stringify(payload)
+      });
+      let data; try { data = await res.json(); } catch { data = { ok:false, error:'Invalid server response' }; }
+      if (!res.ok || !data.ok) {
+        const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
+        throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
+      }
+      return data;
+    }
+
+    // ======= FORM: POLE =======
+    const formPole = document.getElementById('formPole');
+    const msgPole  = document.getElementById('msgPole');
+    formPole.addEventListener('submit', async (e)=>{
+      e.preventDefault(); msgPole.textContent = 'Submitting…';
+      const fd = new FormData(formPole);
+      const pole_id = (fd.get('pole_id')||'').trim();
+      const mode = fd.get('mode');
+
+      // Build patch only with provided fields
+      const patch = {};
+      const owner = (fd.get('owner')||'').trim(); if (owner) patch.owner = owner;
+      const cls   = (fd.get('class')||'').trim(); if (cls)   patch.class = cls;
+      const h     = (fd.get('height_ft')||'').trim(); if (h) patch.height_ft = parseInt(h, 10);
+      const lat   = (fd.get('lat')||'').trim(); if (lat) patch.lat = parseFloat(lat);
+      const lon   = (fd.get('lon')||'').trim(); if (lon) patch.lon = parseFloat(lon);
+      const loc   = (fd.get('location_label')||'').trim(); if (loc) patch.location_label = loc;
+
+      const reason = (fd.get('reason')||'').trim();
+
+      try{
+        let payload;
+        if (mode === 'upsert') {
+          // upsert needs a full pole object minimally including pole_id/owner/height_ft if new
+          const existing = poles.find(p=>p.pole_id===pole_id);
+          const base = existing || { pole_id, owner: patch.owner || 'Owner', height_ft: patch.height_ft || 30 };
+          payload = { actorName:'Website User', reason,
+            change: { type:'upsert_pole', pole: { ...base, ...patch, pole_id } }
+          };
+        } else {
+          if (Object.keys(patch).length === 0) throw new Error('Provide at least one field to update.');
+          payload = { actorName:'Website User', reason,
+            change: { type:'update_pole', pole_id, patch }
+          };
+        }
+
+        const data = await callApi(payload);
+        msgPole.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
+        window.open(data.pr_url, '_blank');
+      }catch(err){
+        msgPole.innerHTML = `<span class="err">${err.message}</span>`;
+      }
+    });
+
+    // ======= FORM: PERMIT =======
+    const formPermit = document.getElementById('formPermit');
+    const msgPermit  = document.getElementById('msgPermit');
+    formPermit.addEventListener('submit', async (e)=>{
+      e.preventDefault(); msgPermit.textContent = 'Submitting…';
+      const fd = new FormData(formPermit);
+
+      const permit = {
+        permit_id: (fd.get('permit_id')||'').trim(),
+        pole_id:   (fd.get('pole_id')||'').trim(),
+        status:    (fd.get('status')||'submitted').trim(),
+        requested_by: (fd.get('requested_by')||'').trim() || undefined,
+        submitted_at: (fd.get('submitted_at')||'').trim() || new Date().toISOString(),
+        notes: (fd.get('notes')||'').trim() || undefined,
+        attachments: []
+      };
+
+      try{
+        const payload = { actorName:'Website User', reason:`Permit ${permit.permit_id}`, change:{ type:'upsert_permit', permit } };
+        const data = await callApi(payload);
+        msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
+        window.open(data.pr_url, '_blank');
+      }catch(err){
+        msgPermit.innerHTML = `<span class="err">${err.message}</span>`;
+      }
+    });
+
+    // ======= INIT =======
+    window.addEventListener('load', loadData);
   </script>
 </body>
 </html>
