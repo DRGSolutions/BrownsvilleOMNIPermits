@@ -67,9 +67,17 @@
           </div>
           <div class="flex">
             <button class="btn btn-ghost" id="btnReload">Reload</button>
-            <a class="btn btn-ghost" id="btnEditPoles" target="_blank" rel="noopener">Open <code>poles.json</code></a>
+            <a class="btn btn-ghost" id="btnEditPoles"   target="_blank" rel="noopener">Open <code>poles.json</code></a>
             <a class="btn btn-ghost" id="btnEditPermits" target="_blank" rel="noopener">Open <code>permits.json</code></a>
           </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- Change monitor -->
+        <div id="pendingPanel" class="card" style="padding:12px; display:none;">
+          <div class="title" style="margin-bottom:6px;">Change Monitor</div>
+          <div id="pendingList" class="small muted">No pending changes.</div>
         </div>
 
         <div class="spacer"></div>
@@ -213,13 +221,17 @@
 
   <script>
     // ======= CONFIG =======
-    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // Vercel function
+    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // your Vercel endpoint
     const SHARED_KEY = 'BrownsvilleOMNIPermits';                             // must match FORM_SHARED_KEY
 
     const OWNER = 'DRGSolutions';
     const REPO  = 'BrownsvilleOMNIPermits';
     const DEFAULT_BRANCH = 'main';
-    const DATA_REPO_PATH = 'data'; // where poles.json & permits.json live in the repo
+    const DATA_REPO_PATH = 'data'; // where poles.json & permits.json live in repo
+
+    function ghViewUrl(path){
+      return `https://github.com/${OWNER}/${REPO}/blob/${DEFAULT_BRANCH}/${path}`;
+    }
 
     // Show script errors on the page
     window.addEventListener('error', (e) => {
@@ -232,11 +244,7 @@
       if (s) s.innerHTML = `<span class="err">Async error: ${msg}</span>`;
     });
 
-    function ghViewUrl(path){
-      return `https://github.com/${OWNER}/${REPO}/blob/${DEFAULT_BRANCH}/${path}`;
-    }
-
-    // ======= DATA VIEWER =======
+    // ======= DATA VIEWER DOM =======
     const elStatus = document.getElementById('status');
     const elList   = document.getElementById('list');
     const elKPoles = document.getElementById('kPoles');
@@ -251,7 +259,95 @@
     let poles = [], permits = [];
     const fmt = n => new Intl.NumberFormat().format(n);
 
-    // Get latest commit SHA for the default branch
+    // ======= CHANGE MONITOR =======
+    let currentSha = null;              // last commit SHA we loaded
+    const pending = new Map();          // key `${kind}:${id}` -> { kind,id,expected,prUrl,state,started,appliedSha }
+    let watcher = null;
+
+    function matchesPatch(obj, expected) {
+      for (const [k, v] of Object.entries(expected)) {
+        if (obj[k] !== v) return false;
+      }
+      return true;
+    }
+
+    function renderPending() {
+      const panel = document.getElementById('pendingPanel');
+      const list  = document.getElementById('pendingList');
+
+      if (pending.size === 0) {
+        panel.style.display = 'none';
+        list.innerHTML = 'No pending changes.';
+        return;
+      }
+      panel.style.display = 'block';
+
+      list.innerHTML = [...pending.values()].map(it => {
+        const secs = Math.floor((Date.now() - it.started) / 1000);
+        const pr = it.prUrl ? ` · <a class="link" target="_blank" rel="noopener" href="${it.prUrl}">PR</a>` : '';
+        return `<div>
+          ${it.kind} <code>${it.id}</code>
+          — <span class="status" style="border-color:${it.state==='applied'?'#1f3b2f':'#664c00'};color:${it.state==='applied'?'#6ee7b7':'#ffda6a'}">
+            ${it.state === 'applied' ? 'applied' : 'pending'}
+          </span>
+          ${pr} · ${secs}s
+          ${it.appliedSha ? ` · in <code>${it.appliedSha.slice(0,7)}</code>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function trackPendingChange(kind, id, expected, prUrl) {
+      const key = `${kind}:${id}`;
+      pending.set(key, { kind, id, expected, prUrl, state: 'pending', started: Date.now() });
+      renderPending();
+      ensureWatcher();
+    }
+
+    function ensureWatcher() {
+      if (watcher) return;
+      watcher = setInterval(checkPending, 7000); // poll every 7s
+    }
+
+    async function checkPending() {
+      if (pending.size === 0) {
+        clearInterval(watcher);
+        watcher = null;
+        return;
+      }
+
+      let sha;
+      try {
+        sha = await getLatestSha();
+      } catch (e) {
+        console.warn('SHA poll failed', e);
+        return;
+      }
+
+      if (sha !== currentSha) {
+        await loadData(); // will update currentSha and arrays
+      }
+
+      for (const [key, it] of [...pending.entries()]) {
+        if (it.kind === 'pole') {
+          const obj = poles.find(p => p.pole_id === it.id);
+          if (obj && matchesPatch(obj, it.expected)) {
+            it.state = 'applied';
+            it.appliedSha = currentSha;
+            pending.delete(key);
+          }
+        } else {
+          const obj = permits.find(p => p.permit_id === it.id);
+          if (obj && matchesPatch(obj, it.expected)) {
+            it.state = 'applied';
+            it.appliedSha = currentSha;
+            pending.delete(key);
+          }
+        }
+      }
+      renderPending();
+    }
+
+    // ======= GITHUB DATA LOAD (SHA pinned) =======
     async function getLatestSha() {
       const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
       const r = await fetch(url, { cache: 'no-store' });
@@ -263,7 +359,9 @@
     async function loadData() {
       try {
         elStatus.textContent = 'Loading…';
-        const sha = await getLatestSha(); // pin to exact commit (avoids CDN staleness)
+        const sha = await getLatestSha();
+        currentSha = sha; // remember what we loaded
+
         const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_REPO_PATH}`;
         const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -282,6 +380,7 @@
         elStatus.innerHTML = `<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`;
 
         renderList();
+        renderPending();
       } catch (err) {
         console.error('loadData error:', err);
         elStatus.innerHTML = `<span class="err">Error: ${err.message}</span>`;
@@ -304,11 +403,17 @@
       elList.innerHTML = '';
       for (const p of filtered){
         const rel = (byPole[p.pole_id]||[]).slice().sort((a,b)=>a.permit_id.localeCompare(b.permit_id));
+        const key = `pole:${p.pole_id}`;
+        const isPending = pending.has(key);
+
         const li = document.createElement('div'); li.className='card';
         li.innerHTML = `
           <div class="flex" style="justify-content:space-between;align-items:flex-start;">
             <div>
-              <div class="title">${p.pole_id} <span class="muted small">— ${p.location_label||''}</span></div>
+              <div class="title">
+                ${p.pole_id} <span class="muted small">— ${p.location_label||''}</span>
+                ${isPending ? '<span class="status" style="margin-left:8px;border-color:#664c00;color:#ffda6a">pending</span>' : ''}
+              </div>
               <div class="small muted">Owner: ${p.owner||'—'} · Class: ${p.class||'—'} · Height: ${p.height_ft||'—'} ft</div>
               <div class="small muted">Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'}</div>
             </div>
@@ -390,6 +495,9 @@
 
         const data = await callApi(payload);
         msgPole.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
+        // Track only the fields actually changed
+        const expected = { ...patch };
+        trackPendingChange('pole', pole_id, expected, data.pr_url);
         window.open(data.pr_url, '_blank');
       }catch(err){
         msgPole.innerHTML = `<span class="err">${err.message}</span>`;
@@ -417,6 +525,8 @@
         const payload = { actorName:'Website User', reason:`Permit ${permit.permit_id}`, change:{ type:'upsert_permit', permit } };
         const data = await callApi(payload);
         msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
+        const expected = { pole_id: permit.pole_id, status: permit.status };
+        trackPendingChange('permit', permit.permit_id, expected, data.pr_url);
         window.open(data.pr_url, '_blank');
       }catch(err){
         msgPermit.innerHTML = `<span class="err">${err.message}</span>`;
@@ -425,9 +535,8 @@
 
     // ======= INIT =======
     window.addEventListener('load', () => {
-      // set GitHub links
-      elBtnEditPoles.href   = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
-      elBtnEditPerms.href   = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
+      elBtnEditPoles.href  = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
+      elBtnEditPerms.href  = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
       loadData();
     });
   </script>
