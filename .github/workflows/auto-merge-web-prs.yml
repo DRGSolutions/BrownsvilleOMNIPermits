@@ -1,0 +1,25 @@
+name: Auto-merge web edits
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+    branches: [main]
+    paths:
+      - 'data/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable-automerge:
+    # Our backend creates branches like webedit/<timestamp>-<id>
+    if: startsWith(github.event.pull_request.head.ref, 'webedit/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable GitHub auto-merge (squash)
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash
