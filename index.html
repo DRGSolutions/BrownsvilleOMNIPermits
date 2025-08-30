@@ -5,12 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pole & Permit Manager (Web Editor)</title>
 
-  <!--
-    Replace the two placeholders below before deploying:
-      1) API_URL: your Vercel function URL (e.g., https://your-project.vercel.app/api/propose-change)
-      2) SHARED_KEY: the same value you set in Vercel as FORM_SHARED_KEY
-  -->
-
   <style>
     :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; }
     * { box-sizing:border-box }
@@ -219,13 +213,24 @@
 
   <script>
     // ======= CONFIG =======
-    const API_URL   = 'https://permits-api.vercel.app/api/propose-change'; // <-- replace
-    const SHARED_KEY = 'BrownsvilleOMNIPermits'; // <-- replace (must match FORM_SHARED_KEY in Vercel)
-    const DATA_WEB_PATH  = './data';  // how the page fetches JSON
-    const DATA_REPO_PATH = 'data';    // where the files are in the repo for the "Open poles.json" links
-    const DATA_WEB_PATH = './data';
+    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // <- your Vercel function
+    const SHARED_KEY = 'BrownsvilleOMNIPermits';                             // <- must match FORM_SHARED_KEY
 
-    // Try to auto-derive OWNER/REPO for fallback "Open poles.json/permits.json" links
+    const DATA_WEB_PATH  = './data';  // fetch JSON from here
+    const DATA_REPO_PATH = 'data';    // repo path for "Open poles/permits" links
+
+    // Show script errors on the page instead of silently hanging
+    window.addEventListener('error', (e) => {
+      const s = document.getElementById('status');
+      if (s) s.innerHTML = `<span class="err">JS error: ${e.message}</span>`;
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      const s = document.getElementById('status');
+      const msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
+      if (s) s.innerHTML = `<span class="err">Async error: ${msg}</span>`;
+    });
+
+    // Try to auto-derive OWNER/REPO for "Open ..." links
     function deriveOwnerRepo(){
       try {
         const host = location.hostname;
@@ -251,32 +256,36 @@
     const elKPoles = document.getElementById('kPoles');
     const elKPerms = document.getElementById('kPermits');
     const elKLoaded= document.getElementById('kLoaded');
-    const elBtnReload = document.getElementById('btnReload');
-    const elBtnEditPoles = document.getElementById('btnEditPoles');
-    const elBtnEditPerms = document.getElementById('btnEditPermits');
+    const elBtnReload   = document.getElementById('btnReload');
+    const elBtnEditPoles= document.getElementById('btnEditPoles');
+    const elBtnEditPerms= document.getElementById('btnEditPermits');
     const elSearch = document.getElementById('searchPoles');
     const elFilter = document.getElementById('filterStatus');
 
     let poles=[], permits=[];
     function fmt(n){ return new Intl.NumberFormat().format(n); }
 
-      // replace your loader with this:
-      async function loadData() {
-        const bust = `?v=${Date.now()}`; // prevent cached JSON
+    async function loadData() {
+      const bust = `?v=${Date.now()}`;
+      const url1 = `${DATA_WEB_PATH}/poles.json${bust}`;
+      const url2 = `${DATA_WEB_PATH}/permits.json${bust}`;
+      try {
+        if (elStatus) elStatus.textContent = 'Loading…';
         const [r1, r2] = await Promise.all([
-          fetch(`${DATA_WEB_PATH}/poles.json${bust}`,   { cache: 'no-store' }),
-          fetch(`${DATA_WEB_PATH}/permits.json${bust}`, { cache: 'no-store' })
+          fetch(url1, { cache: 'no-store' }),
+          fetch(url2, { cache: 'no-store' })
         ]);
-        if (!r1.ok) throw new Error(`poles.json ${r1.status}`);
-        if (!r2.ok) throw new Error(`permits.json ${r2.status}`);
-        poles = await r1.json();
-        permits = await r2.json();
-        elKPoles.textContent = Intl.NumberFormat().format(poles.length);
-        elKPerms.textContent = Intl.NumberFormat().format(permits.length);
+        if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status} (poles/permits)`);
+        const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
+        poles = j1; permits = j2;
+
+        elKPoles.textContent  = fmt(poles.length);
+        elKPerms.textContent  = fmt(permits.length);
         elKLoaded.textContent = new Date().toLocaleString();
         elStatus.innerHTML = `<span class="ok">Loaded successfully.</span>`;
         renderList();
       } catch (err) {
+        console.error('loadData error:', err);
         elStatus.innerHTML = `<span class="err">Error: ${err.message}</span>`;
       }
     }
@@ -285,9 +294,8 @@
       const q = (elSearch.value||'').toLowerCase().trim();
       const fStatus = elFilter.value || '';
       const byPole = {};
-      for(const p of permits){
-        (byPole[p.pole_id] ||= []).push(p);
-      }
+      for(const p of permits){ (byPole[p.pole_id] ||= []).push(p); }
+
       const filtered = poles.filter(p=>{
         const hay = [p.pole_id, p.owner, p.location_label, p.class].join(' ').toLowerCase();
         const matchQ = !q || hay.includes(q);
@@ -357,7 +365,6 @@
       const pole_id = (fd.get('pole_id')||'').trim();
       const mode = fd.get('mode');
 
-      // Build patch only with provided fields
       const patch = {};
       const owner = (fd.get('owner')||'').trim(); if (owner) patch.owner = owner;
       const cls   = (fd.get('class')||'').trim(); if (cls)   patch.class = cls;
@@ -371,7 +378,6 @@
       try{
         let payload;
         if (mode === 'upsert') {
-          // upsert needs a full pole object minimally including pole_id/owner/height_ft if new
           const existing = poles.find(p=>p.pole_id===pole_id);
           const base = existing || { pole_id, owner: patch.owner || 'Owner', height_ft: patch.height_ft || 30 };
           payload = { actorName:'Website User', reason,
@@ -420,7 +426,15 @@
     });
 
     // ======= INIT =======
-    window.addEventListener('load', loadData);
+    window.addEventListener('load', () => {
+      // set edit links
+      const polesUrl   = ghEditUrl(`${DATA_REPO_PATH}/poles.json`)   || `${DATA_WEB_PATH}/poles.json`;
+      const permitsUrl = ghEditUrl(`${DATA_REPO_PATH}/permits.json`) || `${DATA_WEB_PATH}/permits.json`;
+      if (polesUrl)   elBtnEditPoles.href  = polesUrl;
+      if (permitsUrl) elBtnEditPerms.href  = permitsUrl;
+
+      loadData();
+    });
   </script>
 </body>
 </html>
