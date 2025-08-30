@@ -213,16 +213,17 @@
 
   <script>
     // ======= CONFIG =======
-    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // <- your Vercel function
-    const SHARED_KEY = 'BrownsvilleOMNIPermits';                             // <- must match FORM_SHARED_KEY
+    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // Vercel function
+    const SHARED_KEY = 'BrownsvilleOMNIPermits';                             // must match FORM_SHARED_KEY
 
-    //const DATA_WEB_PATH  = './data';  // fetch JSON from here
-    const DATA_REPO_PATH = 'data';    // repo path for "Open poles/permits" links
     const OWNER = 'DRGSolutions';
     const REPO  = 'BrownsvilleOMNIPermits';
-    const DATA_WEB_PATH = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/data`;
+    const DATA_REPO_PATH = 'data';
 
-    // Show script errors on the page instead of silently hanging
+    // Pull JSON directly from repo HEAD (no Pages delay)
+    const DATA_WEB_PATH = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${DATA_REPO_PATH}`;
+
+    // Show script errors on the page
     window.addEventListener('error', (e) => {
       const s = document.getElementById('status');
       if (s) s.innerHTML = `<span class="err">JS error: ${e.message}</span>`;
@@ -233,24 +234,8 @@
       if (s) s.innerHTML = `<span class="err">Async error: ${msg}</span>`;
     });
 
-    // Try to auto-derive OWNER/REPO for "Open ..." links
-    function deriveOwnerRepo(){
-      try {
-        const host = location.hostname;
-        const parts = location.pathname.split('/').filter(Boolean);
-        if (host.endsWith('github.io') && parts.length >= 1) {
-          return { owner: host.split('.')[0], repo: parts[0] };
-        }
-      } catch {}
-      return { owner:'', repo:'' };
-    }
-    const guessed = deriveOwnerRepo();
-    //const OWNER = guessed.owner || 'YOUR_OWNER_HERE';
-    //const REPO  = guessed.repo  || 'YOUR_REPO_HERE';
-
-    function ghEditUrl(path){
-      if (!OWNER || !REPO) return null;
-      return `https://github.com/${OWNER}/${REPO}/edit/main/${path}`;
+    function ghViewUrl(path){
+      return `https://github.com/${OWNER}/${REPO}/blob/main/${path}`;
     }
 
     // ======= DATA VIEWER =======
@@ -265,15 +250,16 @@
     const elSearch = document.getElementById('searchPoles');
     const elFilter = document.getElementById('filterStatus');
 
-    let poles=[], permits=[];
+    let poles = [], permits = [];
     function fmt(n){ return new Intl.NumberFormat().format(n); }
 
     async function loadData() {
-      const bust = `?v=${Date.now()}`;
+      const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const url1 = `${DATA_WEB_PATH}/poles.json${bust}`;
       const url2 = `${DATA_WEB_PATH}/permits.json${bust}`;
       try {
         if (elStatus) elStatus.textContent = 'Loading…';
+        console.log('Fetching:', url1, url2);
         const [r1, r2] = await Promise.all([
           fetch(url1, { cache: 'no-store' }),
           fetch(url2, { cache: 'no-store' })
@@ -285,7 +271,7 @@
         elKPoles.textContent  = fmt(poles.length);
         elKPerms.textContent  = fmt(permits.length);
         elKLoaded.textContent = new Date().toLocaleString();
-        elStatus.innerHTML = `<span class="ok">Loaded successfully.</span>`;
+        elStatus.innerHTML = `<span class="ok">Loaded from repo HEAD.</span>`;
         renderList();
       } catch (err) {
         console.error('loadData error:', err);
@@ -430,12 +416,9 @@
 
     // ======= INIT =======
     window.addEventListener('load', () => {
-      // set edit links
-      const polesUrl   = ghEditUrl(`${DATA_REPO_PATH}/poles.json`)   || `${DATA_WEB_PATH}/poles.json`;
-      const permitsUrl = ghEditUrl(`${DATA_REPO_PATH}/permits.json`) || `${DATA_WEB_PATH}/permits.json`;
-      if (polesUrl)   elBtnEditPoles.href  = polesUrl;
-      if (permitsUrl) elBtnEditPerms.href  = permitsUrl;
-
+      // set GitHub links
+      elBtnEditPoles.href   = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
+      elBtnEditPermits.href = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
       loadData();
     });
   </script>
