@@ -218,10 +218,8 @@
 
     const OWNER = 'DRGSolutions';
     const REPO  = 'BrownsvilleOMNIPermits';
-    const DATA_REPO_PATH = 'data';
-
-    // Pull JSON directly from repo HEAD (no Pages delay)
-    const DATA_WEB_PATH = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${DATA_REPO_PATH}`;
+    const DEFAULT_BRANCH = 'main';
+    const DATA_REPO_PATH = 'data'; // where poles.json & permits.json live in the repo
 
     // Show script errors on the page
     window.addEventListener('error', (e) => {
@@ -235,7 +233,7 @@
     });
 
     function ghViewUrl(path){
-      return `https://github.com/${OWNER}/${REPO}/blob/main/${path}`;
+      return `https://github.com/${OWNER}/${REPO}/blob/${DEFAULT_BRANCH}/${path}`;
     }
 
     // ======= DATA VIEWER =======
@@ -251,27 +249,38 @@
     const elFilter = document.getElementById('filterStatus');
 
     let poles = [], permits = [];
-    function fmt(n){ return new Intl.NumberFormat().format(n); }
+    const fmt = n => new Intl.NumberFormat().format(n);
+
+    // Get latest commit SHA for the default branch
+    async function getLatestSha() {
+      const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
+      const j = await r.json();
+      return j.sha;
+    }
 
     async function loadData() {
-      const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const url1 = `${DATA_WEB_PATH}/poles.json${bust}`;
-      const url2 = `${DATA_WEB_PATH}/permits.json${bust}`;
       try {
-        if (elStatus) elStatus.textContent = 'Loading…';
-        console.log('Fetching:', url1, url2);
+        elStatus.textContent = 'Loading…';
+        const sha = await getLatestSha(); // pin to exact commit (avoids CDN staleness)
+        const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_REPO_PATH}`;
+        const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
         const [r1, r2] = await Promise.all([
-          fetch(url1, { cache: 'no-store' }),
-          fetch(url2, { cache: 'no-store' })
+          fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
+          fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
         ]);
         if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status} (poles/permits)`);
+
         const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
         poles = j1; permits = j2;
 
         elKPoles.textContent  = fmt(poles.length);
         elKPerms.textContent  = fmt(permits.length);
         elKLoaded.textContent = new Date().toLocaleString();
-        elStatus.innerHTML = `<span class="ok">Loaded from repo HEAD.</span>`;
+        elStatus.innerHTML = `<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`;
+
         renderList();
       } catch (err) {
         console.error('loadData error:', err);
@@ -417,8 +426,8 @@
     // ======= INIT =======
     window.addEventListener('load', () => {
       // set GitHub links
-      if (elBtnEditPoles)  elBtnEditPoles.href  = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
-      if (elBtnEditPerms)  elBtnEditPerms.href  = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
+      elBtnEditPoles.href   = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
+      elBtnEditPerms.href   = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
       loadData();
     });
   </script>
