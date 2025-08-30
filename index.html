@@ -265,8 +265,24 @@
     let watcher = null;
 
     function matchesPatch(obj, expected) {
-      for (const [k, v] of Object.entries(expected)) {
-        if (obj[k] !== v) return false;
+      // Be tolerant of "123" vs 123, and tiny float diffs
+      const EPS = 1e-9;
+      for (const [k, vExp] of Object.entries(expected)) {
+        const vObj = obj[k];
+
+        // exact match?
+        if (vObj === vExp) continue;
+
+        // stringified match (handles "123" vs 123)
+        if (vObj != null && vExp != null && String(vObj) === String(vExp)) continue;
+
+        // numeric & close enough?
+        const nObj = Number(vObj);
+        const nExp = Number(vExp);
+        if (!Number.isNaN(nObj) && !Number.isNaN(nExp) && Math.abs(nObj - nExp) < EPS) continue;
+
+        // otherwise it's not a match
+        return false;
       }
       return true;
     }
@@ -323,9 +339,13 @@
         return;
       }
 
+      // If repo head moved, reload data (loadData sets currentSha and re-renders once)
       if (sha !== currentSha) {
-        await loadData(); // will update currentSha and arrays
+        await loadData();
       }
+
+      // Verify after data is fresh; if anything applies, re-render the list too
+      let anyApplied = false;
 
       for (const [key, it] of [...pending.entries()]) {
         if (it.kind === 'pole') {
@@ -334,6 +354,7 @@
             it.state = 'applied';
             it.appliedSha = currentSha;
             pending.delete(key);
+            anyApplied = true;
           }
         } else {
           const obj = permits.find(p => p.permit_id === it.id);
@@ -341,12 +362,19 @@
             it.state = 'applied';
             it.appliedSha = currentSha;
             pending.delete(key);
+            anyApplied = true;
           }
         }
       }
-      renderPending();
-    }
 
+      // Update the monitor panel
+      renderPending();
+
+      // IMPORTANT: also refresh the pole list so "pending" chip disappears immediately
+      if (anyApplied) {
+        renderList();
+      }
+    }
     // ======= GITHUB DATA LOAD (SHA pinned) =======
     async function getLatestSha() {
       const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
