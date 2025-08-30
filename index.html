@@ -417,8 +417,8 @@
     // ======= INIT =======
     window.addEventListener('load', () => {
       // set GitHub links
-      elBtnEditPoles.href   = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
-      elBtnEditPermits.href = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
+      if (elBtnEditPoles)  elBtnEditPoles.href  = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
+      if (elBtnEditPerms)  elBtnEditPerms.href  = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
       loadData();
     });
   </script>
