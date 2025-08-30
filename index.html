@@ -223,6 +223,7 @@
     const SHARED_KEY = 'BrownsvilleOMNIPermits'; // <-- replace (must match FORM_SHARED_KEY in Vercel)
     const DATA_WEB_PATH  = './data';  // how the page fetches JSON
     const DATA_REPO_PATH = 'data';    // where the files are in the repo for the "Open poles.json" links
+    const DATA_WEB_PATH = './data';
 
     // Try to auto-derive OWNER/REPO for fallback "Open poles.json/permits.json" links
     function deriveOwnerRepo(){
@@ -258,9 +259,6 @@
 
     let poles=[], permits=[];
     function fmt(n){ return new Intl.NumberFormat().format(n); }
-
-      // make sure this config exists near the top of the script
-      const DATA_WEB_PATH = './data';
 
       // replace your loader with this:
       async function loadData() {
