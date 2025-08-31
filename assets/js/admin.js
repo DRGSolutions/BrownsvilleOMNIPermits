@@ -16,8 +16,7 @@
   function filters() {
     const util = ($('#fUtility')?.value || 'All');
     const job  = ($('#fJob')?.value || 'All');
-    // Optional status filter if you later add #aStatus in HTML
-    const status = ($('#aStatus')?.value || 'All');
+    const status = ($('#fStatus')?.value || $('#aStatus')?.value || 'All'); // support either id
     return { util, job, status };
   }
 
@@ -31,25 +30,23 @@
     return map;
   }
 
-  // Build rows so that EVERY POLE appears at least once.
+  // Build rows so EVERY POLE appears at least once (status NONE when no permits)
   function buildRows() {
     const st = window.STATE || {};
     const poles = st.poles || [];
     const permits = st.permits || [];
-
     const { util, job, status } = filters();
     const pmap = buildPermitIndex(permits);
     const rows = [];
 
     for (const p of poles) {
       if (util !== 'All' && p.owner !== util) continue;
-      if (job !== 'All' && p.job_name !== job) continue;
+      if (job  !== 'All' && p.job_name !== job) continue;
 
       const key = `${p.job_name}::${p.tag}::${p.SCID}`;
       const rel = pmap.get(key) || [];
 
       if (rel.length === 0) {
-        // No permits for this pole -> add a NONE row
         if (status === 'All' || status === 'NONE') {
           rows.push({
             job_name: p.job_name,
@@ -102,8 +99,8 @@
     const csv = '\uFEFF' + headers.join(',') + '\n' + body; // BOM for Excel
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
+
     const ts = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     a.download = `permits_export_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.csv`;
@@ -114,32 +111,28 @@
   }
 
   function setMsg(t) {
-    const el = $('#msgExport');
+    const el = $('#adminMsg'); // matches your index.html
     if (el) el.textContent = t || '';
   }
 
   function onExport(ev) {
-    if (ev) ev.preventDefault(); // in case the button is inside a <form>
+    if (ev) ev.preventDefault(); // if button ever sits in a <form>
     const st = window.STATE || {};
     if (!st.poles || !st.permits) { setMsg('Data not loaded yet.'); return; }
-
     const rows = buildRows();
     if (!rows.length) { setMsg('Nothing to export with current filters.'); return; }
-
     downloadCsv(rows);
     setMsg(`Exported ${rows.length} rows.`);
   }
 
   function enableAndWireButtons() {
-    const btns = Array.from(document.querySelectorAll('#btnExportCsv, #btnExport, [data-action="export"]'));
-    btns.forEach((btn) => {
-      if (btn.tagName === 'BUTTON' && (!btn.type || btn.type.toLowerCase() === 'submit')) {
-        btn.type = 'button';
-      }
-      btn.disabled = false;
-      btn.removeEventListener('click', onExport);
-      btn.addEventListener('click', onExport);
-    });
+    const btn = $('#btnExportCsv');
+    if (!btn) return;
+    // force type=button so it never submits forms
+    if (!btn.type || btn.type.toLowerCase() === 'submit') btn.type = 'button';
+    btn.disabled = false;
+    btn.removeEventListener('click', onExport);
+    btn.addEventListener('click', onExport);
   }
 
   ready(enableAndWireButtons);
