@@ -1,8 +1,7 @@
 // assets/js/data.js
-// Loads poles/permits from your repo. Robust against:
-// - missing DOM elements
-// - GitHub API hiccups (falls back to branch fetch)
-// - caching (uses cache-busting query)
+// Two-phase loader:
+//  1) Load from branch immediately (no API rate limit)
+//  2) In background, try to pin to latest commit SHA; if found, reload from that SHA
 
 (() => {
   const CFG = (window.APP_CONFIG || {});
@@ -19,7 +18,7 @@
   const STATE = {
     poles: [],
     permits: [],
-    currentRef: null,
+    currentRef: null,     // branch name or commit sha last loaded
     lastLoadedAt: null,
   };
 
@@ -27,6 +26,15 @@
     if (!elStatus) return;
     const cls = kind === 'err' ? 'err' : (kind === 'ok' ? 'ok' : 'muted');
     elStatus.innerHTML = `<span class="${cls}">${msg}</span>`;
+  }
+
+  function fmt(n){ return new Intl.NumberFormat().format(n); }
+
+  function withTimeout(promise, ms, label) {
+    return Promise.race([
+      promise,
+      new Promise((_, rej) => setTimeout(() => rej(new Error(`${label || 'Operation'} timed out after ${ms}ms`)), ms))
+    ]);
   }
 
   async function getLatestSha() {
@@ -38,61 +46,87 @@
     return j.sha;
   }
 
-  async function loadData() {
+  async function fetchFromRef(ref) {
+    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${DATA_REPO_PATH}`;
+    const bust = `?v=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // use explicit short timeouts so we never hang on a stalled fetch
+    const [r1, r2] = await Promise.all([
+      withTimeout(fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }), 5000, 'poles.json fetch'),
+      withTimeout(fetch(`${base}/permits.json${bust}`, { cache: 'no-store' }), 5000, 'permits.json fetch')
+    ]);
+
+    if (!r1.ok || !r2.ok) {
+      const dbg = `Ref: ${ref} | poles:${r1.status} permits:${r2.status}`;
+      throw new Error(`Failed to load data. ${dbg}`);
+    }
+
+    const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
+    if (!Array.isArray(poles) || !Array.isArray(permits)) {
+      throw new Error('Malformed data (expected arrays).');
+    }
+    return { poles, permits };
+  }
+
+  async function loadBranchFirstThenPin() {
     try {
-      if (elStatus) elStatus.textContent = 'Loading…';
-
-      // Try to pin by commit; if that fails (rate limit, etc.), fall back to branch
-      let ref = DEFAULT_BRANCH;
-      let pinned = false;
-      try {
-        ref = await getLatestSha();
-        pinned = true;
-      } catch (e) {
-        console.warn('getLatestSha failed, falling back to branch:', e);
-        ref = DEFAULT_BRANCH;
-        pinned = false;
-      }
-      STATE.currentRef = ref;
-
-      const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${DATA_REPO_PATH}`;
-      const bust = `?v=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-      const [r1, r2] = await Promise.all([
-        fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-        fetch(`${base}/permits.json${bust}`, { cache: 'no-store' }),
-      ]);
-
-      if (!r1.ok || !r2.ok) {
-        throw new Error(`HTTP ${r1.status}/${r2.status} when fetching poles/permits`);
-      }
-
-      const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
-      STATE.poles   = Array.isArray(poles) ? poles : [];
-      STATE.permits = Array.isArray(permits) ? permits : [];
+      // Phase 1: branch load (fast path)
+      setStatus('Loading… (branch)', 'info');
+      const { poles, permits } = await fetchFromRef(DEFAULT_BRANCH);
+      STATE.poles = poles;
+      STATE.permits = permits;
+      STATE.currentRef = DEFAULT_BRANCH;
       STATE.lastLoadedAt = new Date();
 
-      if (elKPoles)  elKPoles.textContent  = new Intl.NumberFormat().format(STATE.poles.length);
-      if (elKPerms)  elKPerms.textContent  = new Intl.NumberFormat().format(STATE.permits.length);
+      if (elKPoles)  elKPoles.textContent  = fmt(poles.length);
+      if (elKPerms)  elKPerms.textContent  = fmt(permits.length);
       if (elKLoaded) elKLoaded.textContent = STATE.lastLoadedAt.toLocaleString();
+      setStatus(`Loaded from branch <code>${DEFAULT_BRANCH}</code>.`, 'ok');
 
-      const refMsg = pinned ? `commit <code>${String(ref).slice(0,7)}</code>` : `branch <code>${DEFAULT_BRANCH}</code>`;
-      setStatus(`Loaded from ${refMsg}.`, 'ok');
+      if (typeof window.renderList === 'function') window.renderList();
+      if (typeof window.renderPending === 'function') window.renderPending();
 
-      // Tell UI layer to render
-      if (typeof window.renderList === 'function') {
-        window.renderList();
+      // Phase 2: try to pin to SHA (short timeout so UI never stalls)
+      let sha = null;
+      try {
+        sha = await withTimeout(getLatestSha(), 2000, 'latest commit');
+      } catch (e) {
+        // Not fatal—stay on branch
+        console.warn('Pin-to-commit skipped:', e.message);
+        return;
       }
-      if (typeof window.renderPending === 'function') {
-        window.renderPending();
-      }
+
+      if (!sha || sha === DEFAULT_BRANCH) return;
+      if (sha === STATE.currentRef) return;
+
+      // Reload pinned
+      setStatus(`Refreshing from commit <code>${sha.slice(0,7)}</code>…`, 'info');
+      const pinned = await fetchFromRef(sha);
+      STATE.poles = pinned.poles;
+      STATE.permits = pinned.permits;
+      STATE.currentRef = sha;
+      STATE.lastLoadedAt = new Date();
+
+      if (elKPoles)  elKPoles.textContent  = fmt(STATE.poles.length);
+      if (elKPerms)  elKPerms.textContent  = fmt(STATE.permits.length);
+      if (elKLoaded) elKLoaded.textContent = STATE.lastLoadedAt.toLocaleString();
+      setStatus(`Loaded from commit <code>${sha.slice(0,7)}</code>.`, 'ok');
+
+      if (typeof window.renderList === 'function') window.renderList();
+      if (typeof window.renderPending === 'function') window.renderPending();
+
     } catch (err) {
       console.error('loadData error:', err);
-      setStatus(`Error: ${err.message}`, 'err');
+      // Helpful debug with direct URLs user can click
+      const urlPoles   = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${DEFAULT_BRANCH}/${DATA_REPO_PATH}/poles.json`;
+      const urlPermits = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${DEFAULT_BRANCH}/${DATA_REPO_PATH}/permits.json`;
+      setStatus(`Error: ${err.message}<br><span class="small">Try opening <a class="link" href="${urlPoles}" target="_blank" rel="noopener">poles.json</a> and <a class="link" href="${urlPermits}" target="_blank" rel="noopener">permits.json</a> directly to verify access.</span>`, 'err');
     }
   }
 
   // Expose
+  async function loadData() { return loadBranchFirstThenPin(); }
+
   window.DATA = {
     OWNER, REPO, DEFAULT_BRANCH, DATA_REPO_PATH,
     getLatestSha, loadData, STATE, setStatus
