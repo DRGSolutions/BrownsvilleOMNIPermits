@@ -8,11 +8,11 @@
   window.STATE = STATE;
 
   function setKPIs() {
-    $('#kPoles').textContent  = fmt(STATE.poles.length);
-    $('#kPermits').textContent= fmt(STATE.permits.length);
-    $('#kLoaded').textContent = STATE.loadedAt ? new Date(STATE.loadedAt).toLocaleString() : '—';
-    $('#kSha').textContent    = STATE.sha || (CFG.BRANCH || 'main');
-    $('#status').textContent  = 'Loaded.';
+    $('#kPoles').textContent   = fmt(STATE.poles.length);
+    $('#kPermits').textContent = fmt(STATE.permits.length);
+    $('#kLoaded').textContent  = STATE.loadedAt ? new Date(STATE.loadedAt).toLocaleString() : '—';
+    $('#kSha').textContent     = STATE.sha || (CFG.BRANCH || 'main');
+    $('#status').textContent   = 'Loaded.';
     window.dispatchEvent(new CustomEvent('data:loaded'));
   }
 
@@ -25,31 +25,49 @@
   }
   window.getLatestSha = getLatestSha;
 
-  async function loadData() {
+  // Raw fetch pinned to a ref (commit or branch) with small retry loop for CDN propagation.
+  async function fetchRawJsonAtRef(filename, ref, attempts = 4) {
+    const base = `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${ref}/${CFG.DATA_DIR}`;
+    let lastErr;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const bust = `?ts=${Date.now()}-${i}`;
+        const r = await fetch(`${base}/${filename}${bust}`, { cache: 'no-store' });
+        if (!r.ok) throw new Error(`${filename} ${r.status}`);
+        return await r.json();
+      } catch (e) {
+        lastErr = e;
+        // Backoff 0.8s, 1.6s, 2.4s… (capped)
+        await new Promise(res => setTimeout(res, Math.min(800 * (i + 1), 2400)));
+      }
+    }
+    throw lastErr;
+  }
+
+  // If ref is provided, we use it; otherwise we ask GitHub for the latest SHA first.
+  async function loadData(ref) {
     try {
       $('#status').textContent = 'Loading…';
+      const sha = ref || (await getLatestSha().catch(() => null));
+      const usedRef = sha || CFG.BRANCH;
 
-      let sha = null;
-      try { sha = await getLatestSha(); } catch (_) { /* fall back to branch */ }
-      const ref = sha || CFG.BRANCH;
-
-      const base = `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${ref}/${CFG.DATA_DIR}`;
-      const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const [r1, r2] = await Promise.all([
-        fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-        fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
+      const [poles, permits] = await Promise.all([
+        fetchRawJsonAtRef('poles.json', usedRef),
+        fetchRawJsonAtRef('permits.json', usedRef)
       ]);
-      if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status}`);
-      const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
-      STATE.poles = j1; STATE.permits = j2; STATE.sha = sha || CFG.BRANCH; STATE.loadedAt = Date.now();
+
+      STATE.poles = poles;
+      STATE.permits = permits;
+      STATE.sha = sha || CFG.BRANCH;
+      STATE.loadedAt = Date.now();
       setKPIs();
     } catch (e) {
-      console.error(e);
+      console.error('loadData error:', e);
       $('#status').textContent = `Error: ${e.message}`;
     }
   }
   window.loadData = loadData;
 
-  // bootstrap
-  window.addEventListener('load', loadData);
+  // initial load
+  window.addEventListener('load', () => loadData());
 })();
