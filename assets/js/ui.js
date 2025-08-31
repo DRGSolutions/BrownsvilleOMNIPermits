@@ -18,12 +18,12 @@ function statusStyles(status) {
 
   switch (status) {
     case 'Created - NOT Submitted':
-      fg = '#f59e0b';           // amber-500 (yellow-ish)
-      bg = '#3a2a00';           // deep amber background
+      fg = '#fde047';           // bright yellow
+      bg = '#3a3000';           // dark yellow background
       break;
     case 'Submitted - Pending':
       fg = '#fb923c';           // orange-400
-      bg = '#331c00';           // darker orange bg
+      bg = '#331c00';
       break;
     case 'Approved':
       fg = '#22c55e';           // green-500
@@ -40,7 +40,7 @@ function statusStyles(status) {
       bg = '#2a0f12';
       break;
     case 'NONE':
-      fg = '#9ca3af';           // gray-400
+      fg = '#9ca3af';
       bg = '#1f2937';
       break;
   }
@@ -69,23 +69,21 @@ function renderCounts(st) {
 }
 
 function renderList(st) {
-  // This function expects you already have a list container with id="list"
-  // and that your filters are applied upstream (same as before).
   const list = $('#list');
   if (!list) return;
 
-  const byKey = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
+  const keyOf = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
 
   // Group permits by composite key so each pole shows its permits
   const permitsByPole = {};
   for (const r of st.permits) {
-    const key = `${r.job_name}::${r.tag}::${r.SCID}`;
-    (permitsByPole[key] ||= []).push(r);
+    const k = `${r.job_name}::${r.tag}::${r.SCID}`;
+    (permitsByPole[k] ||= []).push(r);
   }
 
   const items = st.poles.map((p) => {
-    const key = byKey(p);
-    const prs = (permitsByPole[key] || []).sort((a,b) => a.permit_id.localeCompare(b.permit_id));
+    const k = keyOf(p);
+    const prs = (permitsByPole[k] || []).sort((a,b) => a.permit_id.localeCompare(b.permit_id));
     return `
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -145,9 +143,18 @@ export async function initUI() {
   startWatcher((st) => {
     renderCounts(st);
     renderList(st);
-    // brief visual cue
     const s = $('#status');
     if (s) s.innerHTML = `<span class="ok">Updated from repo.</span>`;
     setTimeout(() => { if (s) s.textContent = ''; }, 1500);
   });
+}
+
+// ---- OPTIONAL: auto-boot if app.js forgets to call us ----
+if (!window.__APP_UI_BOOT__) {
+  window.__APP_UI_BOOT__ = true;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initUI().catch(console.error));
+  } else {
+    initUI().catch(console.error);
+  }
 }
