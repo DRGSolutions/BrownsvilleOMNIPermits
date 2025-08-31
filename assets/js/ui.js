@@ -1,361 +1,457 @@
 // assets/js/ui.js
-import { UTILITIES, PERMIT_STATUSES } from './config.js';
-import { state, jobsForUtility, polesFor, getPermitsForPole, getPermitById } from './state.js';
-import { callApi } from './api.js';
-import { fmt } from './utils.js';
+import { OWNER, REPO, DEFAULT_BRANCH, PERMIT_STATUSES_UI, STATUS_NONE, STATUS_FOR_API, API_URL, SHARED_KEY, DATA_REPO_DIR } from './config.js';
+import * as S from './state.js';
+import * as API from './api.js';
 
-/* ---------- DOM refs (robust: tolerate missing elements) ---------- */
+/* ---------- DOM ---------- */
 const $ = (id) => document.getElementById(id);
 
-// Filters / status
-const elUtil    = $('selUtility');
-const elJob     = $('selJobName');
-const elSearch  = $('inpTagScid');
-const elStatus  = $('status');        // text "Loading…"
-const elKPoles  = $('kPoles');
-const elKPerms  = $('kPermits');
-const elKLoaded = $('kLoaded');
-const elKCommit = $('kCommit');
-const elList    = $('list');
+/* Filters + KPIs + List */
+const selUtility  = $('selUtility');
+const selJobName  = $('selJobName');
+const inpTagScid  = $('inpTagScid');
+const kPoles      = $('kPoles');
+const kPermits    = $('kPermits');
+const kLoaded     = $('kLoaded');
+const kCommit     = $('kCommit');
+const list        = $('list');
+const statusBox   = $('status');
 
-// Pole form
-const elPoleMode   = $('poleMode');
-const elPoleOwner  = $('poleOwner');
-const elPoleJob    = $('poleJobName');
-const elPoleTag    = $('poleTag');
-const elPoleSCID   = $('poleSCID');
-const elPoleSpec   = $('poleSpec');
-const elPoleProp   = $('proposedSpec');
-const elPoleLat    = $('poleLat');
-const elPoleLon    = $('poleLon');
-const elPoleMR     = $('mrLevel');
-const elSavePole   = $('btnSavePole');
-const elMsgPole    = $('msgPole');
+/* Pole details (read-only) */
+const pdJobName = $('pdJobName');
+const pdOwner   = $('pdOwner');
+const pdTag     = $('pdTag');
+const pdSCID    = $('pdSCID');
+const pdPoleSpec= $('pdPoleSpec');
+const pdPropSpec= $('pdProposedSpec');
+const pdLat     = $('pdLat');
+const pdLon     = $('pdLon');
+const pdMrLevel = $('pdMrLevel');
 
-// Permit form
-const elPermitPicker = $('permitPicker');       // select of existing permits OR "— New —"
-const elPermitId     = $('permitId');
-const elPermitStatus = $('permitStatus');
-const elPermitBy     = $('permitBy');
-const elPermitAt     = $('permitAt');
-const elPermitNotes  = $('permitNotes');
-const elSavePermit   = $('btnSavePermit');
-const elMsgPermit    = $('msgPermit');
+/* Permit editor */
+const permitPicker = $('permitPicker');
+const permitId     = $('permitId');
+const permitStatus = $('permitStatus');
+const permitBy     = $('permitBy');
+const permitAt     = $('permitAt');
+const permitNotes  = $('permitNotes');
+const btnSavePermit= $('btnSavePermit');
+const msgPermit    = $('msgPermit');
 
-// Reload button (if you kept one)
-const elReloadBtn = $('btnReload');
+/* Admin */
+const exportStatus     = $('exportStatus');
+const exportIncludeNone= $('exportIncludeNone');
+const btnExportCsv     = $('btnExportCsv');
+const msgExport        = $('msgExport');
 
-/* ---------- helpers ---------- */
-export function showStatus(text, isErr=false) {
-  if (!elStatus) return;
-  elStatus.innerHTML = isErr ? `<span style="color:#ef4444">${text}</span>` : text;
+const bulkStatus = $('bulkStatus');
+const bulkBy     = $('bulkBy');
+const bulkAt     = $('bulkAt');
+const bulkNotes  = $('bulkNotes');
+const btnBulk    = $('btnBulkCreate');
+const msgBulk    = $('msgBulk');
+const bulkHint   = $('bulkHint');
+
+/* ---------- Helpers ---------- */
+
+function fmt(n){ return new Intl.NumberFormat().format(n); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function badgeClass(status) {
+  if (!status) return 'status';
+  if (status === 'Submitted - Pending') return 'status badge-pending';
+  if (status === 'Approved') return 'status badge-approved';
+  if (status === 'Created - NOT Submitted') return 'status badge-created';
+  if (status === 'Not Approved - Cannot Attach') return 'status badge-na-cannot';
+  if (status.startsWith('Not Approved')) return 'status badge-na-other';
+  if (status === 'NONE') return 'status badge-none';
+  return 'status';
 }
 
-function fillSelect(sel, values, { placeholder, value, map=String } = {}) {
-  if (!sel) return;
-  sel.innerHTML = '';
-  if (placeholder) {
-    const opt = document.createElement('option');
-    opt.value = ''; opt.textContent = placeholder;
-    sel.appendChild(opt);
-  }
-  for (const v of values) {
-    const opt = document.createElement('option');
-    opt.value = v;
-    opt.textContent = map(v);
-    if (value != null && String(value) === String(v)) opt.selected = true;
-    sel.appendChild(opt);
-  }
+function poleKey(p){ return `${p.job_name}::${p.tag}::${p.SCID}`; }
+function matchPermitToPole(pole, r){
+  return r.job_name === pole.job_name && r.tag === pole.tag && r.SCID === pole.SCID;
 }
 
-function poleKey(p) { return `${p.job_name} / ${p.tag} / ${p.SCID}`; }
+function filteredPoles(){
+  const { poles } = S.get();
+  const util = selUtility.value || '';
+  const job  = selJobName.value || '';
+  const q    = (inpTagScid.value || '').trim().toLowerCase();
 
-/* ---------- list rendering ---------- */
-function renderCounts(sha) {
-  if (elKPoles)  elKPoles.textContent  = fmt(state.poles.length);
-  if (elKPerms)  elKPerms.textContent  = fmt(state.permits.length);
-  if (elKLoaded) elKLoaded.textContent = new Date().toLocaleString();
-  if (elKCommit) elKCommit.textContent = sha ? sha.slice(0,7) : '—';
-}
-
-function renderList() {
-  if (!elList) return;
-
-  const util = elUtil?.value || '';
-  const job  = elJob?.value || '';
-  const q    = (elSearch?.value || '').trim().toLowerCase();
-
-  const poles = polesFor(util, job).filter(p => {
-    if (!q) return true;
-    return (
-      String(p.tag).toLowerCase().includes(q) ||
-      String(p.SCID).toLowerCase().includes(q)
-    );
-  });
-
-  elList.innerHTML = '';
-  for (const p of poles) {
-    const permits = getPermitsForPole(p);
-    const permitsHTML = permits.length
-      ? `<ul style="margin:.4rem 0 .2rem 1rem;">
-          ${permits.map(r => `
-            <li class="small">
-              <code>${r.permit_id}</code>
-              <span class="status">${r.permit_status}</span>
-              · by ${r.submitted_by}
-              · ${r.submitted_at}
-            </li>`).join('')}
-        </ul>`
-      : `<div class="small muted"><em>Status: NONE (no permits)</em></div>`;
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="flex" style="justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div class="title">${poleKey(p)}</div>
-          <div class="small muted">
-            Owner: ${p.owner} · Spec: ${p.pole_spec || '—'} → ${p.proposed_spec || '—'}
-          </div>
-          <div class="small muted">Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'}</div>
-          <div class="small muted">MR Level: ${p.mr_level || '—'}</div>
-        </div>
-        <button class="btn btn-ghost" data-edit="${p.job_name}|${p.tag}|${p.SCID}">Edit</button>
-      </div>
-      <div class="spacer"></div>
-      <div class="small muted">Permits:</div>
-      ${permitsHTML}
-    `;
-    elList.appendChild(card);
-  }
-
-  // wire edit buttons
-  elList.querySelectorAll('button[data-edit]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const [job, tag, scid] = btn.dataset.edit.split('|');
-      prefillPole(job, tag, scid);
-      prefillPermits(job, tag, scid);
-      document.getElementById('poleEditorTop')?.scrollIntoView({ behavior:'smooth', block:'start' });
-    });
+  return poles.filter(p=>{
+    if (util && p.owner !== util) return false;
+    if (job && p.job_name !== job) return false;
+    if (q && !(String(p.tag).toLowerCase().includes(q) || String(p.SCID).toLowerCase().includes(q))) return false;
+    return true;
   });
 }
 
-/* ---------- filters ---------- */
-function refreshJobs() {
-  const util = elUtil?.value || '';
-  fillSelect(elJob, jobsForUtility(util), { placeholder:'All Jobs' });
-  renderList();
+function jobHasAnyPermits(jobName){
+  const { permits } = S.get();
+  return permits.some(r => r.job_name === jobName);
 }
 
-/* ---------- prefill editors ---------- */
-function prefillPole(job, tag, scid) {
-  const p = state.poles.find(x =>
-    String(x.job_name) === String(job) &&
-    String(x.tag)      === String(tag) &&
-    String(x.SCID)     === String(scid)
-  );
+/* ---------- Populate filters & status pickers ---------- */
 
-  // mode: default Update if existing, Upsert if not
-  if (elPoleMode)  elPoleMode.value = p ? 'update' : 'upsert';
-  if (elPoleOwner) elPoleOwner.value = p?.owner || 'BPUB';
-  if (elPoleJob)   elPoleJob.value   = job || p?.job_name || '';
-  if (elPoleTag)   elPoleTag.value   = tag || p?.tag || '';
-  if (elPoleSCID)  elPoleSCID.value  = scid || p?.SCID || '';
-  if (elPoleSpec)  elPoleSpec.value  = p?.pole_spec || '';
-  if (elPoleProp)  elPoleProp.value  = p?.proposed_spec || '';
-  if (elPoleLat)   elPoleLat.value   = p?.lat ?? '';
-  if (elPoleLon)   elPoleLon.value   = p?.lon ?? '';
-  if (elPoleMR)    elPoleMR.value    = p?.mr_level || '';
+function populateFilters(){
+  const { poles } = S.get();
+  // Utilities
+  const utils = [...new Set(poles.map(p=>p.owner))].sort();
+  selUtility.innerHTML = `<option value="">All Utilities</option>` + utils.map(u=>`<option>${u}</option>`).join('');
+
+  // Jobs (depends on utility selection)
+  const jobs = [...new Set(poles
+    .filter(p => !selUtility.value || p.owner === selUtility.value)
+    .map(p=>p.job_name))].sort();
+  selJobName.innerHTML = `<option value="">All Jobs</option>` + jobs.map(j=>`<option>${j}</option>`).join('');
 }
 
-function prefillPermits(job, tag, scid) {
-  const rows = state.permits.filter(r =>
-    String(r.job_name) === String(job) &&
-    String(r.tag)      === String(tag) &&
-    String(r.SCID)     === String(scid)
-  );
-  const vals = rows.map(r => r.permit_id);
-  if (elPermitPicker) {
-    elPermitPicker.innerHTML = '';
-    const newOpt = document.createElement('option');
-    newOpt.value = ''; newOpt.textContent = '— New —';
-    elPermitPicker.appendChild(newOpt);
-    for (const id of vals) {
-      const opt = document.createElement('option');
-      opt.value = id; opt.textContent = id;
-      elPermitPicker.appendChild(opt);
-    }
-    elPermitPicker.dataset.job  = job;
-    elPermitPicker.dataset.tag  = tag;
-    elPermitPicker.dataset.scid = scid;
-  }
-  // default to blank/new
-  setPermitFormForId('');
+function populateStatusPickers(){
+  // Permit editor (do NOT include NONE)
+  permitStatus.innerHTML = STATUS_FOR_API.map(s=>`<option>${s}</option>`).join('');
+  // Export (include NONE + "All")
+  exportStatus.innerHTML = `<option value="">All</option>` +
+    [STATUS_NONE, ...STATUS_FOR_API].map(s=>`<option>${s}</option>`).join('');
+  // Bulk (do NOT include NONE)
+  bulkStatus.innerHTML = STATUS_FOR_API.map(s=>`<option>${s}</option>`).join('');
 }
 
-function setPermitFormForId(permitId) {
-  const r = permitId ? getPermitById(permitId) : null;
+/* ---------- Render list ---------- */
 
-  if (elPermitId)     elPermitId.value     = r?.permit_id || '';
-  if (elPermitStatus) elPermitStatus.value = r?.permit_status || 'Created - NOT Submitted';
-  if (elPermitBy)     elPermitBy.value     = r?.submitted_by || ''; // required
-  if (elPermitNotes)  elPermitNotes.value  = r?.notes || '';
+function renderList(){
+  const { permits } = S.get();
+  const poles = filteredPoles();
 
-  // Convert "MM/DD/YYYY" to <input type=date> value YYYY-MM-DD
-  if (elPermitAt) {
-    if (r?.submitted_at && /^\d{2}\/\d{2}\/\d{4}$/.test(r.submitted_at)) {
-      const [m,d,y] = r.submitted_at.split('/');
-      elPermitAt.value = `${y}-${m}-${d}`;
-    } else {
-      const today = new Date();
-      const ym = String(today.getMonth()+1).padStart(2,'0');
-      const yd = String(today.getDate()).padStart(2,'0');
-      elPermitAt.value = `${today.getFullYear()}-${ym}-${yd}`;
-    }
-  }
-}
-
-/* ---------- form submit handlers ---------- */
-async function onSavePole() {
-  if (!elMsgPole) return;
-  elMsgPole.textContent = 'Submitting…';
-
-  const mode = elPoleMode?.value || 'upsert';
-  const payloadKeys = {
-    job_name: elPoleJob?.value?.trim(),
-    tag:      elPoleTag?.value?.trim(),
-    SCID:     elPoleSCID?.value?.trim(),
-  };
-
-  // common fields (optional)
-  const patch = {};
-  if (elPoleOwner?.value) patch.owner = elPoleOwner.value;
-  if (elPoleSpec?.value)  patch.pole_spec = elPoleSpec.value;
-  if (elPoleProp?.value)  patch.proposed_spec = elPoleProp.value;
-  if (elPoleLat?.value)   patch.lat = parseFloat(elPoleLat.value);
-  if (elPoleLon?.value)   patch.lon = parseFloat(elPoleLon.value);
-  if (elPoleMR?.value)    patch.mr_level = elPoleMR.value;
-
-  try {
-    let change;
-    if (mode === 'update') {
-      change = { type:'update_pole', keys: payloadKeys, patch };
-    } else {
-      const pole = { ...payloadKeys, ...patch };
-      change = { type:'upsert_pole', pole };
-    }
-    const out = await callApi(change, { reason: 'Pole edit' });
-    elMsgPole.innerHTML = `PR opened. <a class="link" target="_blank" rel="noopener" href="${out.pr_url}">View PR</a>`;
-  } catch (e) {
-    elMsgPole.innerHTML = `<span class="err">${e.message}</span>`;
-  }
-}
-
-async function onSavePermit() {
-  if (!elMsgPermit) return;
-  elMsgPermit.textContent = 'Submitting…';
-
-  const job  = elPermitPicker?.dataset.job  || elJob?.value || '';
-  const tag  = elPermitPicker?.dataset.tag  || '';
-  const scid = elPermitPicker?.dataset.scid || '';
-
-  const pickedId = elPermitPicker?.value || '';
-  const status = elPermitStatus?.value || 'Created - NOT Submitted';
-  const subBy  = (elPermitBy?.value || '').trim(); // required
-  const dateISO= elPermitAt?.value || '';          // YYYY-MM-DD from <input type=date>
-  const notes  = elPermitNotes?.value || '';
-
-  if (!subBy) {
-    elMsgPermit.innerHTML = `<span class="err">"Submitted By" is required.</span>`;
+  list.innerHTML = '';
+  if (!poles.length){
+    list.innerHTML = `<div class="muted small">No poles found for current filters.</div>`;
     return;
   }
 
-  // convert to MM/DD/YYYY expected by API validator
-  let submitted_at = '';
-  if (dateISO) {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateISO);
-    submitted_at = m ? `${m[2]}/${m[3]}/${m[1]}` : dateISO;
+  for (const p of poles){
+    const rel = permits.filter(r => matchPermitToPole(p, r));
+    // Compute overall chip (NONE or latest status of the most recent r? show multiple anyway)
+    const chip = rel.length ? '' : `<span class="${badgeClass('NONE')}" style="margin-left:6px;">NONE</span>`;
+
+    const li = document.createElement('div');
+    li.className = 'card';
+    li.innerHTML = `
+      <div class="flex" style="justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="title">${p.job_name} · <span class="muted small">Owner: ${p.owner}</span> ${chip}</div>
+          <div class="small muted">Tag: <b>${p.tag}</b> · SCID: <b>${p.SCID}</b></div>
+          <div class="small muted">Pole Spec: ${p.pole_spec || '—'} · Proposed: ${p.proposed_spec || '—'}</div>
+          <div class="small muted">Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'} · MR: ${p.mr_level || '—'}</div>
+        </div>
+        <button class="btn btn-ghost">Select</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="small muted">Permits:</div>
+      ${
+        rel.length ? `
+          <ul style="margin:.4rem 0 .2rem 1rem;">
+            ${rel.map(r=>`
+              <li class="small">
+                <code>${r.permit_id}</code>
+                <span class="${badgeClass(r.permit_status)}">${r.permit_status}</span>
+                ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
+                ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+              </li>
+            `).join('')}
+          </ul>
+        ` : `<div class="small muted"><em>No permits (status NONE)</em></div>`
+      }
+    `;
+    li.querySelector('button').addEventListener('click', ()=> selectPole(p));
+    list.appendChild(li);
+  }
+}
+
+/* ---------- Select pole & load permit editor ---------- */
+
+function selectPole(p){
+  S.set({ currentPole: p });
+
+  // Fill details read-only
+  pdJobName.value = p.job_name || '';
+  pdOwner.value   = p.owner || '';
+  pdTag.value     = p.tag || '';
+  pdSCID.value    = p.SCID || '';
+  pdPoleSpec.value= p.pole_spec || '';
+  pdPropSpec.value= p.proposed_spec || '';
+  pdLat.value     = (p.lat ?? '').toString();
+  pdLon.value     = (p.lon ?? '').toString();
+  pdMrLevel.value = p.mr_level || '';
+
+  // Fill permits for this pole into picker
+  const { permits } = S.get();
+  const rel = permits.filter(r => matchPermitToPole(p, r));
+  permitPicker.innerHTML = `<option value="">— New —</option>` + rel.map(r=>`<option value="${r.permit_id}">${r.permit_id}</option>`).join('');
+
+  // Reset editor defaults
+  permitId.value = `PERM-${p.job_name}-${p.tag}-${p.SCID}`;
+  permitStatus.value = 'Created - NOT Submitted';
+  permitBy.value = '';
+  permitAt.value = todayISO();
+  permitNotes.value = '';
+  msgPermit.textContent = '';
+
+  // Update mass-create availability
+  updateBulkAvailability();
+}
+
+/* ---------- Save (upsert) single permit ---------- */
+
+async function onSavePermit(){
+  const p = S.get().currentPole;
+  if (!p){ msgPermit.textContent = 'Select a pole first.'; return; }
+
+  const editingExisting = !!permitPicker.value;
+  const selId = permitPicker.value || permitId.value.trim();
+  if (!selId){ msgPermit.textContent = 'Permit ID is required for new permits.'; return; }
+  if (!permitBy.value.trim()){ msgPermit.textContent = 'Submitted By is required.'; return; }
+
+  const payload = {
+    actorName: 'Website User',
+    reason: `Permit ${selId}`,
+    change: {
+      type: 'upsert_permit',
+      permit: {
+        permit_id: selId,
+        job_name: p.job_name,
+        tag: p.tag,
+        SCID: p.SCID,
+        permit_status: permitStatus.value,
+        submitted_by: permitBy.value.trim(),
+        submitted_at: permitAt.value, // server normalizes to MM/DD/YYYY
+        notes: permitNotes.value.trim()
+      }
+    }
+  };
+
+  msgPermit.textContent = 'Submitting…';
+  try{
+    const res = await API.callApi(payload);
+    msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${res.pr_url}">View PR</a>`;
+  }catch(e){
+    msgPermit.innerHTML = `<span class="err">${e.message}</span>`;
+  }
+}
+
+/* ---------- Export CSV ---------- */
+
+function rowsForExport(){
+  const util = selUtility.value || '';
+  const job  = selJobName.value || '';
+  const st   = exportStatus.value || '';
+
+  const { poles, permits } = S.get();
+
+  // Candidate poles by util/job
+  const pPoles = poles.filter(p=>{
+    if (util && p.owner !== util) return false;
+    if (job && p.job_name !== job) return false;
+    return true;
+  });
+
+  const rows = [];
+
+  // add existing permits that match status filter
+  for (const r of permits){
+    const pole = pPoles.find(p => matchPermitToPole(p, r));
+    if (!pole) continue;
+    if (st && r.permit_status !== st) continue;
+
+    rows.push({
+      Utility: pole.owner,
+      Job: pole.job_name,
+      Tag: pole.tag,
+      SCID: pole.SCID,
+      PermitID: r.permit_id,
+      Status: r.permit_status,
+      SubmittedBy: r.submitted_by || '',
+      SubmittedAt: r.submitted_at || '',
+      Notes: r.notes || ''
+    });
   }
 
-  try {
-    let change;
-    if (!pickedId) {
-      // new permit → must provide an id
-      const id = (elPermitId?.value || '').trim();
-      if (!id) throw new Error('Permit ID is required for new permits.');
-      change = {
-        type: 'upsert_permit',
-        permit: {
-          permit_id: id,
-          job_name: job,
-          tag, SCID: scid,
-          permit_status: status,
-          submitted_by: subBy,
-          submitted_at,
-          notes
+  // include NONE if asked
+  if (exportIncludeNone.checked){
+    for (const p of pPoles){
+      const has = permits.some(r => matchPermitToPole(p, r));
+      if (!has){
+        if (!st || st === 'NONE'){
+          rows.push({
+            Utility: p.owner,
+            Job: p.job_name,
+            Tag: p.tag,
+            SCID: p.SCID,
+            PermitID: '',
+            Status: 'NONE',
+            SubmittedBy: '',
+            SubmittedAt: '',
+            Notes: ''
+          });
+        }
+      }
+    }
+  }
+  return rows;
+}
+
+function makeCSV(rows){
+  if (!rows.length) return '';
+  const headers = Object.keys(rows[0]);
+  const esc = (s)=>`"${String(s??'').replace(/"/g,'""')}"`;
+  const lines = [headers.join(',')];
+  for (const r of rows){
+    lines.push(headers.map(h=>esc(r[h])).join(','));
+  }
+  return lines.join('\r\n');
+}
+
+function download(filename, text){
+  const blob = new Blob([text], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function onExportCsv(){
+  msgExport.textContent = '';
+  const rows = rowsForExport();
+  if (!rows.length){ msgExport.textContent = 'No rows to export for current filters.'; return; }
+  const util = selUtility.value || 'ALL';
+  const job  = selJobName.value || 'ALL';
+  const st   = exportStatus.value || 'ALL';
+  const name = `permits_${util}_${job}_${st}_${Date.now()}.csv`.replace(/\s+/g,'');
+  download(name, makeCSV(rows));
+  msgExport.textContent = `Exported ${rows.length} rows.`;
+}
+
+/* ---------- Bulk create permits (job-level) ---------- */
+
+function updateBulkAvailability(){
+  const job = selJobName.value || '';
+  if (!job){
+    bulkHint.textContent = 'Pick a Job Name to check eligibility.';
+    btnBulk.disabled = true;
+    return;
+  }
+  const ok = !jobHasAnyPermits(job);
+  btnBulk.disabled = !ok;
+  bulkHint.textContent = ok
+    ? 'Eligible: no existing permits under this Job.'
+    : 'Disabled: this Job already has one or more permits.';
+}
+
+async function onBulkCreate(){
+  msgBulk.textContent = '';
+  const job = selJobName.value || '';
+  const util = selUtility.value || '';
+
+  if (!job){ msgBulk.textContent = 'Choose a Job Name first.'; return; }
+  if (jobHasAnyPermits(job)){ msgBulk.textContent = 'This job already has permits. Bulk create is disabled.'; return; }
+  if (!bulkBy.value.trim()){ msgBulk.textContent = 'Submitted By is required.'; return; }
+
+  const { poles, permits } = S.get();
+  const jobPoles = poles.filter(p => p.job_name === job && (!util || p.owner === util));
+
+  // confirm none have permits
+  const anyHas = jobPoles.some(p => permits.some(r => matchPermitToPole(p, r)));
+  if (anyHas){ msgBulk.textContent = 'Detected existing permits; aborting.'; return; }
+
+  // create one PR per permit (API is single-change)
+  const created = [];
+  btnBulk.disabled = true;
+  try{
+    for (const p of jobPoles){
+      const id = `PERM-${p.job_name}-${p.tag}-${p.SCID}`;
+      const payload = {
+        actorName: 'Website User',
+        reason: `Bulk create for ${p.job_name}`,
+        change: {
+          type: 'upsert_permit',
+          permit: {
+            permit_id: id,
+            job_name: p.job_name,
+            tag: p.tag,
+            SCID: p.SCID,
+            permit_status: bulkStatus.value,
+            submitted_by: bulkBy.value.trim(),
+            submitted_at: bulkAt.value || todayISO(),
+            notes: bulkNotes.value.trim()
+          }
         }
       };
-    } else {
-      // update existing
-      const patch = {
-        permit_status: status,
-        submitted_by: subBy,
-        submitted_at,
-        notes
-      };
-      change = { type:'update_permit', permit_id: pickedId, patch };
+      const res = await API.callApi(payload);
+      created.push(res.pr_url);
     }
-
-    const out = await callApi(change, { reason: 'Permit edit' });
-    elMsgPermit.innerHTML = `PR opened. <a class="link" target="_blank" rel="noopener" href="${out.pr_url}">View PR</a>`;
-  } catch (e) {
-    elMsgPermit.innerHTML = `<span class="err">${e.message}</span>`;
+    msgBulk.innerHTML = `Opened ${created.length} PRs.`;
+  }catch(e){
+    msgBulk.innerHTML = `<span class="err">${e.message}</span>`;
+  }finally{
+    btnBulk.disabled = false;
   }
 }
 
-/* ---------- public init / post-load ---------- */
-export function initUI({ onReload } = {}) {
-  // filters
-  if (elUtil) {
-    fillSelect(elUtil, UTILITIES, { placeholder:'All Utilities' });
-    elUtil.addEventListener('change', () => {
-      refreshJobs();
-      renderList();
-    });
-  }
-  if (elJob) {
-    elJob.addEventListener('change', renderList);
-  }
-  if (elSearch) {
-    elSearch.addEventListener('input', renderList);
-  }
+/* ---------- Public init ---------- */
 
-  // form static options
-  if (elPoleOwner) fillSelect(elPoleOwner, UTILITIES);
-  if (elPoleMode)  fillSelect(elPoleMode, ['update', 'upsert'], { map:v => v === 'update' ? 'Update (must exist)' : 'Upsert (create if missing)' });
+export async function initUI(){
+  // defaults
+  permitAt.value = todayISO();
+  bulkAt.value   = todayISO();
 
-  if (elPermitStatus) fillSelect(elPermitStatus, PERMIT_STATUSES);
-  if (elPermitPicker) elPermitPicker.addEventListener('change', () => setPermitFormForId(elPermitPicker.value));
+  populateStatusPickers();
 
-  // save handlers
-  elSavePole?.addEventListener('click', (e)=>{ e.preventDefault(); onSavePole(); });
-  elSavePermit?.addEventListener('click', (e)=>{ e.preventDefault(); onSavePermit(); });
-
-  // reload button if present
-  elReloadBtn?.addEventListener('click', (e)=>{ e.preventDefault(); onReload?.(); });
-
-  // prefills when user types core key fields in pole editor
-  [elPoleJob, elPoleTag, elPoleSCID].forEach(inp => {
-    inp?.addEventListener('blur', () => {
-      const j = elPoleJob?.value, t = elPoleTag?.value, s = elPoleSCID?.value;
-      if (j && t && s) { prefillPole(j,t,s); prefillPermits(j,t,s); }
-    });
+  // events
+  selUtility.addEventListener('change', ()=>{
+    populateFilters(); // rebuild jobs when utility changes
+    renderList();
+    updateBulkAvailability();
   });
-}
+  selJobName.addEventListener('change', ()=>{
+    renderList();
+    updateBulkAvailability();
+  });
+  inpTagScid.addEventListener('input', renderList);
 
-export async function renderAfterLoad(sha) {
-  renderCounts(sha);
-  // set job list for selected util
-  refreshJobs();
+  permitPicker.addEventListener('change', ()=>{
+    const id = permitPicker.value;
+    const { currentPole } = S.get();
+    if (!currentPole || !id) return;
+    const r = S.get().permits.find(x => x.permit_id === id);
+    if (!r) return;
+    permitId.value = r.permit_id;
+    permitStatus.value = r.permit_status;
+    permitBy.value = r.submitted_by || '';
+    // convert MM/DD/YYYY to yyyy-mm-dd best effort
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.submitted_at || '');
+    permitAt.value = m ? `${m[3]}-${m[1]}-${m[2]}` : todayISO();
+    permitNotes.value = r.notes || '';
+  });
+
+  btnSavePermit.addEventListener('click', onSavePermit);
+
+  btnExportCsv.addEventListener('click', onExportCsv);
+
+  btnBulk.addEventListener('click', onBulkCreate);
+
+  // first data load
+  await S.refreshFromGitHub(statusBox);
+  populateFilters();
   renderList();
+
+  // KPIs & commit info
+  const { poles, permits, sha } = S.get();
+  kPoles.textContent   = fmt(poles.length);
+  kPermits.textContent = fmt(permits.length);
+  kLoaded.textContent  = new Date().toLocaleString();
+  kCommit.textContent  = sha ? sha.slice(0,7) : '—';
 }

@@ -19,14 +19,11 @@
     .small { font-size:12px }
     .title { font-weight:700; font-size:16px; margin-bottom:8px }
     .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520; color:#c7d2fe }
-    .ok { color:var(--accent) }
-    .err { color:var(--danger) }
 
     .kpi { display:flex; gap:14px; flex-wrap:wrap; margin:8px 0 0 }
     .kpi div { background:#0f1219; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px; color:var(--muted) }
 
     .list { display:grid; grid-template-columns: 1fr; gap:12px; max-height:520px; overflow:auto; padding-right:4px }
-
     .row { display:grid; grid-template-columns: repeat(12, 1fr); gap:12px }
     .col-12 { grid-column: span 12 }
     .col-6  { grid-column: span 6 }
@@ -45,6 +42,14 @@
     .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .spacer { height:10px }
 
+    /* Status colors */
+    .badge-pending   { border-color:#7c4a03; background:#2c1f0a; color:#f59e0b } /* Submitted - Pending (orange) */
+    .badge-approved  { border-color:#14532d; background:#0c1f16; color:#22c55e } /* Approved (green) */
+    .badge-created   { border-color:#854d0e; background:#2b230c; color:#eab308 } /* Created - NOT Submitted (yellow) */
+    .badge-na-cannot { border-color:#5b21b6; background:#22123b; color:#a855f7 } /* Not Approved - Cannot Attach (purple) */
+    .badge-na-other  { border-color:#7f1d1d; background:#2b1111; color:#ef4444 } /* any other Not Approved - ... (red) */
+    .badge-none      { border-color:#374151; background:#0e1520; color:#9aa3b2 } /* NONE */
+    
     @media (max-width: 980px) { .grid { grid-template-columns: 1fr } .list { max-height:none } }
   </style>
 </head>
@@ -55,7 +60,7 @@
 
   <main>
     <div class="grid">
-      <!-- LEFT COLUMN: Filters + Current Data + List -->
+      <!-- LEFT COLUMN -->
       <section class="card">
         <div class="title">Filters</div>
         <div class="row">
@@ -89,59 +94,49 @@
         <div id="list" class="list"></div>
       </section>
 
-      <!-- RIGHT COLUMN: Editors -->
+      <!-- RIGHT COLUMN -->
       <section class="card">
-        <div id="poleEditorTop" class="title">Pole Editor</div>
-
+        <div class="title">Pole Details</div>
         <div class="row">
           <div class="col-6">
-            <label>Mode</label>
-            <select id="poleMode"></select>
+            <label>Job Name</label>
+            <input id="pdJobName" disabled />
           </div>
           <div class="col-6">
             <label>Owner</label>
-            <select id="poleOwner"></select>
+            <input id="pdOwner" disabled />
           </div>
 
           <div class="col-6">
-            <label>Job Name *</label>
-            <input id="poleJobName" />
+            <label>Tag</label>
+            <input id="pdTag" disabled />
           </div>
-          <div class="col-3">
-            <label>Tag *</label>
-            <input id="poleTag" />
-          </div>
-          <div class="col-3">
-            <label>SCID *</label>
-            <input id="poleSCID" />
+          <div class="col-6">
+            <label>SCID</label>
+            <input id="pdSCID" disabled />
           </div>
 
           <div class="col-6">
             <label>Pole Spec</label>
-            <input id="poleSpec" />
+            <input id="pdPoleSpec" disabled />
           </div>
           <div class="col-6">
             <label>Proposed Spec</label>
-            <input id="proposedSpec" />
+            <input id="pdProposedSpec" disabled />
           </div>
 
           <div class="col-6">
             <label>Latitude</label>
-            <input id="poleLat" type="number" step="any" />
+            <input id="pdLat" disabled />
           </div>
           <div class="col-6">
             <label>Longitude</label>
-            <input id="poleLon" type="number" step="any" />
+            <input id="pdLon" disabled />
           </div>
 
           <div class="col-12">
             <label>MR Level</label>
-            <input id="mrLevel" />
-          </div>
-
-          <div class="col-12">
-            <button id="btnSavePole" class="btn btn-accent">Save Pole</button>
-            <span id="msgPole" class="small muted"></span>
+            <input id="pdMrLevel" disabled />
           </div>
         </div>
 
@@ -188,11 +183,59 @@
             <span id="msgPermit" class="small muted"></span>
           </div>
         </div>
+
+        <div class="spacer"></div>
+
+        <div class="title">Admin</div>
+
+        <div class="card" style="margin-bottom:12px;">
+          <div class="title" style="margin-bottom:6px;">Export CSV</div>
+          <div class="row">
+            <div class="col-6">
+              <label>Status Filter</label>
+              <select id="exportStatus"></select>
+            </div>
+            <div class="col-6">
+              <label>&nbsp;</label>
+              <label class="small"><input type="checkbox" id="exportIncludeNone" /> Include poles with no permits (status NONE)</label>
+            </div>
+            <div class="col-12">
+              <button id="btnExportCsv" class="btn">Download CSV</button>
+              <span id="msgExport" class="small muted"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title" style="margin-bottom:6px;">Mass Create Permits (job-level)</div>
+          <div class="small muted" id="bulkHint">Enabled only if the selected Job has no existing permits.</div>
+          <div class="row">
+            <div class="col-12">
+              <label>Permit Status</label>
+              <select id="bulkStatus"></select>
+            </div>
+            <div class="col-6">
+              <label>Submitted By (required)</label>
+              <input id="bulkBy" />
+            </div>
+            <div class="col-6">
+              <label>Submitted At</label>
+              <input id="bulkAt" type="date" />
+            </div>
+            <div class="col-12">
+              <label>Notes</label>
+              <textarea id="bulkNotes" rows="3"></textarea>
+            </div>
+            <div class="col-12">
+              <button id="btnBulkCreate" class="btn btn-accent" disabled>Mass Create Permits</button>
+              <span id="msgBulk" class="small muted"></span>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   </main>
 
-  <!-- App entry point (this imports the rest of the modules) -->
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>
