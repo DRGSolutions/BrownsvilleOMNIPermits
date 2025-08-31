@@ -1,120 +1,110 @@
 // assets/js/data.js
-// Loads poles/permits from the repo, keeps indexes, and exposes a simple API.
+// Centralized data loader + change watcher.
 
-(() => {
-  const CFG = (window.APP_CONFIG || {});
-  const STATE = {
-    poles: [],
-    permits: [],
-    commitSha: null,
-    lastLoaded: null,
+import { OWNER, REPO, BRANCH, DATA_DIR } from './config.js';
 
-    // indexes
-    jobs: new Map(),         // job_name -> { poles:[], permits:[] }
-    permitsById: new Map(),  // permit_id -> permit
+const RAW_BASE = (ref) =>
+  `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${DATA_DIR}`;
+
+let state = {
+  poles: [],
+  permits: [],
+  lastLoadedAt: null,
+  lastRef: BRANCH,
+  meta: {
+    etag: { poles: null, permits: null },
+    lastModified: { poles: null, permits: null },
+  },
+};
+
+let watcherTimer = null;
+
+/** Utility to build a cache-busting URL for a data file */
+function fileUrl(ref, filename, bust = true) {
+  const ts = bust ? `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}` : '';
+  return `${RAW_BASE(ref)}/${filename}${ts}`;
+}
+
+/** HEAD the raw file to read ETag/Last-Modified without downloading body */
+async function headTag(ref, filename) {
+  const r = await fetch(fileUrl(ref, filename, true), {
+    method: 'HEAD',
+    cache: 'no-store',
+  });
+  if (!r.ok) throw new Error(`HEAD ${filename} ${r.status}`);
+  return {
+    etag: r.headers.get('etag'),
+    lastModified: r.headers.get('last-modified'),
   };
+}
 
-  function groupAndIndex() {
-    STATE.jobs.clear();
-    STATE.permitsById.clear();
+/** GET and parse JSON; also record ETag/Last-Modified from this fetch */
+async function fetchJSON(ref, filename) {
+  const r = await fetch(fileUrl(ref, filename, true), {
+    cache: 'no-store',
+  });
+  if (!r.ok) throw new Error(`${filename} ${r.status}`);
+  const etag = r.headers.get('etag');
+  const lastModified = r.headers.get('last-modified');
+  const json = await r.json();
+  return { json, etag, lastModified };
+}
 
-    for (const p of STATE.poles) {
-      const j = String(p.job_name || '').trim();
-      if (!STATE.jobs.has(j)) STATE.jobs.set(j, { poles: [], permits: [] });
-      STATE.jobs.get(j).poles.push(p);
-    }
+/** Load both files (poles & permits) pinned to a ref (default: BRANCH) */
+export async function loadData(ref = BRANCH) {
+  const [p1, p2] = await Promise.all([
+    fetchJSON(ref, 'poles.json'),
+    fetchJSON(ref, 'permits.json'),
+  ]);
 
-    for (const r of STATE.permits) {
-      const j = String(r.job_name || '').trim();
-      if (!STATE.jobs.has(j)) STATE.jobs.set(j, { poles: [], permits: [] });
-      STATE.jobs.get(j).permits.push(r);
-      STATE.permitsById.set(String(r.permit_id), r);
-    }
-  }
+  state.poles = Array.isArray(p1.json) ? p1.json : [];
+  state.permits = Array.isArray(p2.json) ? p2.json : [];
+  state.lastLoadedAt = new Date();
+  state.lastRef = ref;
+  state.meta.etag.poles = p1.etag;
+  state.meta.etag.permits = p2.etag;
+  state.meta.lastModified.poles = p1.lastModified;
+  state.meta.lastModified.permits = p2.lastModified;
 
-  async function getLatestSha() {
-    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
-    const j = await r.json();
-    return j.sha;
-  }
+  return getState();
+}
 
-  async function loadData() {
-    const sha = await getLatestSha();
-    STATE.commitSha = sha;
+/** Provide an immutable snapshot of current state */
+export function getState() {
+  return JSON.parse(JSON.stringify(state));
+}
 
-    const base = `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${CFG.DATA_REPO_PATH}`;
-    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+/** Start polling raw files; on change => reload & invoke onChange() */
+export function startWatcher(onChange, { intervalMs = 5000 } = {}) {
+  stopWatcher();
+  watcherTimer = setInterval(async () => {
+    try {
+      const [t1, t2] = await Promise.all([
+        headTag(BRANCH, 'poles.json'),
+        headTag(BRANCH, 'permits.json'),
+      ]);
 
-    const [r1, r2] = await Promise.all([
-      fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
-    ]);
-    if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status}`);
+      const changed =
+        t1.etag !== state.meta.etag.poles ||
+        t2.etag !== state.meta.etag.permits ||
+        t1.lastModified !== state.meta.lastModified.poles ||
+        t2.lastModified !== state.meta.lastModified.permits;
 
-    STATE.poles   = await r1.json();
-    STATE.permits = await r2.json();
-    STATE.lastLoaded = new Date();
-
-    groupAndIndex();
-    if (window.UI && window.UI.onDataLoaded) window.UI.onDataLoaded(STATE);
-  }
-
-  // ------- helpers / filters -------
-  function getJobNamesFilteredByOwner(owner) {
-    const out = new Set();
-    for (const [job, obj] of STATE.jobs.entries()) {
-      if (!owner) { out.add(job); continue; }
-      if ((obj.poles || []).some(p => String(p.owner) === String(owner))) out.add(job);
-    }
-    return [...out].sort();
-  }
-
-  function polesFiltered({ owner = '', job_name = '', q = '' }) {
-    const Q = (q || '').toLowerCase().trim();
-    return STATE.poles.filter(p => {
-      if (owner && String(p.owner) !== String(owner)) return false;
-      if (job_name && String(p.job_name) !== String(job_name)) return false;
-      if (!Q) return true;
-      const hay = [p.tag, p.SCID].map(x => String(x || '').toLowerCase()).join(' ');
-      return hay.includes(Q);
-    });
-  }
-
-  function permitsForPole(pole) {
-    return STATE.permits.filter(r =>
-      String(r.job_name) === String(pole.job_name) &&
-      String(r.tag)      === String(pole.tag) &&
-      String(r.SCID)     === String(pole.SCID)
-    );
-  }
-
-  function jobsEligibleForMassCreate() {
-    const eligible = [];
-    for (const [job, obj] of STATE.jobs.entries()) {
-      if (!obj.poles.length) continue;
-      let ok = true;
-      for (const pole of obj.poles) {
-        const prs = permitsForPole(pole);
-        if (prs.some(r => String(r.permit_status) && String(r.permit_status) !== 'NONE')) {
-          ok = false; break;
-        }
+      if (changed) {
+        await loadData(BRANCH);
+        if (typeof onChange === 'function') onChange(getState());
       }
-      if (ok) eligible.push(job);
+    } catch (e) {
+      // Network hiccup; keep watching silently.
+      // console.warn('watcher:', e);
     }
-    return eligible.sort();
+  }, intervalMs);
+}
+
+/** Stop polling */
+export function stopWatcher() {
+  if (watcherTimer) {
+    clearInterval(watcherTimer);
+    watcherTimer = null;
   }
-
-  window.DATA = {
-    get state() { return STATE; },
-    async reload() { await loadData(); },
-    async init() { await loadData(); },
-
-    getJobNamesFilteredByOwner,
-    polesFiltered,
-    permitsForPole,
-    jobsEligibleForMassCreate,
-    findPermitById: id => STATE.permitsById.get(String(id)),
-  };
-})();
+}
