@@ -6,11 +6,11 @@
   const STATUS_CLASS = (s) => {
     if (!s) return '';
     const t = s.toLowerCase();
-    if (t.startsWith('submitted')) return 'pending';
-    if (t === 'approved') return 'approved';
-    if (t.startsWith('created')) return 'created';
-    if (t.includes('cannot attach')) return 'na_cannot';
-    if (t.startsWith('not approved')) return 'na_other';
+    if (t.startsWith('submitted')) return 'pending';            // orange
+    if (t === 'approved') return 'approved';                    // green
+    if (t.startsWith('created')) return 'created';              // yellow
+    if (t.includes('cannot attach')) return 'na_cannot';        // purple
+    if (t.startsWith('not approved')) return 'na_other';        // red
     return '';
   };
 
@@ -170,26 +170,28 @@
   $('#fJob').addEventListener('change', renderList);
   $('#fSearch').addEventListener('input', renderList);
 
-  async function sendChange(change, reason) {
+  async function callApi(change, reason) {
     const res = await fetch(CFG.API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Permits-Key':CFG.SHARED_KEY},
-      body: JSON.stringify({ actorName:'Website User', reason, change })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Permits-Key': CFG.SHARED_KEY },
+      body: JSON.stringify({ actorName: 'Website User', reason, change })
     });
     const data = await res.json().catch(()=>({}));
     if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
     return data;
-  }
+    }
 
+  // --- Save permit ---
   $('#btnSavePermit').addEventListener('click', async () => {
+    const btn = $('#btnSavePermit'); const btnDel = $('#btnDeletePermit'); const msg = $('#msgPermit');
     try {
-      const msg = $('#msgPermit');
-      msg.textContent = 'Submitting…';
+      btn.disabled = true; btnDel.disabled = true; msg.textContent = 'Submitting…';
+
       if (!UI.selectedPoleKey) { msg.textContent = 'Select a pole first.'; return; }
       const [job_name, tag, SCID] = UI.selectedPoleKey.split('::');
 
-      const existing = $('#selPermit').value !== '__new';
-      let permit_id = existing ? $('#selPermit').value : ($('#permit_id').value||'').trim();
+      const isExisting = $('#selPermit').value !== '__new';
+      let permit_id = isExisting ? $('#selPermit').value : ($('#permit_id').value||'').trim();
       if (!permit_id) { msg.textContent='Permit ID is required for new permits.'; return; }
 
       const permit_status = $('#permit_status').value;
@@ -207,26 +209,37 @@
         permit:{ permit_id, job_name, tag, SCID, permit_status, submitted_by, submitted_at, notes }
       };
 
-      const data = await sendChange(payload, `Edit permit ${permit_id}`);
+      const data = await callApi(payload, `Edit permit ${permit_id}`);
       msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-      window.startAggressiveWatch && window.startAggressiveWatch(); // ← temporary 5s polling
-    } catch (e) { $('#msgPermit').textContent = e.message; }
+      // Start on-demand 2s watcher + progress banner
+      window.watchForRepoUpdate && window.watchForRepoUpdate(data.pr_url);
+
+    } catch (e) {
+      msg.textContent = e.message;
+    } finally {
+      btn.disabled = false; btnDel.disabled = false;
+    }
   });
 
+  // --- Delete permit ---
   $('#btnDeletePermit').addEventListener('click', async () => {
+    const btn = $('#btnDeletePermit'); const btnSave = $('#btnSavePermit'); const msg = $('#msgPermit');
     try {
-      const msg = $('#msgPermit');
-      msg.textContent = 'Deleting…';
+      btn.disabled = true; btnSave.disabled = true; msg.textContent = 'Deleting…';
       const id = $('#selPermit').value;
       if (!id || id==='__new'){ msg.textContent='Select an existing permit to delete.'; return; }
-      const data = await sendChange({ type:'delete_permit', permit_id:id }, `Delete permit ${id}`);
-      msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-      window.startAggressiveWatch && window.startAggressiveWatch(); // ← temporary 5s polling
-    } catch (e) { $('#msgPermit').textContent = e.message; }
-  });
 
-  // Admin export stays unchanged (omitted here for brevity in this note; it's identical to the last version)
-  // Reuse the same Export CSV handler you already have in place.
+      const data = await callApi({ type:'delete_permit', permit_id:id }, `Delete permit ${id}`);
+      msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
+      // Start on-demand 2s watcher + progress banner
+      window.watchForRepoUpdate && window.watchForRepoUpdate(data.pr_url);
+
+    } catch (e) {
+      msg.textContent = e.message;
+    } finally {
+      btn.disabled = false; btnSave.disabled = false;
+    }
+  });
 
   window.addEventListener('data:loaded', renderList);
 })();
