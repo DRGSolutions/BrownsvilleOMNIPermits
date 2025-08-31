@@ -1,97 +1,228 @@
 // assets/js/app.js
-(function(){
-  const CFG = window.APP_CONFIG || {};
+(function () {
   const $ = (s) => document.querySelector(s);
-  const fmt = (n) => new Intl.NumberFormat().format(n);
 
-  // -------- GitHub helpers --------
+  const CFG = window.CONFIG || {};
+  const OWNER  = CFG.OWNER;
+  const REPO   = CFG.REPO;
+  const BRANCH = CFG.DEFAULT_BRANCH || 'main';
+  const DATA_DIR = CFG.DATA_DIR || 'data';
+  const API_URL = CFG.API_URL;
+  const SHARED_KEY = CFG.SHARED_KEY;
+
+  // ---- Status helpers ----
+  function setStatus(msgHtml) {
+    const el = $('#status');
+    if (el) el.innerHTML = msgHtml || '';
+  }
+  function kpi(id, val) {
+    const el = $(id);
+    if (el) el.textContent = val;
+  }
+  function fmt(n) { return new Intl.NumberFormat().format(n); }
+  function nowLocal() { return new Date().toLocaleString(); }
+
+  // ---- GitHub fetch (pinned-to-SHA, branch fallback) ----
   async function getLatestSha() {
-    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
-    const r = await fetch(url, { cache: 'no-store' });
+    const r = await fetch(
+      `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}?_=${Date.now()}`,
+      { cache: 'no-store' }
+    );
     if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
     const j = await r.json();
     return j.sha;
   }
 
-  async function fetchJson(url) {
-    const r = await fetch(url, { cache: 'no-store' });
-    return { ok: r.ok, status: r.status, json: r.ok ? await r.json() : null, url };
-  }
-
-  async function tryLoadBases(bases) {
+  async function fetchDataAtSha(sha) {
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const errors = [];
-    for (const base of bases) {
-      const p1 = await fetchJson(`${base}/poles.json${bust}`);
-      const p2 = await fetchJson(`${base}/permits.json${bust}`);
-      if (p1.ok && p2.ok) {
-        return { poles: p1.json, permits: p2.json, base };
-      }
-      if (!p1.ok) errors.push(`poles.json ${p1.status} @ ${p1.url}`);
-      if (!p2.ok) errors.push(`permits.json ${p2.status} @ ${p2.url}`);
-    }
-    const last = errors.slice(-1)[0] || 'Unknown fetch error';
-    throw new Error(last);
+    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_DIR}`;
+    const [r1, r2] = await Promise.all([
+      fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
+      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
+    ]);
+    if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
+    const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
+    return { poles, permits, sha };
   }
 
-  // -------- Main load --------
+  async function fetchDataBranchFallback() {
+    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${DATA_DIR}`;
+    const [r1, r2] = await Promise.all([
+      fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
+      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
+    ]);
+    if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
+    const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
+    return { poles, permits, sha: null };
+  }
+
   async function loadData() {
-    const status = $('#status');
-    status.textContent = 'Loading…';
+    try {
+      setStatus('Loading…');
+      let data;
+      try {
+        const sha = await getLatestSha();
+        data = await fetchDataAtSha(sha);
+        setStatus(`<span class="ok">Loaded from commit <code>${data.sha.slice(0,7)}</code>.</span>`);
+      } catch {
+        data = await fetchDataBranchFallback();
+        setStatus(`<span class="ok">Loaded (branch fallback).</span>`);
+      }
+
+      const prev = window.STATE || {};
+      window.STATE = {
+        ...prev,
+        poles: data.poles || [],
+        permits: data.permits || [],
+        sha: data.sha,
+        lastLoaded: new Date().toISOString()
+      };
+
+      kpi('#kPoles',   fmt((window.STATE.poles || []).length));
+      kpi('#kPermits', fmt((window.STATE.permits || []).length));
+      kpi('#kLoaded',  nowLocal());
+      if (window.STATE.sha) kpi('#kSha', window.STATE.sha.slice(0,7));
+
+      // Tell UI to render
+      window.dispatchEvent(new CustomEvent('data:loaded'));
+    } catch (err) {
+      console.error(err);
+      setStatus(`<span class="err">Error: ${err.message}</span>`);
+    }
+  }
+
+  // ---- API call helper ----
+  async function callApi(payload) {
+    if (!API_URL) throw new Error('Missing CONFIG.API_URL');
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Permits-Key': SHARED_KEY || ''
+      },
+      body: JSON.stringify(payload)
+    });
+    let data;
+    try { data = await res.json(); } catch { data = { ok: false, error: 'Invalid server response' }; }
+    if (!res.ok || !data.ok) {
+      const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
+      throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
+    }
+    return data; // { ok:true, pr_url, branch }
+  }
+
+  // ---- Save / Delete handlers ----
+  function msg(textHtml) {
+    const el = $('#msgPermit');
+    if (el) el.innerHTML = textHtml || '';
+  }
+
+  async function onSavePermit(ev) {
+    if (ev) ev.preventDefault();
+    // Ensure buttons never submit any form
+    const btn = $('#btnSavePermit');
+    if (btn && (!btn.type || btn.type.toLowerCase() === 'submit')) btn.type = 'button';
+
+    if (typeof window.UI_collectPermitForm !== 'function') {
+      msg('<span class="err">Internal error: form collector missing.</span>');
+      return;
+    }
+
+    const f = window.UI_collectPermitForm();
+    // Required fields
+    if (!f.job_name || !f.tag || !f.SCID) { msg('<span class="err">Missing pole keys (job_name, tag, SCID).</span>'); return; }
+    if (!f.permit_id) { msg('<span class="err">Permit ID is required.</span>'); return; }
+    if (!f.permit_status) { msg('<span class="err">Permit Status is required.</span>'); return; }
+    if (!f.submitted_by) { msg('<span class="err">Submitted By is required.</span>'); return; }
+    if (!f.submitted_at) { msg('<span class="err">Submitted At (date) is required.</span>'); return; }
+
+    const st = window.STATE || {};
+    const exists = (st.permits || []).some(r => String(r.permit_id) === String(f.permit_id));
+
+    const change = exists
+      ? {
+          type: 'update_permit',
+          permit_id: f.permit_id,
+          patch: {
+            job_name: f.job_name,
+            tag:      f.tag,
+            SCID:     f.SCID,
+            permit_status: f.permit_status,
+            submitted_by:  f.submitted_by,
+            submitted_at:  f.submitted_at, // already MM/DD/YYYY from ui.js
+            notes:         f.notes || ''
+          }
+        }
+      : {
+          type: 'upsert_permit',
+          permit: {
+            permit_id: f.permit_id,
+            job_name:  f.job_name,
+            tag:       f.tag,
+            SCID:      f.SCID,
+            permit_status: f.permit_status,
+            submitted_by:  f.submitted_by,
+            submitted_at:  f.submitted_at,
+            notes:         f.notes || ''
+          }
+        };
 
     try {
-      // Candidate directories (unique): your configured dir, plus safe fallbacks.
-      const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
-
-      // 1) Try pinned SHA (strongest cache-busting)
-      let sha = await getLatestSha();
-      let bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
-      let result;
-      try {
-        result = await tryLoadBases(bases);
-        window.STATE = { ...result, sha, from: 'sha' };
-      } catch {
-        // 2) Branch fallback (in case path moved in latest commit)
-        bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
-        result = await tryLoadBases(bases);
-        window.STATE = { ...result, sha: CFG.DEFAULT_BRANCH, from: 'branch' };
-      }
-
-      // Update KPIs
-      $('#kPoles').textContent  = fmt(window.STATE.poles.length);
-      $('#kPermits').textContent= fmt(window.STATE.permits.length);
-      $('#kLoaded').textContent = new Date().toLocaleString();
-      $('#kSha').textContent    = window.STATE.from === 'sha'
-        ? String(window.STATE.sha).slice(0,7)
-        : `${CFG.DEFAULT_BRANCH} (fallback)`;
-
-      status.innerHTML = window.STATE.from === 'sha'
-        ? `<span style="color:#34d399">Loaded from commit ${String(window.STATE.sha).slice(0,7)}</span>`
-        : `<span style="color:#f59e0b">Loaded from branch (fallback)</span>`;
-
-      // Announce to UI/admin modules
-      window.dispatchEvent(new Event('data:loaded'));
-    } catch (e) {
-      // Helpful message incl. last failing URL & code
-      $('#kPoles').textContent = '—';
-      $('#kPermits').textContent = '—';
-      $('#kLoaded').textContent = '—';
-      $('#kSha').textContent = '—';
-      const hint = `
-        <div class="small muted" style="margin-top:6px">
-          • Check <code>APP_CONFIG.DATA_DIR</code> in <code>assets/js/config.js</code> (e.g. <code>data</code> vs <code>docs/data</code>).<br/>
-          • If the repo is <b>private</b>, raw URLs return 404. Make it public or add a data proxy endpoint.
-        </div>`;
-      $('#status').innerHTML = `<span style="color:#ef4444">Error: ${e.message}</span>${hint}`;
-      console.error('[loadData]', e);
+      msg('Submitting…');
+      const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
+      msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
+      // watch.js will start polling on click; nothing else to do here
+    } catch (err) {
+      console.error(err);
+      msg(`<span class="err">${err.message}</span>`);
     }
   }
 
-  // Expose for the 2-second “pending changes” watcher
-  window.getLatestRepoSha = async function() {
-    try { return await getLatestSha(); } catch { return null; }
-  };
-  window.reloadData = loadData;
+  async function onDeletePermit(ev) {
+    if (ev) ev.preventDefault();
+    const btn = $('#btnDeletePermit');
+    if (btn && (!btn.type || btn.type.toLowerCase() === 'submit')) btn.type = 'button';
 
-  document.addEventListener('DOMContentLoaded', loadData);
+    const id = ($('#permit_id')?.value || '').trim();
+    if (!id) { msg('<span class="err">Permit ID is required to delete.</span>'); return; }
+
+    try {
+      msg('Submitting delete…');
+      const data = await callApi({
+        actorName: 'Website User',
+        reason: `Delete ${id}`,
+        change: { type: 'delete_permit', permit_id: id } // needs backend support
+      });
+      msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
+      // watch.js will poll and refresh
+    } catch (err) {
+      console.error(err);
+      msg(`<span class="err">${err.message}</span>`);
+    }
+  }
+
+  function wireButtons() {
+    const save = $('#btnSavePermit');
+    if (save) {
+      if (!save.type || save.type.toLowerCase() === 'submit') save.type = 'button';
+      save.removeEventListener('click', onSavePermit);
+      save.addEventListener('click', onSavePermit);
+    }
+    const del = $('#btnDeletePermit');
+    if (del) {
+      if (!del.type || del.type.toLowerCase() === 'submit') del.type = 'button';
+      del.removeEventListener('click', onDeletePermit);
+      del.addEventListener('click', onDeletePermit);
+    }
+  }
+
+  // ---- boot ----
+  document.addEventListener('DOMContentLoaded', () => {
+    wireButtons();
+    loadData();
+  });
+
+  // also re-enable buttons whenever data loads
+  window.addEventListener('data:loaded', wireButtons);
 })();
