@@ -1,73 +1,97 @@
 // assets/js/app.js
-(function () {
+(function(){
   const CFG = window.APP_CONFIG || {};
-  const fmt = (n) => new Intl.NumberFormat().format(n);
   const $ = (s) => document.querySelector(s);
+  const fmt = (n) => new Intl.NumberFormat().format(n);
 
-  const STATE = { poles: [], permits: [], sha: null, loadedAt: null };
-  window.STATE = STATE;
-
-  function setKPIs() {
-    $('#kPoles').textContent   = fmt(STATE.poles.length);
-    $('#kPermits').textContent = fmt(STATE.permits.length);
-    $('#kLoaded').textContent  = STATE.loadedAt ? new Date(STATE.loadedAt).toLocaleString() : '—';
-    $('#kSha').textContent     = STATE.sha || (CFG.BRANCH || 'main');
-    $('#status').textContent   = 'Loaded.';
-    window.dispatchEvent(new CustomEvent('data:loaded'));
-  }
-
+  // -------- GitHub helpers --------
   async function getLatestSha() {
-    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.BRANCH}`;
+    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
     const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+    if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
     const j = await r.json();
     return j.sha;
   }
-  window.getLatestSha = getLatestSha;
 
-  // Raw fetch pinned to a ref (commit or branch) with small retry loop for CDN propagation.
-  async function fetchRawJsonAtRef(filename, ref, attempts = 4) {
-    const base = `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${ref}/${CFG.DATA_DIR}`;
-    let lastErr;
-    for (let i = 0; i < attempts; i++) {
-      try {
-        const bust = `?ts=${Date.now()}-${i}`;
-        const r = await fetch(`${base}/${filename}${bust}`, { cache: 'no-store' });
-        if (!r.ok) throw new Error(`${filename} ${r.status}`);
-        return await r.json();
-      } catch (e) {
-        lastErr = e;
-        // Backoff 0.8s, 1.6s, 2.4s… (capped)
-        await new Promise(res => setTimeout(res, Math.min(800 * (i + 1), 2400)));
+  async function fetchJson(url) {
+    const r = await fetch(url, { cache: 'no-store' });
+    return { ok: r.ok, status: r.status, json: r.ok ? await r.json() : null, url };
+  }
+
+  async function tryLoadBases(bases) {
+    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const errors = [];
+    for (const base of bases) {
+      const p1 = await fetchJson(`${base}/poles.json${bust}`);
+      const p2 = await fetchJson(`${base}/permits.json${bust}`);
+      if (p1.ok && p2.ok) {
+        return { poles: p1.json, permits: p2.json, base };
       }
+      if (!p1.ok) errors.push(`poles.json ${p1.status} @ ${p1.url}`);
+      if (!p2.ok) errors.push(`permits.json ${p2.status} @ ${p2.url}`);
     }
-    throw lastErr;
+    const last = errors.slice(-1)[0] || 'Unknown fetch error';
+    throw new Error(last);
   }
 
-  // If ref is provided, we use it; otherwise we ask GitHub for the latest SHA first.
-  async function loadData(ref) {
+  // -------- Main load --------
+  async function loadData() {
+    const status = $('#status');
+    status.textContent = 'Loading…';
+
     try {
-      $('#status').textContent = 'Loading…';
-      const sha = ref || (await getLatestSha().catch(() => null));
-      const usedRef = sha || CFG.BRANCH;
+      // Candidate directories (unique): your configured dir, plus safe fallbacks.
+      const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
 
-      const [poles, permits] = await Promise.all([
-        fetchRawJsonAtRef('poles.json', usedRef),
-        fetchRawJsonAtRef('permits.json', usedRef)
-      ]);
+      // 1) Try pinned SHA (strongest cache-busting)
+      let sha = await getLatestSha();
+      let bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
+      let result;
+      try {
+        result = await tryLoadBases(bases);
+        window.STATE = { ...result, sha, from: 'sha' };
+      } catch {
+        // 2) Branch fallback (in case path moved in latest commit)
+        bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
+        result = await tryLoadBases(bases);
+        window.STATE = { ...result, sha: CFG.DEFAULT_BRANCH, from: 'branch' };
+      }
 
-      STATE.poles = poles;
-      STATE.permits = permits;
-      STATE.sha = sha || CFG.BRANCH;
-      STATE.loadedAt = Date.now();
-      setKPIs();
+      // Update KPIs
+      $('#kPoles').textContent  = fmt(window.STATE.poles.length);
+      $('#kPermits').textContent= fmt(window.STATE.permits.length);
+      $('#kLoaded').textContent = new Date().toLocaleString();
+      $('#kSha').textContent    = window.STATE.from === 'sha'
+        ? String(window.STATE.sha).slice(0,7)
+        : `${CFG.DEFAULT_BRANCH} (fallback)`;
+
+      status.innerHTML = window.STATE.from === 'sha'
+        ? `<span style="color:#34d399">Loaded from commit ${String(window.STATE.sha).slice(0,7)}</span>`
+        : `<span style="color:#f59e0b">Loaded from branch (fallback)</span>`;
+
+      // Announce to UI/admin modules
+      window.dispatchEvent(new Event('data:loaded'));
     } catch (e) {
-      console.error('loadData error:', e);
-      $('#status').textContent = `Error: ${e.message}`;
+      // Helpful message incl. last failing URL & code
+      $('#kPoles').textContent = '—';
+      $('#kPermits').textContent = '—';
+      $('#kLoaded').textContent = '—';
+      $('#kSha').textContent = '—';
+      const hint = `
+        <div class="small muted" style="margin-top:6px">
+          • Check <code>APP_CONFIG.DATA_DIR</code> in <code>assets/js/config.js</code> (e.g. <code>data</code> vs <code>docs/data</code>).<br/>
+          • If the repo is <b>private</b>, raw URLs return 404. Make it public or add a data proxy endpoint.
+        </div>`;
+      $('#status').innerHTML = `<span style="color:#ef4444">Error: ${e.message}</span>${hint}`;
+      console.error('[loadData]', e);
     }
   }
-  window.loadData = loadData;
 
-  // initial load
-  window.addEventListener('load', () => loadData());
+  // Expose for the 2-second “pending changes” watcher
+  window.getLatestRepoSha = async function() {
+    try { return await getLatestSha(); } catch { return null; }
+  };
+  window.reloadData = loadData;
+
+  document.addEventListener('DOMContentLoaded', loadData);
 })();
