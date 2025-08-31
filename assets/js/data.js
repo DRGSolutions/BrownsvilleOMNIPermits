@@ -1,6 +1,5 @@
 // assets/js/data.js
-// Loads poles/permits from the repo and builds handy indexes.
-// Exposes a small DATA API the UI can use.
+// Loads poles/permits from the repo, keeps indexes, and exposes a simple API.
 
 (() => {
   const CFG = (window.APP_CONFIG || {});
@@ -62,9 +61,8 @@
     if (window.UI && window.UI.onDataLoaded) window.UI.onDataLoaded(STATE);
   }
 
-  // Helper lookups ----------
+  // ------- helpers / filters -------
   function getJobNamesFilteredByOwner(owner) {
-    // If owner provided, include only jobs that have at least one pole with that owner
     const out = new Set();
     for (const [job, obj] of STATE.jobs.entries()) {
       if (!owner) { out.add(job); continue; }
@@ -93,7 +91,6 @@
   }
 
   function jobsEligibleForMassCreate() {
-    // Eligible if every pole in job has NO permit or only status 'NONE'
     const eligible = [];
     for (const [job, obj] of STATE.jobs.entries()) {
       if (!obj.poles.length) continue;
@@ -106,11 +103,9 @@
       }
       if (ok) eligible.push(job);
     }
-    eligible.sort();
-    return eligible;
+    return eligible.sort();
   }
 
-  // Public API
   window.DATA = {
     get state() { return STATE; },
     async reload() { await loadData(); },
