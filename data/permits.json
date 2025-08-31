@@ -38,5 +38,15 @@
     "submitted_by": "joe",
     "submitted_at": "08/31/2025",
     "notes": ""
+  },
+  {
+    "permit_id": "test",
+    "job_name": "BRN03-MV10",
+    "tag": "M-900",
+    "SCID": "M90",
+    "permit_status": "Not Approved - Cannot Attach",
+    "submitted_by": "j",
+    "submitted_at": "08/31/2025",
+    "notes": ""
   }
 ]
