@@ -179,9 +179,21 @@
     const data = await res.json().catch(()=>({}));
     if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
     return data;
-    }
+  }
 
-  // --- Save permit ---
+  function normalizeDateToMDY(inputValue) {
+    let s = (inputValue || '').trim();
+    if (!s) return null;
+    // from <input type="date"> YYYY-MM-DD → MM/DD/YYYY
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      const [y,m,d] = s.split('-'); return `${m}/${d}/${y}`;
+    }
+    // already MM/DD/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+    return null; // invalid
+  }
+
+  // --- Save permit (DATE REQUIRED) ---
   $('#btnSavePermit').addEventListener('click', async () => {
     const btn = $('#btnSavePermit'); const btnDel = $('#btnDeletePermit'); const msg = $('#msgPermit');
     try {
@@ -198,10 +210,10 @@
       const submitted_by  = ($('#submitted_by').value||'').trim();
       if (!submitted_by){ msg.textContent='Submitted By is required.'; return; }
 
-      let submitted_at = $('#submitted_at').value;
-      if (submitted_at && /^\d{4}-\d{2}-\d{2}$/.test(submitted_at)) {
-        const [y,m,d] = submitted_at.split('-'); submitted_at = `${m}/${d}/${y}`;
-      }
+      const rawDate = $('#submitted_at').value;
+      const submitted_at = normalizeDateToMDY(rawDate);
+      if (!submitted_at) { msg.textContent='A valid "Submitted At" date is required (MM/DD/YYYY).'; return; }
+
       const notes = $('#permit_notes').value || '';
 
       const payload = {
@@ -231,7 +243,6 @@
 
       const data = await callApi({ type:'delete_permit', permit_id:id }, `Delete permit ${id}`);
       msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-      // Start on-demand 2s watcher + progress banner
       window.watchForRepoUpdate && window.watchForRepoUpdate(data.pr_url);
 
     } catch (e) {
