@@ -28,5 +28,25 @@
     "submitted_by": "klopez",
     "submitted_at": "08/15/2025",
     "notes": "Approved for construction."
+  },
+  {
+    "permit_id": "PERM-BRN03-MV10-M-900-M90",
+    "job_name": "BRN03-MV10",
+    "tag": "M-900",
+    "SCID": "M90",
+    "permit_status": "Approved",
+    "submitted_by": "joe",
+    "submitted_at": "08/31/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "test",
+    "job_name": "BRN03-MV10",
+    "tag": "M-900",
+    "SCID": "M90",
+    "permit_status": "Not Approved - Cannot Attach",
+    "submitted_by": "j",
+    "submitted_at": "08/31/2025",
+    "notes": ""
   }
 ]
