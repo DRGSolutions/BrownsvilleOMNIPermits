@@ -1,24 +1,17 @@
 // assets/js/config.js
-export const OWNER           = 'DRGSolutions';
-export const REPO            = 'BrownsvilleOMNIPermits';
-export const DEFAULT_BRANCH  = 'main';
-export const DATA_REPO_DIR   = 'data'; // where poles.json & permits.json live
+// Central configuration used by data.js/api.js/ui.js
 
-// Your Vercel function
-export const API_URL   = 'https://permits-api.vercel.app/api/propose-change';
-export const SHARED_KEY = 'BrownsvilleOMNIPermits';
+window.APP_CONFIG = {
+  // GitHub repo that hosts the data under /data
+  OWNER: 'DRGSolutions',
+  REPO: 'BrownsvilleOMNIPermits',
+  DEFAULT_BRANCH: 'main',
+  DATA_REPO_PATH: 'data',
 
-// Status sets
-export const STATUS_NONE = 'NONE';
-export const PERMIT_STATUSES_UI = [
-  'Created - NOT Submitted',
-  'Submitted - Pending',
-  'Approved',
-  'Not Approved - Cannot Attach',
-  'Not Approved - PLA Issues',
-  'Not Approved - MRE Issues',
-  'Not Approved - Other Issues'
-];
+  // Vercel function that opens PRs
+  API_URL: 'https://permits-api.vercel.app/api/propose-change',
+  SHARED_KEY: 'BrownsvilleOMNIPermits',
 
-// Same list used for API (no NONE)
-export const STATUS_FOR_API = [...PERMIT_STATUSES_UI];
+  // Optional: CORS allow-list for the server (mirrors your Vercel env)
+  // ALLOWED_ORIGIN is set on the server; listed here for reference only
+};
