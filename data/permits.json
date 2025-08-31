@@ -28,15 +28,5 @@
     "submitted_by": "Joe",
     "submitted_at": "08/30/2025",
     "notes": "test"
-  },
-  {
-    "permit_id": "test1",
-    "job_name": "BRN01-F300",
-    "tag": "1235",
-    "SCID": "077",
-    "permit_status": "Not Approved - Cannot Attach",
-    "submitted_by": "Joe",
-    "submitted_at": "08/31/2025",
-    "notes": "TESTING!!!!!!!!!!!!!!!!!!!!!!\n123"
   }
 ]
