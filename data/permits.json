@@ -1,15 +1,5 @@
 [
   {
-    "permit_id": "PERM-BRN01-F300-1234-076",
-    "job_name": "BRN01-F300",
-    "tag": "1234",
-    "SCID": "076",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "jdoe",
-    "submitted_at": "08/29/2025",
-    "notes": "Initial creation for 22 NT6."
-  },
-  {
     "permit_id": "PERM-BRN02-X120-A-0021-A12",
     "job_name": "BRN02-X120",
     "tag": "A-0021",
