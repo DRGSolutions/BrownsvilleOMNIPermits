@@ -34,8 +34,8 @@
     "job_name": "BRN03-MV10",
     "tag": "M-900",
     "SCID": "M90",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "Joe",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "joe",
     "submitted_at": "08/31/2025",
     "notes": ""
   }
