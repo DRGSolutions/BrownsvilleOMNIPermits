@@ -20,16 +20,6 @@
     "notes": ""
   },
   {
-    "permit_id": "test",
-    "job_name": "BRN01-F300",
-    "tag": "1235",
-    "SCID": "077",
-    "permit_status": "Not Approved - Cannot Attach",
-    "submitted_by": "joe",
-    "submitted_at": "08/31/2025",
-    "notes": ""
-  },
-  {
     "permit_id": "TEST",
     "job_name": "BRN01-F300",
     "tag": "1234",
