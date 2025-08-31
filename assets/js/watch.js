@@ -1,36 +1,22 @@
 // assets/js/watch.js
+// Simple always-on watcher: polls repo HEAD every 5s; if SHA changes, reloads data.
 (function () {
-  const CFG = window.APP_CONFIG || {};
-  let timer = null;
+  let lastSha = null;
 
   async function tick() {
     try {
-      // If SHA polling works, reload only when the SHA changes
-      try {
-        const sha = await window.getLatestSha();
-        if (sha && window.STATE && window.STATE.sha && sha !== window.STATE.sha) {
-          // Repo advanced — refresh data
-          await window.loadData();
-        } else if (!window.STATE || !window.STATE.sha) {
-          // First time or missing sha — (re)load
-          await window.loadData();
-        }
-      } catch (apiErr) {
-        // If rate-limited or offline, gently refresh on a timer so the UI keeps moving
-        console.warn('[watch] commit poll failed, soft-refreshing:', apiErr.message);
-        await window.loadData();
+      const sha = await window.getLatestSha();
+      if (!lastSha) lastSha = window.STATE.sha || sha;
+      if (sha && sha !== lastSha) {
+        lastSha = sha;
+        await window.loadData();  // will emit data:loaded → UI refresh
       }
-    } catch (e) {
-      console.warn('[watch] tick failed:', e);
+    } catch (_) {
+      // ignore temporary GitHub API rate limits; we'll try again next tick
     } finally {
-      timer = setTimeout(tick, CFG.POLL_MS || 5000);
+      setTimeout(tick, 5000);
     }
   }
 
-  function startWatcher() {
-    if (!timer) tick();
-  }
-
-  window.addEventListener('DOMContentLoaded', startWatcher);
-  window.startWatcher = startWatcher; // (optional) manual start
+  window.addEventListener('load', tick);
 })();
