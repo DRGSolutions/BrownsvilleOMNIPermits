@@ -3,54 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Brownsville, TX are Pole & Permit Manager</title>
+  <title>DRG Brownsville, TX Permit Management System</title>
 
   <style>
-    :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; }
+    :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; --chip:#0e1520; }
     * { box-sizing:border-box }
     body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--fg); }
-    header { padding:20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, #0b0c10 0%, #0d0f14 100%); position:sticky; top:0; z-index:10 }
-    h1 { margin:0; font-size:22px }
-    main { max-width:1100px; margin:24px auto 56px; padding:0 16px }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    header { padding:24px 16px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, #0b0c10 0%, #0d0f14 100%); position:sticky; top:0; z-index:10; text-align:center }
+    h1 { margin:0; font-size:24px; letter-spacing:.2px }
+    main { max-width:1200px; margin:20px auto 56px; padding:0 16px }
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    .grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px }
     .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px }
     .muted { color:var(--muted) }
     .btn { appearance:none; border:1px solid var(--border); background:#161922; color:var(--fg); padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
     .btn:hover { background:#1a1f2b }
     .btn:disabled { opacity:.6; cursor:not-allowed }
     .btn-accent { border-color:#1f3b2f; background:#0f2b22 }
+    .btn-danger { border-color:#3a1e1e; background:#2a1515 }
     input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3242; background:#0f1219; color:var(--fg); }
     label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px }
+    .title { font-weight:700; font-size:16px; margin-bottom:6px }
+    .small { font-size:12px }
+    .kpi { display:flex; gap:14px; flex-wrap:wrap; margin:10px 0 0 }
+    .kpi div { background:#0f1219; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px; color:var(--muted) }
+    .list { display:grid; gap:12px; max-height:600px; overflow:auto; padding-right:4px }
+    .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:var(--chip); color:#c7d2fe }
+    .chip-ok { color:var(--accent) }
+    .chip-warn { color:#ffda6a; border-color:#5a4700 }
+    .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
     .row { display:grid; grid-template-columns: repeat(12, 1fr); gap:12px }
     .col-6 { grid-column: span 6 }
     .col-4 { grid-column: span 4 }
     .col-3 { grid-column: span 3 }
     .col-12 { grid-column: span 12 }
-    .kpi { display:flex; gap:14px; flex-wrap:wrap; margin:14px 0 0 }
-    .kpi div { background:#0f1219; border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; color:var(--muted) }
-    .list { display:grid; grid-template-columns: 1fr; gap:12px; max-height:520px; overflow:auto; padding-right:4px }
-    .title { font-weight:700; font-size:16px; margin-bottom:2px }
-    .small { font-size:12px }
-    .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520; color:#c7d2fe }
-    .ok { color:var(--accent) }
-    .err { color:var(--danger) }
-    .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #664c00; color:#ffda6a; background:transparent; }
-    .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-    .spacer { height:10px }
-    .link { color:#7dd3fc; text-decoration:none }
-    .link:hover { text-decoration:underline }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr } .list { max-height:none } }
+    @media (max-width: 1060px) { .grid-2 { grid-template-columns: 1fr } .list { max-height:none } }
   </style>
 </head>
 <body>
   <header>
-    <h1>Brownsville, TX are Pole & Permit Manager</h1>
+    <h1>DRG Brownsville, TX Permit Management System</h1>
   </header>
 
   <main>
-    <div class="grid">
-      <!-- Left: Filters + Data viewer -->
+    <div class="grid-2">
+      <!-- Left column: Filters, status, list -->
       <section class="card">
+        <div class="title">Filters</div>
+        <div class="grid-3" style="margin-bottom:12px;">
+          <div>
+            <label>Utility</label>
+            <select id="selUtility"></select>
+          </div>
+          <div>
+            <label>Job Name</label>
+            <select id="selJob"></select>
+          </div>
+          <div>
+            <label>Search Tag or SCID</label>
+            <input id="searchTagScid" placeholder="e.g., 1234 or 076" />
+          </div>
+        </div>
+
         <div class="flex" style="justify-content:space-between; align-items:flex-start;">
           <div>
             <div class="title">Current Data</div>
@@ -58,571 +72,133 @@
             <div class="kpi">
               <div>Poles: <b id="kPoles">—</b></div>
               <div>Permits: <b id="kPermits">—</b></div>
-              <div>Last loaded: <b id="kLoaded">—</b></div>
+              <div>Loaded: <b id="kLoaded">—</b></div>
+              <div>Commit: <b id="kSha">—</b></div>
             </div>
           </div>
         </div>
 
-        <div class="spacer"></div>
-
-        <!-- Filters -->
-        <div class="row">
-          <div class="col-6">
-            <label>Utility</label>
-            <select id="filterUtility">
-              <option value="">All</option>
-              <option>BPUB</option>
-              <option>AEP</option>
-              <option>MVEC</option>
-            </select>
-          </div>
-          <div class="col-6">
-            <label>Job Name</label>
-            <select id="filterJob">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="spacer"></div>
-
-        <!-- Change monitor -->
-        <div id="pendingPanel" class="card" style="padding:12px; display:none;">
+        <div id="pendingPanel" class="card" style="padding:12px; display:none; margin:12px 0 10px;">
           <div class="title" style="margin-bottom:6px;">Change Monitor</div>
           <div id="pendingList" class="small muted">No pending changes.</div>
         </div>
 
-        <div class="spacer"></div>
-
         <div id="list" class="list"></div>
       </section>
 
-      <!-- Right: Editor forms -->
+      <!-- Right column: Forms & Admin -->
       <section class="card">
-        <div class="title">Web Editor</div>
-        <div class="spacer"></div>
-
-        <!-- Update or upsert a Pole -->
-        <form id="formPole" class="card" style="padding:14px;">
-          <div class="title" style="margin-bottom:8px;">Update / Upsert Pole</div>
+        <div class="title" style="margin-bottom:8px;">Pole Editor</div>
+        <form id="formPole" class="card" style="padding:14px; margin-bottom:14px;">
           <div class="row">
-            <div class="col-4">
-              <label>Job Name (required)</label>
-              <input name="job_name" required />
-            </div>
-            <div class="col-4">
-              <label>Tag (required)</label>
-              <input name="tag" required />
-            </div>
-            <div class="col-4">
-              <label>SCID (required)</label>
-              <input name="SCID" required />
-            </div>
-
-            <div class="col-6">
-              <label>Mode</label>
+            <div class="col-6"><label>Mode</label>
               <select name="mode">
-                <option value="update">Update existing</option>
                 <option value="upsert">Upsert (create if missing)</option>
+                <option value="update">Update existing</option>
               </select>
             </div>
-            <div class="col-6">
-              <label>Owner (Utility)</label>
-              <select name="owner">
-                <option>BPUB</option>
-                <option>AEP</option>
-                <option>MVEC</option>
-              </select>
+            <div class="col-6"><label>Owner</label>
+              <select name="owner" id="pole_owner"></select>
             </div>
 
-            <div class="col-6">
-              <label>Pole Spec</label>
-              <input name="pole_spec" placeholder="e.g., 50-3" />
-            </div>
-            <div class="col-6">
-              <label>Proposed Spec</label>
-              <input name="proposed_spec" placeholder="e.g., 50-3" />
-            </div>
+            <div class="col-4"><label>Job Name *</label><input name="job_name" required /></div>
+            <div class="col-4"><label>Tag *</label><input name="tag" required /></div>
+            <div class="col-4"><label>SCID *</label><input name="SCID" required /></div>
 
-            <div class="col-6">
-              <label>Latitude</label>
-              <input name="lat" type="number" step="any" />
-            </div>
-            <div class="col-6">
-              <label>Longitude</label>
-              <input name="lon" type="number" step="any" />
-            </div>
+            <div class="col-6"><label>Pole Spec</label><input name="pole_spec" /></div>
+            <div class="col-6"><label>Proposed Spec</label><input name="proposed_spec" /></div>
 
-            <div class="col-12">
-              <label>MR Level</label>
-              <input name="mr_level" placeholder="e.g., Complex MR" />
-            </div>
+            <div class="col-6"><label>Latitude</label><input name="lat" type="number" step="any" /></div>
+            <div class="col-6"><label>Longitude</label><input name="lon" type="number" step="any" /></div>
 
-            <div class="col-12">
-              <label>Reason (optional)</label>
-              <input name="reason" placeholder="Why are you making this change?" />
-            </div>
+            <div class="col-12"><label>MR Level</label><input name="mr_level" /></div>
           </div>
-
-          <div class="spacer"></div>
-          <div class="flex">
+          <div class="flex" style="margin-top:10px;">
             <button class="btn btn-accent" type="submit">Save Pole</button>
             <span id="msgPole" class="muted small"></span>
           </div>
         </form>
 
-        <div class="spacer"></div>
-
-        <!-- Upsert a Permit -->
-        <form id="formPermit" class="card" style="padding:14px;">
-          <div class="title" style="margin-bottom:8px;">Upsert Permit</div>
-          <div class="row">
-            <div class="col-6">
-              <label>Permit ID (required)</label>
-              <input name="permit_id" required />
-            </div>
-            <div class="col-6">
-              <label>Job Name (required)</label>
-              <input name="job_name" required />
+        <div class="title" style="margin-bottom:8px;">Permit Editor</div>
+        <form id="formPermit" class="card" style="padding:14px; margin-bottom:14px;">
+          <div class="small muted" id="selPoleSummary">No pole selected.</div>
+          <div class="row" style="margin-top:8px;">
+            <div class="col-12"><label>Select Existing Permit (or choose “New”)</label>
+              <select id="permit_select">
+                <option value="">— New —</option>
+              </select>
             </div>
 
-            <div class="col-12">
-              <label>Permit Status</label>
-              <select name="permit_status" id="permit_status_select"></select>
+            <div class="col-6"><label>Permit ID *</label><input name="permit_id" id="permit_id" required /></div>
+            <div class="col-6"><label>Status *</label>
+              <select name="permit_status" id="permit_status"></select>
             </div>
 
-            <div class="col-6">
-              <label>Submitted By</label>
-              <input name="submitted_by" />
-            </div>
-            <div class="col-6">
-              <label>Submitted At</label>
-              <input name="submitted_at" type="date" />
-            </div>
+            <div class="col-6"><label>Submitted By *</label><input name="submitted_by" id="submitted_by" required /></div>
+            <div class="col-6"><label>Submitted At</label><input name="submitted_at" id="submitted_at" type="date" /></div>
 
-            <div class="col-12">
-              <label>Notes</label>
-              <textarea name="notes" rows="3" placeholder="Add any relevant notes…"></textarea>
-            </div>
+            <div class="col-12"><label>Notes</label><textarea name="notes" id="notes" rows="3" placeholder="Add any notes…"></textarea></div>
           </div>
-
-          <div class="spacer"></div>
-          <div class="flex">
+          <div class="flex" style="margin-top:10px;">
             <button class="btn btn-accent" type="submit">Save Permit</button>
             <span id="msgPermit" class="muted small"></span>
           </div>
         </form>
+
+        <div class="title" style="margin-bottom:8px;">Admin</div>
+        <div class="card" style="padding:14px;">
+          <div class="row">
+            <div class="col-4">
+              <label>Export — Utility</label>
+              <select id="adminUtility"></select>
+            </div>
+            <div class="col-4">
+              <label>Export — Job</label>
+              <select id="adminJob"></select>
+            </div>
+            <div class="col-4">
+              <label>Export — Permit Status</label>
+              <select id="adminStatus">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="col-12 flex">
+              <button id="btnExportPoles" class="btn">Export Poles CSV</button>
+              <button id="btnExportPermits" class="btn">Export Permits CSV</button>
+            </div>
+          </div>
+
+          <hr style="border-color:#222; margin:14px 0" />
+
+          <div class="row">
+            <div class="col-12"><div class="small muted">Mass create permits for the <b>currently selected Job</b> (left filters) — only allowed when the job has <b>no existing permits</b>.</div></div>
+            <div class="col-4">
+              <label>Template Status *</label>
+              <select id="mass_status"></select>
+            </div>
+            <div class="col-4">
+              <label>Template Submitted By *</label>
+              <input id="mass_submitted_by" />
+            </div>
+            <div class="col-4">
+              <label>Template Submitted At</label>
+              <input id="mass_submitted_at" type="date" />
+            </div>
+            <div class="col-12">
+              <label>Template Notes</label>
+              <textarea id="mass_notes" rows="3"></textarea>
+            </div>
+            <div class="col-12 flex">
+              <button id="btnMassCreate" class="btn btn-danger">Create Permits For Job</button>
+              <span id="msgMass" class="muted small"></span>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   </main>
 
-  <script>
-    // ======= CONFIG =======
-    const API_URL    = 'https://permits-api.vercel.app/api/propose-change'; // your Vercel endpoint
-    const SHARED_KEY = 'BrownsvilleOMNIPermits';                             // must match FORM_SHARED_KEY
-
-    const OWNER = 'DRGSolutions';
-    const REPO  = 'BrownsvilleOMNIPermits';
-    const DEFAULT_BRANCH = 'main';
-    const DATA_REPO_PATH = 'data'; // where poles.json & permits.json live in repo
-
-    // ======= DOM =======
-    const elStatus   = document.getElementById('status');
-    const elList     = document.getElementById('list');
-    const elKPoles   = document.getElementById('kPoles');
-    const elKPerms   = document.getElementById('kPermits');
-    const elKLoaded  = document.getElementById('kLoaded');
-    const elUtility  = document.getElementById('filterUtility');
-    const elJob      = document.getElementById('filterJob');
-
-    let poles = [], permits = [];
-
-    const PERMIT_STATUSES = [
-      "Not Submitted",
-      "Submitted - Pending",
-      "Approved",
-      "Not Approved - Cannot Attach",
-      "Not Approved - PLA Issues",
-      "Not Approved - MRE Issues",
-      "Not Approved - Other Issues"
-    ];
-
-    // Populate the status dropdown
-    (function initStatusSelect(){
-      const sel = document.getElementById('permit_status_select');
-      PERMIT_STATUSES.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s; opt.textContent = s;
-        sel.appendChild(opt);
-      });
-    })();
-
-    // ======= CHANGE MONITOR =======
-    let currentSha = null;              // last commit SHA we loaded
-    const pending = new Map();          // key -> { kind,id,expected,prUrl,state,started,appliedSha }
-    let watcher = null;
-
-    function keyForPole(p) {
-      return `${String(p.job_name||'').trim()}::${String(p.tag||'').trim()}::${String(p.SCID||'').trim()}`;
-    }
-    function matchesPatch(obj, expected) {
-      const EPS = 1e-9;
-      for (const [k, vExp] of Object.entries(expected)) {
-        const vObj = obj[k];
-        if (vObj === vExp) continue;
-        if (vObj != null && vExp != null && String(vObj) === String(vExp)) continue;
-        const nObj = Number(vObj), nExp = Number(vExp);
-        if (!Number.isNaN(nObj) && !Number.isNaN(nExp) && Math.abs(nObj - nExp) < EPS) continue;
-        return false;
-      }
-      return true;
-    }
-    function renderPending() {
-      const panel = document.getElementById('pendingPanel');
-      const list  = document.getElementById('pendingList');
-      if (pending.size === 0) {
-        panel.style.display = 'none';
-        list.innerHTML = 'No pending changes.';
-        return;
-      }
-      panel.style.display = 'block';
-      list.innerHTML = [...pending.values()].map(it => {
-        const secs = Math.floor((Date.now() - it.started) / 1000);
-        const pr = it.prUrl ? ` · <a class="link" target="_blank" rel="noopener" href="${it.prUrl}">View PR</a>` : '';
-        return `<div>
-          ${it.kind} <code>${it.id}</code>
-          — <span class="status" style="border-color:${it.state==='applied'?'#1f3b2f':'#664c00'};color:${it.state==='applied'?'#6ee7b7':'#ffda6a'}">
-            ${it.state === 'applied' ? 'applied' : 'pending'}
-          </span>
-          ${pr} · ${secs}s
-          ${it.appliedSha ? ` · in <code>${it.appliedSha.slice(0,7)}</code>` : ''}
-        </div>`;
-      }).join('');
-    }
-    function trackPendingChange(kind, id, expected, prUrl) {
-      pending.set(id, { kind, id, expected, prUrl, state: 'pending', started: Date.now() });
-      renderPending();
-      if (!watcher) watcher = setInterval(checkPending, 3000);
-    }
-    async function checkPending() {
-      if (pending.size === 0) {
-        clearInterval(watcher); watcher = null; return;
-      }
-      let sha;
-      try { sha = await getLatestSha(); } catch { return; }
-      if (sha !== currentSha) await loadData(); // refresh data if repo advanced
-
-      let anyApplied = false;
-      for (const [id, it] of [...pending.entries()]) {
-        if (it.kind === 'pole') {
-          const [j,t,s] = id.split('::');
-          const obj = poles.find(p => String(p.job_name)===j && String(p.tag)===t && String(p.SCID)===s);
-          if (obj && matchesPatch(obj, it.expected)) {
-            it.state = 'applied'; it.appliedSha = currentSha; pending.delete(id); anyApplied = true;
-          }
-        } else {
-          const obj = permits.find(p => String(p.permit_id) === id);
-          if (obj && matchesPatch(obj, it.expected)) {
-            it.state = 'applied'; it.appliedSha = currentSha; pending.delete(id); anyApplied = true;
-          }
-        }
-      }
-      renderPending();
-      if (anyApplied) renderList();
-    }
-
-    // ======= GITHUB DATA LOAD (SHA pinned) =======
-    async function getLatestSha() {
-      const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
-      const r = await fetch(url, { cache: 'no-store' });
-      if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
-      const j = await r.json();
-      return j.sha;
-    }
-    async function loadData() {
-      try {
-        elStatus.textContent = 'Loading…';
-        const sha = await getLatestSha();
-        currentSha = sha;
-
-        const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_REPO_PATH}`;
-        const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-        const [r1, r2] = await Promise.all([
-          fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-          fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
-        ]);
-        if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status} (poles/permits)`);
-
-        const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
-        poles = Array.isArray(j1) ? j1 : [];
-        permits = Array.isArray(j2) ? j2 : [];
-
-        elKPoles.textContent  = new Intl.NumberFormat().format(poles.length);
-        elKPerms.textContent  = new Intl.NumberFormat().format(permits.length);
-        elKLoaded.textContent = new Date().toLocaleString();
-        elStatus.innerHTML = `<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`;
-
-        rebuildJobFilter();
-        renderList();
-        renderPending();
-      } catch (err) {
-        console.error('loadData error:', err);
-        elStatus.innerHTML = `<span class="err">Error: ${err.message}</span>`;
-      }
-    }
-
-    // ======= Filters & List =======
-    function rebuildJobFilter() {
-      // Build job list from poles, filtered by utility (owner) if selected
-      const util = elUtility.value || '';
-      const jobs = new Set(
-        poles
-          .filter(p => !util || String(p.owner) === util)
-          .map(p => String(p.job_name || '').trim())
-          .filter(Boolean)
-      );
-      const current = elJob.value;
-      elJob.innerHTML = '<option value="">All</option>' + [...jobs].sort().map(j => `<option>${j}</option>`).join('');
-      // Re-apply previous if still present
-      if (current && jobs.has(current)) elJob.value = current;
-    }
-
-    function renderList(){
-      const util = elUtility.value || '';
-      const job  = elJob.value || '';
-
-      // Filter poles
-      const filteredPoles = poles.filter(p => {
-        const okU = !util || String(p.owner) === util;
-        const okJ = !job  || String(p.job_name) === job;
-        return okU && okJ;
-      });
-
-      // Build permits-by-job map
-      const byJobPermits = {};
-      for (const perm of permits) {
-        const jn = String(perm.job_name || '').trim(); // requires job_name on permits
-        if (!jn) continue;
-        (byJobPermits[jn] ||= []).push(perm);
-      }
-
-      elList.innerHTML = '';
-      for (const p of filteredPoles){
-        const pKey = keyForPole(p);
-        const isPending = pending.has(pKey);
-
-        const row = document.createElement('div'); row.className = 'card';
-        const coords = `${p.lat ?? '—'}, ${p.lon ?? '—'}`;
-        const specs  = `${p.pole_spec || '—'} → ${p.proposed_spec || '—'}`;
-        row.innerHTML = `
-          <div class="flex" style="justify-content:space-between;align-items:flex-start;">
-            <div>
-              <div class="title">
-                ${p.job_name || '—'} — tag ${p.tag || '—'} — SCID ${p.SCID || '—'}
-                ${isPending ? '<span class="chip" style="margin-left:8px;">pending</span>' : ''}
-              </div>
-              <div class="small muted">
-                ${p.owner || '—'} &nbsp;·&nbsp; ${specs} &nbsp;·&nbsp; MR: ${p.mr_level || '—'}
-              </div>
-              <div class="small muted">Coords: ${coords}</div>
-            </div>
-            <button class="btn" onclick="prefillPole('${encodeURIComponent(p.job_name||'')}','${encodeURIComponent(p.tag||'')}','${encodeURIComponent(p.SCID||'')}')">Edit in form</button>
-          </div>
-          <div class="spacer"></div>
-          <div class="small muted">Permits for job <code>${p.job_name || '—'}</code>:</div>
-          ${renderPermitsList(byJobPermits[p.job_name]||[])}
-        `;
-        elList.appendChild(row);
-      }
-
-      if (filteredPoles.length === 0) {
-        const empty = document.createElement('div');
-        empty.className='muted small';
-        empty.textContent = 'No poles match the selected filters.';
-        elList.appendChild(empty);
-      }
-    }
-
-    function renderPermitsList(list){
-      if (!list || list.length === 0) return `<div class="small muted"><em>No permits found for this job.</em></div>`;
-      const sorted = list.slice().sort((a,b) => String(a.permit_id).localeCompare(String(b.permit_id)));
-      return `
-        <ul style="margin:.4rem 0 .2rem 1rem;">
-          ${sorted.map(r => `
-            <li class="small">
-              <code>${r.permit_id}</code>
-              — ${r.permit_status || '—'}
-              ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
-              ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
-              ${r.notes ? ` · <span class="muted">${escapeHtml(r.notes)}</span>` : ''}
-            </li>
-          `).join('')}
-        </ul>
-      `;
-    }
-
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
-
-    elUtility.addEventListener('change', () => { rebuildJobFilter(); renderList(); });
-    elJob.addEventListener('change', renderList);
-
-    function prefillPole(job_name, tag, SCID){
-      try {
-        job_name = decodeURIComponent(job_name);
-        tag      = decodeURIComponent(tag);
-        SCID     = decodeURIComponent(SCID);
-      } catch {}
-      const form = document.getElementById('formPole');
-      form.job_name.value = job_name || '';
-      form.tag.value      = tag || '';
-      form.SCID.value     = SCID || '';
-      form.mode.value     = 'update';
-      form.scrollIntoView({ behavior:'smooth', block:'start' });
-    }
-
-    // ======= API CALL HELPER =======
-    async function callApi(payload){
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', 'X-Permits-Key': SHARED_KEY },
-        body: JSON.stringify(payload)
-      });
-      let data; try { data = await res.json(); } catch { data = { ok:false, error:'Invalid server response' }; }
-      if (!res.ok || !data.ok) {
-        const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
-        throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
-      }
-      return data;
-    }
-
-    // ======= FORM: POLE (new schema) =======
-    const formPole = document.getElementById('formPole');
-    const msgPole  = document.getElementById('msgPole');
-    formPole.addEventListener('submit', async (e)=>{
-      e.preventDefault(); msgPole.textContent = 'Submitting…';
-      const fd = new FormData(formPole);
-
-      const job_name = (fd.get('job_name')||'').trim();
-      const tag      = (fd.get('tag')||'').trim();
-      const SCID     = (fd.get('SCID')||'').trim();
-      const mode     = fd.get('mode');
-
-      if (!job_name || !tag || !SCID) {
-        msgPole.innerHTML = `<span class="err">job_name, tag, and SCID are required.</span>`;
-        return;
-      }
-
-      const patch = {};
-      const owner = (fd.get('owner')||'').trim();           if (owner)         patch.owner = owner;
-      const pole_spec = (fd.get('pole_spec')||'').trim();   if (pole_spec)     patch.pole_spec = pole_spec;
-      const proposed_spec = (fd.get('proposed_spec')||'').trim(); if (proposed_spec) patch.proposed_spec = proposed_spec;
-      const lat   = (fd.get('lat')||'').trim();             if (lat)           patch.lat = parseFloat(lat);
-      const lon   = (fd.get('lon')||'').trim();             if (lon)           patch.lon = parseFloat(lon);
-      const mr    = (fd.get('mr_level')||'').trim();        if (mr)            patch.mr_level = mr;
-
-      const reason = (fd.get('reason')||'').trim();
-
-      try{
-        let payload;
-        const idKey = `${job_name}::${tag}::${SCID}`;
-        if (mode === 'upsert') {
-          const base = { job_name, tag, SCID, owner: owner || 'BPUB' };
-          payload = { actorName:'Website User', reason,
-            change: { type:'upsert_pole', pole: { ...base, ...patch } }
-          };
-        } else {
-          if (Object.keys(patch).length === 0) throw new Error('Provide at least one field to update.');
-          payload = { actorName:'Website User', reason,
-            change: { type:'update_pole', keys: { job_name, tag, SCID }, patch }
-          };
-        }
-
-        const data = await callApi(payload);
-        msgPole.innerHTML = `<span class="ok">PR opened.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-
-        // Track pending only on fields we changed
-        const expected = { ...patch };
-        trackPendingChange('pole', `${job_name}::${tag}::${SCID}`, expected, data.pr_url);
-      }catch(err){
-        msgPole.innerHTML = `<span class="err">${err.message}</span>`;
-      }
-    });
-
-    // ======= FORM: PERMIT (new schema) =======
-    const formPermit = document.getElementById('formPermit');
-    const msgPermit  = document.getElementById('msgPermit');
-
-    function todayYMD() {
-      const d = new Date();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      const y = d.getFullYear();
-      return `${y}-${m}-${day}`;
-    }
-    function toMDY(ymdOrMdy) {
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(ymdOrMdy)) return ymdOrMdy;
-      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymdOrMdy);
-      if (!m) return ymdOrMdy;
-      return `${m[2]}/${m[3]}/${m[1]}`;
-    }
-    // default the date picker to today
-    (function initPermitDateDefault(){
-      const el = document.querySelector('#formPermit input[name="submitted_at"]');
-      if (el && !el.value) el.value = todayYMD();
-    })();
-
-    formPermit.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msgPermit.textContent = 'Submitting…';
-
-      const fd = new FormData(formPermit);
-
-      const permit_id     = (fd.get('permit_id')||'').trim();
-      const job_name      = (fd.get('job_name')||'').trim();       // required for linking to job
-      const status_raw    = (fd.get('permit_status')||'').trim();
-      const submitted_by  = (fd.get('submitted_by')||'').trim();
-      const submitted_at  = toMDY((fd.get('submitted_at')||'').trim() || todayYMD());
-      const notes         = (fd.get('notes')||'').trim();
-
-      if (!permit_id) { msgPermit.innerHTML = `<span class="err">Permit ID is required.</span>`; return; }
-      if (!job_name)  { msgPermit.innerHTML = `<span class="err">Job Name is required.</span>`;  return; }
-
-      const permit_status = status_raw || "Not Submitted";
-      if (!PERMIT_STATUSES.includes(permit_status)) {
-        msgPermit.innerHTML = `<span class="err">Invalid permit status.</span>`; return;
-      }
-
-      const permit = {
-        permit_id,
-        job_name,
-        permit_status,
-        submitted_by: submitted_by || undefined,
-        submitted_at,
-        notes: notes || undefined
-      };
-
-      try {
-        const payload = {
-          actorName: 'Website User',
-          reason: `Permit ${permit.permit_id} ${permit.permit_status}`,
-          change: { type: 'upsert_permit', permit }
-        };
-        const data = await callApi(payload);
-        msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-
-        // Mark pending so UI shows the chip until repo refresh confirms it
-        const expected = { job_name: permit.job_name, permit_status: permit.permit_status };
-        trackPendingChange('permit', permit.permit_id, expected, data.pr_url);
-      } catch (err) {
-        msgPermit.innerHTML = `<span class="err">${err.message}</span>`;
-      }
-    });
-
-    // ======= INIT =======
-    window.addEventListener('load', () => {
-      loadData();
-    });
-  </script>
+  <!-- App bootstrap -->
+  <script type="module" src="./assets/js/app.js"></script>
 </body>
 </html>
