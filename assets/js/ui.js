@@ -84,12 +84,15 @@ function populateFilters(){
 }
 
 function populateStatusPickers(){
-  // Editor & bulk (no NONE)
+  // Editor (full set)
   permitStatus.innerHTML = STATUS_FOR_API.map(s=>`<option>${s}</option>`).join('');
-  bulkStatus.innerHTML   = STATUS_FOR_API.map(s=>`<option>${s}</option>`).join('');
+  // Bulk: lock to "Submitted - Pending" only
+  bulkStatus.innerHTML = `<option selected>Submitted - Pending</option>`;
+  bulkStatus.disabled = true;
+
   // Export (include NONE + All)
   exportStatus.innerHTML = `<option value="">All</option>` +
-    [STATUS_NONE, ...STATUS_FOR_API].map(s=>`<option>${s}</option>`).join('');
+    [STATUS_NONE, ...PERMIT_STATUSES_UI].map(s=>`<option>${s}</option>`).join('');
 }
 
 /* ---------- List ---------- */
@@ -355,7 +358,7 @@ async function onBulkCreate(){
             job_name: p.job_name,
             tag: p.tag,
             SCID: p.SCID,
-            permit_status: bulkStatus.value,
+            permit_status: 'Submitted - Pending', // locked
             submitted_by: bulkBy.value.trim(),
             submitted_at: bulkAt.value || todayISO(),
             notes: bulkNotes.value.trim()
