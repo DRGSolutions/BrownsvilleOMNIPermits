@@ -1,110 +1,78 @@
 // assets/js/data.js
-// Centralized data loader + change watcher.
+import { OWNER, REPO, BRANCH, DATA_DIR, WATCH_INTERVAL_MS } from './config.js';
 
-import { OWNER, REPO, BRANCH, DATA_DIR } from './config.js';
-
-const RAW_BASE = (ref) =>
-  `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${DATA_DIR}`;
-
-let state = {
+const state = {
   poles: [],
   permits: [],
+  sha: null,            // null when we’re in fallback mode
   lastLoadedAt: null,
-  lastRef: BRANCH,
-  meta: {
-    etag: { poles: null, permits: null },
-    lastModified: { poles: null, permits: null },
-  },
 };
 
-let watcherTimer = null;
+const RAW = (ref) => `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${DATA_DIR}`;
 
-/** Utility to build a cache-busting URL for a data file */
-function fileUrl(ref, filename, bust = true) {
-  const ts = bust ? `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}` : '';
-  return `${RAW_BASE(ref)}/${filename}${ts}`;
+async function fetchJSON(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`HTTP ${r.status} for ${url.split('?')[0]}`);
+  return r.json();
 }
 
-/** HEAD the raw file to read ETag/Last-Modified without downloading body */
-async function headTag(ref, filename) {
-  const r = await fetch(fileUrl(ref, filename, true), {
-    method: 'HEAD',
-    cache: 'no-store',
-  });
-  if (!r.ok) throw new Error(`HEAD ${filename} ${r.status}`);
-  return {
-    etag: r.headers.get('etag'),
-    lastModified: r.headers.get('last-modified'),
-  };
+async function getLatestShaSafe() {
+  try {
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}?_=${Date.now()}`;
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+    const j = await r.json();
+    return j.sha;
+  } catch (_) {
+    return null; // fallback mode
+  }
 }
 
-/** GET and parse JSON; also record ETag/Last-Modified from this fetch */
-async function fetchJSON(ref, filename) {
-  const r = await fetch(fileUrl(ref, filename, true), {
-    cache: 'no-store',
-  });
-  if (!r.ok) throw new Error(`${filename} ${r.status}`);
-  const etag = r.headers.get('etag');
-  const lastModified = r.headers.get('last-modified');
-  const json = await r.json();
-  return { json, etag, lastModified };
-}
+export async function loadData() {
+  const sha = await getLatestShaSafe();       // may be null (fallback)
+  const ref = sha || BRANCH;
+  const bust = `?ts=${Date.now()}`;
 
-/** Load both files (poles & permits) pinned to a ref (default: BRANCH) */
-export async function loadData(ref = BRANCH) {
-  const [p1, p2] = await Promise.all([
-    fetchJSON(ref, 'poles.json'),
-    fetchJSON(ref, 'permits.json'),
+  const base = RAW(ref);
+  const [poles, permits] = await Promise.all([
+    fetchJSON(`${base}/poles.json${bust}`),
+    fetchJSON(`${base}/permits.json${bust}`)
   ]);
 
-  state.poles = Array.isArray(p1.json) ? p1.json : [];
-  state.permits = Array.isArray(p2.json) ? p2.json : [];
+  state.poles = poles;
+  state.permits = permits;
+  state.sha = sha;                            // null in fallback mode
   state.lastLoadedAt = new Date();
-  state.lastRef = ref;
-  state.meta.etag.poles = p1.etag;
-  state.meta.etag.permits = p2.etag;
-  state.meta.lastModified.poles = p1.lastModified;
-  state.meta.lastModified.permits = p2.lastModified;
-
-  return getState();
+  return state;
 }
 
-/** Provide an immutable snapshot of current state */
-export function getState() {
-  return JSON.parse(JSON.stringify(state));
-}
+export function getState() { return state; }
 
-/** Start polling raw files; on change => reload & invoke onChange() */
-export function startWatcher(onChange, { intervalMs = 5000 } = {}) {
-  stopWatcher();
-  watcherTimer = setInterval(async () => {
+export function startWatcher(onChange) {
+  let lastSha = state.sha; // null means fallback
+
+  async function tick() {
     try {
-      const [t1, t2] = await Promise.all([
-        headTag(BRANCH, 'poles.json'),
-        headTag(BRANCH, 'permits.json'),
-      ]);
-
-      const changed =
-        t1.etag !== state.meta.etag.poles ||
-        t2.etag !== state.meta.etag.permits ||
-        t1.lastModified !== state.meta.lastModified.poles ||
-        t2.lastModified !== state.meta.lastModified.permits;
-
-      if (changed) {
-        await loadData(BRANCH);
-        if (typeof onChange === 'function') onChange(getState());
+      const sha = await getLatestShaSafe();
+      if (sha) {
+        // SHA-aware mode
+        if (lastSha && sha === lastSha) return;
+        lastSha = sha;
+        await loadData();
+        onChange?.(state);
+        return;
       }
+      // Fallback mode: force reload and detect changes in length (cheap heuristic)
+      const sigBefore = `${state.poles.length}/${state.permits.length}`;
+      await loadData();
+      const sigAfter = `${state.poles.length}/${state.permits.length}`;
+      if (sigBefore !== sigAfter) onChange?.(state);
     } catch (e) {
-      // Network hiccup; keep watching silently.
-      // console.warn('watcher:', e);
+      // Keep the watcher alive; surface errors in console
+      console.warn('watcher:', e.message || e);
     }
-  }, intervalMs);
-}
-
-/** Stop polling */
-export function stopWatcher() {
-  if (watcherTimer) {
-    clearInterval(watcherTimer);
-    watcherTimer = null;
   }
+
+  const id = setInterval(tick, WATCH_INTERVAL_MS);
+  return () => clearInterval(id);
 }

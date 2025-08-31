@@ -4,65 +4,38 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DRG Brownsville, TX Permit Management System</title>
-  <meta http-equiv="Cache-Control" content="no-store" />
 
   <style>
-    :root {
-      --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7;
-      --danger:#ef4444; --border:#1f2430; --orange:#f59e0b; --green:#22c55e;
-      --purple:#a78bfa; --yellow:#fde047; /* more yellow for "Created - NOT Submitted" */
-    }
-    * { box-sizing: border-box }
-    html, body { height: 100% }
-    body { margin:0; background:var(--bg); color:var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+    :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; }
+    * { box-sizing:border-box }
+    html, body { height:100% }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--fg); }
+    header { padding:18px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; background:linear-gradient(180deg, #0b0c10 0%, #0d0f14 100%); text-align:center }
+    h1 { margin:0; font-size:20px; letter-spacing:.2px }
 
-    header { padding:22px 16px; border-bottom:1px solid var(--border); text-align:center }
-    header h1 { margin:0; font-size:22px; font-weight:700 }
-
-    main { max-width:1200px; margin:20px auto 60px; padding:0 16px }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr } }
-
-    .card { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px }
-    .title { font-weight:700; font-size:16px; margin-bottom:8px }
+    main { max-width:1200px; margin:16px auto 48px; padding:0 16px }
+    .grid { display:grid; grid-template-columns: 360px 1fr; gap:16px }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px }
     .muted { color:var(--muted) }
     .small { font-size:12px }
-
-    label { font-size:13px; color:var(--muted); display:block; margin:10px 0 6px }
-    input, select, textarea {
-      width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3242; background:#0f1219; color:var(--fg);
-    }
-    textarea { resize: vertical }
-
+    .title { font-weight:700; font-size:16px; margin-bottom:6px }
+    .spacer { height:10px }
+    label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px }
+    input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3242; background:#0f1219; color:var(--fg); }
+    textarea { min-height:76px; resize:vertical }
     .row { display:grid; grid-template-columns: repeat(12, 1fr); gap:12px }
-    .col-12 { grid-column: span 12 }
-    .col-6  { grid-column: span 6 }
-    .col-4  { grid-column: span 4 }
-    .col-3  { grid-column: span 3 }
+    .col-12{grid-column:span 12}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}
 
-    .btn { appearance:none; border:1px solid var(--border); background:#161922; color:var(--fg);
-      padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
+    /* list pane taller */
+    #list { display:grid; grid-template-columns: 1fr; gap:12px; max-height:72vh; overflow:auto; padding-right:4px }
+
+    .btn { appearance:none; border:1px solid var(--border); background:#161922; color:var(--fg); padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
     .btn:hover { background:#1a1f2b }
     .btn:disabled { opacity:.6; cursor:not-allowed }
     .btn-accent { border-color:#1f3b2f; background:#0f2b22 }
     .btn-danger { border-color:#3a1e1e; background:#2a1515 }
 
-    /* status badges */
-    .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520 }
-    .s-approved  { color:var(--green);  border-color:#11351f; background:#0d1f15; }
-    .s-pending   { color:var(--orange); border-color:#43320b; background:#1d1506; }
-    .s-created   { color:#8c6d00;      border-color:#423800; background:#2a2400; } /* text dark yellow */
-    .s-created[data-bg="true"] { background: #3a3000; } /* stronger background if UI sets data-bg */
-    .s-created-yellow { color:#6b5a00; border-color:#5b4f00; background:#241f00; } /* extra yellow option */
-    .s-na-other  { color:var(--danger); border-color:#3a1e1e; background:#2a1515; }
-    .s-na-cannot { color:var(--purple); border-color:#2a1f4a; background:#1a1430; }
-
-    /* list scroll area taller so more rows show */
-    #list { display:grid; grid-template-columns: 1fr; gap:12px; max-height:72vh; overflow:auto; padding-right:4px }
-    .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-    .kpi { display:flex; gap:14px; flex-wrap:wrap; margin:6px 0 0 }
-    .kpi div { background:#0f1219; border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:13px; color:var(--muted) }
+    .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520; color:#c7d2fe }
   </style>
 </head>
 <body>
@@ -70,234 +43,128 @@
     <h1>DRG Brownsville, TX Permit Management System</h1>
   </header>
 
-  <main class="grid">
+  <main>
+    <div class="grid">
+      <!-- LEFT: Filters & Current Data -->
+      <section class="card">
+        <div class="title">Filters</div>
 
-    <!-- LEFT: Filters / Current Data / List -->
-    <section class="card">
-      <div class="title">Filters</div>
-      <div class="row">
-        <div class="col-12">
-          <label>Utility</label>
-          <select id="filterUtility">
-            <option value="">All</option>
-            <option>BPUB</option>
-            <option>AEP</option>
-            <option>MVEC</option>
-          </select>
-        </div>
-        <div class="col-12">
-          <label>Job Name</label>
-          <select id="filterJob"><option value="">All</option></select>
-        </div>
-        <div class="col-12">
-          <label>Search Tag or SCID</label>
-          <input id="filterQuery" placeholder="e.g., 1234 or 076" />
-        </div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <div class="title">Current Data</div>
-      <div id="status" class="muted small">Loading…</div>
-      <div class="kpi">
-        <div>Poles: <b id="kPoles">—</b></div>
-        <div>Permits: <b id="kPermits">—</b></div>
-        <div>Loaded: <b id="kLoaded">—</b></div>
-        <div>Commit: <b id="kCommit">—</b></div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <!-- change monitor -->
-      <div id="pendingPanel" class="card" style="padding:12px; display:none;">
-        <div class="title" style="margin-bottom:6px;">Change Monitor</div>
-        <div id="pendingList" class="small muted">No pending changes.</div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <!-- data list -->
-      <div id="list"></div>
-    </section>
-
-    <!-- RIGHT: Pole (read-only) + Permit Editor + Admin Tools -->
-    <section class="card">
-
-      <!-- Pole details (READ-ONLY) -->
-      <div class="title">Pole Details</div>
-      <div class="row">
-        <div class="col-6">
-          <label>Job Name</label>
-          <input id="pole_job_name" disabled />
-        </div>
-        <div class="col-6">
-          <label>Owner</label>
-          <input id="pole_owner" disabled />
-        </div>
-
-        <div class="col-6">
-          <label>Tag</label>
-          <input id="pole_tag" disabled />
-        </div>
-        <div class="col-6">
-          <label>SCID</label>
-          <input id="pole_scid" disabled />
-        </div>
-
-        <div class="col-6">
-          <label>Pole Spec</label>
-          <input id="pole_spec" disabled />
-        </div>
-        <div class="col-6">
-          <label>Proposed Spec</label>
-          <input id="pole_proposed_spec" disabled />
-        </div>
-
-        <div class="col-6">
-          <label>Latitude</label>
-          <input id="pole_lat" disabled />
-        </div>
-        <div class="col-6">
-          <label>Longitude</label>
-          <input id="pole_lon" disabled />
-        </div>
-
-        <div class="col-12">
-          <label>MR Level</label>
-          <input id="pole_mr_level" disabled />
-        </div>
-      </div>
-
-      <div style="height:14px"></div>
-
-      <!-- Permit editor -->
-      <div class="title">Permit Editor</div>
-      <div class="muted small" id="permitPoleHint">No pole selected.</div>
-
-      <label>Select Existing Permit (or choose “New”)</label>
-      <select id="permitSelector" disabled>
-        <option value="">— New —</option>
-      </select>
-
-      <div class="row">
-        <div class="col-12">
-          <label>Permit ID (required for new permits)</label>
-          <input id="permit_id" placeholder="e.g., PERM-BRN01-F300-1234-076" />
-        </div>
-
-        <div class="col-12">
-          <label>Permit Status</label>
-          <select id="permit_status">
-            <option value="NONE">NONE</option>
-            <option value="Created - NOT Submitted">Created - NOT Submitted</option>
-            <option value="Submitted - Pending">Submitted - Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Not Approved - Cannot Attach">Not Approved - Cannot Attach</option>
-            <option value="Not Approved - PLA Issues">Not Approved - PLA Issues</option>
-            <option value="Not Approved - MRE Issues">Not Approved - MRE Issues</option>
-            <option value="Not Approved - Other Issues">Not Approved - Other Issues</option>
-          </select>
-        </div>
-
-        <div class="col-12">
-          <label>Submitted By (required)</label>
-          <input id="submitted_by" />
-        </div>
-
-        <div class="col-12">
-          <label>Submitted At</label>
-          <input id="submitted_at" type="date" />
-        </div>
-
-        <div class="col-12">
-          <label>Notes</label>
-          <textarea id="permit_notes" rows="3"></textarea>
-        </div>
-      </div>
-
-      <div style="height:10px"></div>
-      <div class="flex">
-        <button class="btn btn-accent" id="btnSavePermit" disabled>Save Permit</button>
-        <button class="btn btn-danger" id="btnDeletePermit" disabled>Delete Permit</button>
-        <span id="msgPermit" class="muted small"></span>
-      </div>
-
-      <div style="height:18px"></div>
-
-      <!-- Admin tools -->
-      <div class="title">Admin Tools</div>
-      <div class="card" style="padding:12px;">
-        <div class="title" style="margin-bottom:8px;">Export CSV</div>
         <div class="row">
-          <div class="col-4">
+          <div class="col-12">
             <label>Utility</label>
-            <select id="adminUtility">
+            <select id="filterUtility">
               <option value="">All</option>
               <option>BPUB</option>
               <option>AEP</option>
               <option>MVEC</option>
             </select>
           </div>
-          <div class="col-4">
+          <div class="col-12">
             <label>Job Name</label>
-            <select id="adminJob"><option value="">All</option></select>
-          </div>
-          <div class="col-4">
-            <label>Permit Status</label>
-            <select id="adminStatus">
+            <select id="filterJob">
               <option value="">All</option>
-              <option>NONE</option>
-              <option>Created - NOT Submitted</option>
-              <option>Submitted - Pending</option>
-              <option>Approved</option>
-              <option>Not Approved - Cannot Attach</option>
-              <option>Not Approved - PLA Issues</option>
-              <option>Not Approved - MRE Issues</option>
-              <option>Not Approved - Other Issues</option>
             </select>
           </div>
+          <div class="col-12">
+            <label>Search Tag or SCID</label>
+            <input id="filterSearch" placeholder="e.g., 1234 or 076" />
+          </div>
         </div>
-        <div style="height:10px"></div>
-        <button class="btn" id="btnExportCSV">Download CSV</button>
-        <span id="msgExport" class="muted small"></span>
-      </div>
 
-      <div style="height:12px"></div>
+        <div class="spacer"></div>
 
-      <div class="card" style="padding:12px;">
-        <div class="title" style="margin-bottom:8px;">Mass Create Permits (only allowed where current status is “NONE”)</div>
+        <div class="title">Current Data</div>
+        <div id="status" class="small muted">Loading…</div>
+        <div class="spacer"></div>
+        <div class="row">
+          <div class="col-3 small">Poles: <b id="kPoles">—</b></div>
+          <div class="col-3 small">Permits: <b id="kPermits">—</b></div>
+          <div class="col-3 small">Loaded: <b id="kLoaded">—</b></div>
+          <div class="col-3 small">Commit: <b id="kCommit">—</b></div>
+        </div>
+
+        <div class="spacer"></div>
+        <div id="list"></div>
+      </section>
+
+      <!-- RIGHT: Details & Permit Editor (poles are read-only) -->
+      <section class="card">
+        <div class="title">Pole Details</div>
         <div class="row">
           <div class="col-6">
-            <label>Job Name</label>
-            <select id="bulkJob"><option value="">Select job…</option></select>
+            <label>Job Name</label><input id="pd_job" disabled />
           </div>
           <div class="col-6">
-            <label>Permit Status (fixed)</label>
-            <select id="bulkStatus" disabled>
-              <option>Submitted - Pending</option>
-            </select>
+            <label>Owner</label><input id="pd_owner" disabled />
           </div>
           <div class="col-6">
-            <label>Submitted By</label>
-            <input id="bulkSubmittedBy" />
+            <label>Tag</label><input id="pd_tag" disabled />
           </div>
           <div class="col-6">
-            <label>Submitted At</label>
-            <input id="bulkDate" type="date" />
+            <label>SCID</label><input id="pd_scid" disabled />
+          </div>
+          <div class="col-6">
+            <label>Pole Spec</label><input id="pd_polespec" disabled />
+          </div>
+          <div class="col-6">
+            <label>Proposed Spec</label><input id="pd_propspec" disabled />
+          </div>
+          <div class="col-6">
+            <label>Latitude</label><input id="pd_lat" disabled />
+          </div>
+          <div class="col-6">
+            <label>Longitude</label><input id="pd_lon" disabled />
+          </div>
+          <div class="col-12">
+            <label>MR Level</label><input id="pd_mr" disabled />
           </div>
         </div>
-        <div style="height:10px"></div>
-        <button class="btn" id="btnMassCreate">Create Permits for Job (status NONE only)</button>
-        <span id="msgBulk" class="muted small"></span>
-      </div>
 
-    </section>
+        <div class="spacer"></div>
+
+        <div class="title">Permit Editor</div>
+        <div class="small muted">Select an existing permit for the selected pole, or choose “New”.</div>
+        <div class="spacer"></div>
+        <div class="row">
+          <div class="col-12">
+            <select id="pe_existing">
+              <option value="__new">— New —</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label>Permit ID (for new permits)</label>
+            <input id="pe_id" placeholder="e.g., PERM-BRN01-F300-1234-076" />
+          </div>
+          <div class="col-12">
+            <label>Permit Status</label>
+            <select id="pe_status"></select>
+          </div>
+          <div class="col-12">
+            <label>Submitted By (required)</label>
+            <input id="pe_by" />
+          </div>
+          <div class="col-12">
+            <label>Submitted At</label>
+            <input id="pe_date" type="date" />
+          </div>
+          <div class="col-12">
+            <label>Notes</label>
+            <textarea id="pe_notes" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="spacer"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-accent" id="btnSavePermit">Save Permit</button>
+          <button class="btn btn-danger" id="btnDeletePermit">Delete Permit</button>
+          <span id="msgPermit" class="small muted"></span>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <!-- Load scripts IN THIS ORDER -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/api.js"></script>
-  <script src="assets/js/ui.js"></script>
+  <!-- App entry -->
+  <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

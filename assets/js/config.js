@@ -1,17 +1,25 @@
 // assets/js/config.js
-// Central configuration used by data.js/api.js/ui.js
+// Repository + data folder used by the frontend loader/watcher.
 
-window.APP_CONFIG = {
-  // GitHub repo that hosts the data under /data
-  OWNER: 'DRGSolutions',
-  REPO: 'BrownsvilleOMNIPermits',
-  DEFAULT_BRANCH: 'main',
-  DATA_REPO_PATH: 'data',
+// GitHub repo containing your data
+export const OWNER  = 'DRGSolutions';
+export const REPO   = 'BrownsvilleOMNIPermits';
+export const BRANCH = 'main';
 
-  // Vercel function that opens PRs
-  API_URL: 'https://permits-api.vercel.app/api/propose-change',
-  SHARED_KEY: 'BrownsvilleOMNIPermits',
+// Where poles.json and permits.json live inside the repo
+export const DATA_DIR = 'data';
 
-  // Optional: CORS allow-list for the server (mirrors your Vercel env)
-  // ALLOWED_ORIGIN is set on the server; listed here for reference only
-};
+// Status set (includes NONE)
+export const PERMIT_STATUSES = [
+  'Created - NOT Submitted',
+  'Submitted - Pending',
+  'Approved',
+  'Not Approved - Cannot Attach',
+  'Not Approved - PLA Issues',
+  'Not Approved - MRE Issues',
+  'Not Approved - Other Issues',
+  'NONE',
+];
+
+// Poll interval for the watcher (milliseconds)
+export const WATCH_INTERVAL_MS = 5000;
