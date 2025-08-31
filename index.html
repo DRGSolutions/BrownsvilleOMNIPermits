@@ -87,8 +87,10 @@
 
       <div class="spacer"></div>
       <div class="small muted" style="margin-bottom:6px;">Admin</div>
-      <button id="btnExportCsv" class="btn">Export CSV (uses current filters)</button>
-      <div id="adminMsg" class="small muted" style="margin-top:6px"></div>
+      <div>
+        <button id="btnExportCsv" class="btn" type="button">Export CSV (uses current filters)</button>
+        <span id="msgExport" class="small muted" style="margin-left:8px"></span>
+      </div>
     </section>
 
     <!-- RIGHT: Pole details (read-only) + Permit editor -->
@@ -137,8 +139,8 @@
 
       <div class="spacer"></div>
       <div class="row">
-        <div class="col-6"><button id="btnSavePermit" class="btn btn-accent">Save Permit</button></div>
-        <div class="col-6" style="text-align:right"><button id="btnDeletePermit" class="btn btn-danger">Delete Permit</button></div>
+        <div class="col-6"><button id="btnSavePermit" class="btn btn-accent" type="button">Save Permit</button></div>
+        <div class="col-6" style="text-align:right"><button id="btnDeletePermit" class="btn btn-danger" type="button">Delete Permit</button></div>
       </div>
       <div class="spacer"></div>
       <div id="msgPermit" class="small muted"></div>
@@ -149,6 +151,7 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/admin.js"></script>   <!-- ✅ now loaded -->
   <script src="assets/js/watch.js"></script>
 </body>
 </html>
