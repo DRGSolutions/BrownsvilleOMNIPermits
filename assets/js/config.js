@@ -1,25 +1,26 @@
 // assets/js/config.js
-// Repository + data folder used by the frontend loader/watcher.
+// Central place for environment & constants used by the front-end.
 
-// GitHub repo containing your data
-export const OWNER  = 'DRGSolutions';
-export const REPO   = 'BrownsvilleOMNIPermits';
-export const BRANCH = 'main';
+window.APP_CONFIG = {
+  // Your deployed Vercel function (unchanged)
+  API_URL:    'https://permits-api.vercel.app/api/propose-change',
+  SHARED_KEY: 'BrownsvilleOMNIPermits',
 
-// Where poles.json and permits.json live inside the repo
-export const DATA_DIR = 'data';
+  // Repo source of truth
+  OWNER:  'DRGSolutions',
+  REPO:   'BrownsvilleOMNIPermits',
+  BRANCH: 'main',
+  DATA_DIR: 'data',
 
-// Status set (includes NONE)
-export const PERMIT_STATUSES = [
-  'Created - NOT Submitted',
-  'Submitted - Pending',
-  'Approved',
-  'Not Approved - Cannot Attach',
-  'Not Approved - PLA Issues',
-  'Not Approved - MRE Issues',
-  'Not Approved - Other Issues',
-  'NONE',
-];
-
-// Poll interval for the watcher (milliseconds)
-export const WATCH_INTERVAL_MS = 5000;
+  // Watcher
+  POLL_MS: 5000,     // check for new commits every 5s
+  // Status -> chip class mapping (text color + bg)
+  STATUS_COLORS: {
+    'Created - NOT Submitted': 'yellow',
+    'Submitted - Pending': 'orange',
+    'Approved': 'green',
+    'Not Approved - Cannot Attach': 'purple'
+  },
+  // Anything starting with this (and not matched above) => red
+  NOT_APPROVED_PREFIX: 'Not Approved - '
+};
