@@ -16,46 +16,79 @@
   function filters() {
     const util = ($('#fUtility')?.value || 'All');
     const job  = ($('#fJob')?.value || 'All');
-    const status = ($('#aStatus')?.value || 'All'); // optional status filter
+    // Optional status filter if you later add #aStatus in HTML
+    const status = ($('#aStatus')?.value || 'All');
     return { util, job, status };
   }
 
+  function buildPermitIndex(permits) {
+    const map = new Map();
+    for (const r of (permits || [])) {
+      const key = `${r.job_name}::${r.tag}::${r.SCID}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    }
+    return map;
+  }
+
+  // Build rows so that EVERY POLE appears at least once.
   function buildRows() {
     const st = window.STATE || {};
     const poles = st.poles || [];
     const permits = st.permits || [];
 
     const { util, job, status } = filters();
-
-    // index poles by composite key
-    const pmap = new Map();
-    for (const p of poles) pmap.set(`${p.job_name}::${p.tag}::${p.SCID}`, p);
-
+    const pmap = buildPermitIndex(permits);
     const rows = [];
-    for (const r of permits) {
-      const key = `${r.job_name}::${r.tag}::${r.SCID}`;
-      const p = pmap.get(key) || {};
 
+    for (const p of poles) {
       if (util !== 'All' && p.owner !== util) continue;
-      if (job  !== 'All' && r.job_name !== job) continue;
-      if (status !== 'All' && r.permit_status !== status) continue;
+      if (job !== 'All' && p.job_name !== job) continue;
 
-      rows.push({
-        job_name: r.job_name,
-        tag: r.tag,
-        SCID: r.SCID,
-        owner: p.owner || '',
-        pole_spec: p.pole_spec || '',
-        proposed_spec: p.proposed_spec || '',
-        lat: p.lat ?? '',
-        lon: p.lon ?? '',
-        mr_level: p.mr_level || '',
-        permit_id: r.permit_id,
-        permit_status: r.permit_status || '',
-        submitted_by: r.submitted_by || '',
-        submitted_at: r.submitted_at || '',
-        notes: r.notes || ''
-      });
+      const key = `${p.job_name}::${p.tag}::${p.SCID}`;
+      const rel = pmap.get(key) || [];
+
+      if (rel.length === 0) {
+        // No permits for this pole -> add a NONE row
+        if (status === 'All' || status === 'NONE') {
+          rows.push({
+            job_name: p.job_name,
+            tag: p.tag,
+            SCID: p.SCID,
+            owner: p.owner || '',
+            pole_spec: p.pole_spec || '',
+            proposed_spec: p.proposed_spec || '',
+            lat: p.lat ?? '',
+            lon: p.lon ?? '',
+            mr_level: p.mr_level || '',
+            permit_id: '',
+            permit_status: 'NONE',
+            submitted_by: '',
+            submitted_at: '',
+            notes: ''
+          });
+        }
+      } else {
+        for (const r of rel) {
+          if (status !== 'All' && status !== r.permit_status) continue;
+          rows.push({
+            job_name: r.job_name,
+            tag: r.tag,
+            SCID: r.SCID,
+            owner: p.owner || '',
+            pole_spec: p.pole_spec || '',
+            proposed_spec: p.proposed_spec || '',
+            lat: p.lat ?? '',
+            lon: p.lon ?? '',
+            mr_level: p.mr_level || '',
+            permit_id: r.permit_id || '',
+            permit_status: r.permit_status || '',
+            submitted_by: r.submitted_by || '',
+            submitted_at: r.submitted_at || '',
+            notes: r.notes || ''
+          });
+        }
+      }
     }
     return rows;
   }
@@ -100,7 +133,6 @@
   function enableAndWireButtons() {
     const btns = Array.from(document.querySelectorAll('#btnExportCsv, #btnExport, [data-action="export"]'));
     btns.forEach((btn) => {
-      // ensure it's clickable even if inside a form
       if (btn.tagName === 'BUTTON' && (!btn.type || btn.type.toLowerCase() === 'submit')) {
         btn.type = 'button';
       }
@@ -110,7 +142,6 @@
     });
   }
 
-  // Initial wiring and whenever data finishes loading
   ready(enableAndWireButtons);
   window.addEventListener('data:loaded', () => { setMsg(''); enableAndWireButtons(); });
 })();

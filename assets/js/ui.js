@@ -1,256 +1,204 @@
 // assets/js/ui.js
 (function () {
-  const CFG = window.APP_CONFIG || {};
-  const $ = (sel) => document.querySelector(sel);
+  const $ = (s) => document.querySelector(s);
+  const fmt = (n) => new Intl.NumberFormat().format(n);
 
-  const STATUS_CLASS = (s) => {
-    if (!s) return '';
-    const t = s.toLowerCase();
-    if (t.startsWith('submitted')) return 'pending';            // orange
-    if (t === 'approved') return 'approved';                    // green
-    if (t.startsWith('created')) return 'created';              // yellow
-    if (t.includes('cannot attach')) return 'na_cannot';        // purple
-    if (t.startsWith('not approved')) return 'na_other';        // red
-    return '';
-  };
-
-  const UI = { selectedPoleKey: null, selectedPermitId: null };
-  window.UI = UI;
-
-  const keyOf = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
-
-  function populateJobs() {
-    const sel = $('#fJob');
-    const seen = new Set();
-    (window.STATE.poles || []).forEach(p => seen.add(p.job_name));
-    const cur = sel.value;
-    sel.innerHTML = `<option>All</option>` + [...seen].sort().map(j => `<option>${j}</option>`).join('');
-    if (cur && (cur === 'All' || seen.has(cur))) sel.value = cur;
+  // Map a permit_status to a CSS class + inline color (for NONE)
+  function statusChipHTML(status) {
+    const s = String(status || '').trim();
+    let cls = 'na_other';
+    let extra = '';
+    if (s === 'Submitted - Pending') cls = 'pending';
+    else if (s === 'Approved') cls = 'approved';
+    else if (s === 'Created - NOT Submitted') cls = 'created';
+    else if (s === 'Not Approved - Cannot Attach') cls = 'na_cannot';
+    else if (s.startsWith('Not Approved -')) cls = 'na_other';
+    else if (s === 'NONE') { cls = ''; extra = 'style="background:#94a3b8;color:#0b0c10"'; } // gray chip for NONE
+    return `<span class="chip ${cls}" ${extra}>${s || '—'}</span>`;
   }
 
-  function renderList() {
-    const listEl = $('#list');
-    const util = $('#fUtility').value || 'All';
-    const job  = $('#fJob').value || 'All';
-    const q    = ($('#fSearch').value || '').trim().toLowerCase();
+  // Composite key for a pole
+  const poleKey = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
 
-    const byPole = new Map();
-    for (const r of (window.STATE.permits || [])) {
-      const k = `${r.job_name}::${r.tag}::${r.SCID}`;
-      if (!byPole.has(k)) byPole.set(k, []);
-      byPole.get(k).push(r);
+  // ------- State helpers -------
+  function buildPermitIndex(permits) {
+    const map = new Map();
+    for (const r of (permits || [])) {
+      const key = `${r.job_name}::${r.tag}::${r.SCID}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
     }
-    for (const arr of byPole.values()) arr.sort((a,b)=>String(a.permit_id).localeCompare(String(b.permit_id)));
+    // stable sort by permit_id for nicer display
+    for (const arr of map.values()) {
+      arr.sort((a, b) => String(a.permit_id).localeCompare(String(b.permit_id)));
+    }
+    return map;
+  }
 
-    const poles = (window.STATE.poles || []).filter(p=>{
+  function ensureJobFilterOptions(poles) {
+    const sel = $('#fJob');
+    if (!sel) return;
+    const prev = sel.value;
+    const jobs = Array.from(new Set((poles || []).map(p => p.job_name))).sort();
+    sel.innerHTML = `<option>All</option>` + jobs.map(j => `<option>${j}</option>`).join('');
+    if (jobs.includes(prev)) sel.value = prev;
+  }
+
+  // ------- Rendering the left list (INCLUDES poles with zero permits) -------
+  function renderList() {
+    const st = window.STATE || {};
+    const poles = st.poles || [];
+    const permits = st.permits || [];
+    const byKey = buildPermitIndex(permits);
+
+    // Filters
+    const util = $('#fUtility')?.value || 'All';
+    const job = $('#fJob')?.value || 'All';
+    const q = ($('#fSearch')?.value || '').toLowerCase().trim();
+
+    const listEl = $('#list');
+    listEl.innerHTML = '';
+
+    // Filter poles first (not permits!)
+    const filteredPoles = poles.filter(p => {
       if (util !== 'All' && p.owner !== util) return false;
       if (job !== 'All' && p.job_name !== job) return false;
       if (q) {
-        const hay = `${p.job_name} ${p.tag} ${p.SCID}`.toLowerCase();
+        const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
-    }).sort((a,b)=>
-      String(a.job_name).localeCompare(String(b.job_name)) ||
-      String(a.tag).localeCompare(String(b.tag)) ||
-      String(a.SCID).localeCompare(String(b.SCID))
-    );
+    });
 
-    populateJobs();
+    // KPIs
+    $('#kPoles').textContent = fmt(filteredPoles.length);
+    $('#kPermits').textContent = fmt(permits.length);
 
-    listEl.innerHTML = '';
-    for (const p of poles) {
-      const k = keyOf(p);
-      const permits = byPole.get(k) || [];
+    // Build each pole card (even if the pole has ZERO permits)
+    for (const p of filteredPoles) {
+      const key = poleKey(p);
+      const rel = byKey.get(key) || [];
 
-      const wrap = document.createElement('div');
-      wrap.className = 'pole';
-      wrap.innerHTML = `
-        <div class="title">${p.job_name} / ${p.tag} / ${p.SCID} <span class="muted small">— ${p.owner}</span></div>
+      const card = document.createElement('div');
+      card.className = 'pole';
+      card.innerHTML = `
+        <div class="title">
+          ${p.job_name}
+          <span class="muted small"> · Tag: <b>${p.tag}</b> · SCID: <b>${p.SCID}</b></span>
+        </div>
         <div class="small muted">
-          <b>Tag:</b> ${p.tag} · <b>SCID:</b> ${p.SCID} ·
-          Spec: ${p.pole_spec||'—'} → ${p.proposed_spec||'—'} ·
-          Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'} · MR: ${p.mr_level||'—'}
+          Owner: ${p.owner || '—'} · Spec: ${p.pole_spec || '—'} → ${p.proposed_spec || '—'} · MR: ${p.mr_level || '—'}
         </div>
         <div class="spacer"></div>
-        ${permits.length ? `<div class="small muted" style="margin-bottom:4px">Permits:</div>` : `<div class="small muted"><em>No permits</em></div>`}
-        ${permits.length ? `
-          <ul style="margin:0 0 6px 1rem;padding:0">
-            ${permits.map(r=>{
-              const notes = r.notes ? String(r.notes).replace(/\s+/g,' ').slice(0,120) + (r.notes.length>120?'…':'') : '';
-              return `
-                <li class="small" style="margin:4px 0">
-                  <code>${r.permit_id}</code>
-                  <span class="chip ${STATUS_CLASS(r.permit_status)}">${r.permit_status||''}</span>
-                  ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
-                  ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
-                  ${notes ? ` · <span class="muted" title="${r.notes.replace(/"/g,'&quot;')}">notes: ${notes}</span>` : ''}
-                  <button class="btn btn-ghost" data-edit="${r.permit_id}" data-key="${k}" style="margin-left:8px;padding:4px 8px;font-size:12px">Edit</button>
-                </li>`;
-            }).join('')}
-          </ul>` : ''}
-        <button class="btn" data-newpermit="${k}" style="padding:6px 10px;font-size:12px">New permit for this pole</button>
+        <div class="small muted">Permits:</div>
+        <div>
+          ${
+            rel.length
+              ? rel.map(r => `
+                  <div class="small" style="margin:4px 0;">
+                    <code>${r.permit_id}</code>
+                    ${statusChipHTML(r.permit_status)}
+                    ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
+                    ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+                    <button class="btn" style="margin-left:8px" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
+                  </div>
+                `).join('')
+              : `<div class="small" style="margin:6px 0;">
+                   ${statusChipHTML('NONE')}
+                   <button class="btn" style="margin-left:8px" onclick="window.UI_editPermit('${key}','__new')">New permit for this pole</button>
+                 </div>`
+          }
+        </div>
       `;
-      listEl.appendChild(wrap);
+      listEl.appendChild(card);
     }
-
-    listEl.querySelectorAll('button[data-edit]').forEach(btn=>{
-      btn.addEventListener('click',()=> {
-        selectPoleByKey(btn.getAttribute('data-key'));
-        selectPermitById(btn.getAttribute('data-edit'));
-      });
-    });
-    listEl.querySelectorAll('button[data-newpermit]').forEach(btn=>{
-      btn.addEventListener('click',()=> {
-        selectPoleByKey(btn.getAttribute('data-newpermit'));
-        beginNewPermitForSelectedPole();
-      });
-    });
   }
-  window.renderList = renderList;
+
+  // ------- Right panel editor hookups -------
+  function fillPoleDetails(p) {
+    $('#pole_job').value = p.job_name || '';
+    $('#pole_owner').value = p.owner || '';
+    $('#pole_tag').value = p.tag || '';
+    $('#pole_scid').value = p.SCID || '';
+    $('#pole_spec').value = p.pole_spec || '';
+    $('#pole_prop').value = p.proposed_spec || '';
+    $('#pole_lat').value = (p.lat ?? '').toString();
+    $('#pole_lon').value = (p.lon ?? '').toString();
+    $('#pole_mr').value = p.mr_level || '';
+  }
+
+  function fillPermitEditorFor(key, permitId) {
+    const st = window.STATE || {};
+    const [job_name, tag, SCID] = key.split('::');
+    const byKey = buildPermitIndex(st.permits || []);
+    const rel = byKey.get(key) || [];
+
+    // Populate the dropdown
+    const sel = $('#selPermit');
+    const opts = [`<option value="__new">— New —</option>`]
+      .concat(rel.map(r => `<option value="${encodeURIComponent(r.permit_id)}">${r.permit_id}</option>`));
+    sel.innerHTML = opts.join('');
+    sel.value = permitId || '__new';
+
+    if (permitId && permitId !== '__new') {
+      const id = decodeURIComponent(permitId);
+      const r = rel.find(x => String(x.permit_id) === id);
+      if (r) {
+        $('#permit_id').value = r.permit_id || '';
+        $('#permit_status').value = r.permit_status || 'Created - NOT Submitted';
+        $('#submitted_by').value = r.submitted_by || '';
+        // Normalize date to yyyy-mm-dd for input[type=date] if it's MM/DD/YYYY
+        const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.submitted_at || '');
+        $('#submitted_at').value = m ? `${m[3]}-${m[1]}-${m[2]}` : (r.submitted_at || '');
+        $('#permit_notes').value = r.notes || '';
+      }
+    } else {
+      // New default
+      $('#permit_id').value = `PERM-${job_name}-${tag}-${SCID}`;
+      $('#permit_status').value = 'Created - NOT Submitted';
+      $('#submitted_by').value = '';
+      // default to today
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      $('#submitted_at').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+      $('#permit_notes').value = '';
+    }
+  }
 
   function selectPoleByKey(key) {
-    UI.selectedPoleKey = key;
-    const [job, tag, scid] = key.split('::');
-    const pole = (window.STATE.poles || []).find(p => p.job_name===job && String(p.tag)===String(tag) && String(p.SCID)===String(scid));
-    if (!pole) return;
-
-    $('#pole_job').value  = pole.job_name || '';
-    $('#pole_owner').value= pole.owner || '';
-    $('#pole_tag').value  = pole.tag || '';
-    $('#pole_scid').value = pole.SCID || '';
-    $('#pole_spec').value = pole.pole_spec || '';
-    $('#pole_prop').value = pole.proposed_spec || '';
-    $('#pole_lat').value  = pole.lat ?? '';
-    $('#pole_lon').value  = pole.lon ?? '';
-    $('#pole_mr').value   = pole.mr_level || '';
-
-    const sel = $('#selPermit');
-    sel.innerHTML = `<option value="__new">— New —</option>`;
-    const permits = (window.STATE.permits || []).filter(r => r.job_name===pole.job_name && String(r.tag)===String(pole.tag) && String(r.SCID)===String(pole.SCID));
-    for (const r of permits) {
-      const opt = document.createElement('option');
-      opt.value = r.permit_id;
-      opt.textContent = `${r.permit_id} — ${r.permit_status||''}`;
-      sel.appendChild(opt);
-    }
-    sel.value = '__new';
-    clearPermitForm();
+    const st = window.STATE || {};
+    const poles = st.poles || [];
+    const [job_name, tag, SCID] = key.split('::');
+    const p = poles.find(x =>
+      String(x.job_name) === job_name &&
+      String(x.tag) === tag &&
+      String(x.SCID) === SCID
+    );
+    if (!p) return;
+    fillPoleDetails(p);
+    fillPermitEditorFor(key, '__new');
   }
 
-  function clearPermitForm() {
-    $('#permit_id').value = '';
-    $('#permit_status').value = 'Created - NOT Submitted';
-    $('#submitted_by').value = '';
-    $('#submitted_at').value = '';
-    $('#permit_notes').value = '';
-    UI.selectedPermitId = null;
-    $('#msgPermit').textContent = '';
+  // Expose editor entry points for the left list buttons
+  window.UI_editPermit = function(key, permitId) {
+    selectPoleByKey(key);
+    fillPermitEditorFor(key, permitId || '__new');
+    // Scroll to editor if on small screens
+    $('#permit_id')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // ------- Wire filters & data load -------
+  function wireFilters() {
+    $('#fUtility')?.addEventListener('change', renderList);
+    $('#fJob')?.addEventListener('change', renderList);
+    $('#fSearch')?.addEventListener('input', renderList);
   }
 
-  function beginNewPermitForSelectedPole(){ $('#selPermit').value='__new'; clearPermitForm(); }
-
-  function selectPermitById(id) {
-    const r = (window.STATE.permits || []).find(x => String(x.permit_id) === String(id));
-    if (!r) return;
-    $('#selPermit').value     = r.permit_id;
-    $('#permit_id').value     = r.permit_id;
-    $('#permit_status').value = r.permit_status || 'Created - NOT Submitted';
-    $('#submitted_by').value  = r.submitted_by || '';
-    if (r.submitted_at && /^\d{2}\/\d{2}\/\d{4}$/.test(r.submitted_at)) {
-      const [mm,dd,yy] = r.submitted_at.split('/');
-      $('#submitted_at').value = `${yy}-${mm}-${dd}`;
-    } else { $('#submitted_at').value = ''; }
-    $('#permit_notes').value  = r.notes || '';
-    UI.selectedPermitId       = r.permit_id;
-  }
-
-  $('#selPermit').addEventListener('change',(e)=>{ e.target.value==='__new'?beginNewPermitForSelectedPole():selectPermitById(e.target.value); });
-  $('#fUtility').addEventListener('change', renderList);
-  $('#fJob').addEventListener('change', renderList);
-  $('#fSearch').addEventListener('input', renderList);
-
-  async function callApi(change, reason) {
-    const res = await fetch(CFG.API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Permits-Key': CFG.SHARED_KEY },
-      body: JSON.stringify({ actorName: 'Website User', reason, change })
-    });
-    const data = await res.json().catch(()=>({}));
-    if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
-    return data;
-  }
-
-  function normalizeDateToMDY(inputValue) {
-    let s = (inputValue || '').trim();
-    if (!s) return null;
-    // from <input type="date"> YYYY-MM-DD → MM/DD/YYYY
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-      const [y,m,d] = s.split('-'); return `${m}/${d}/${y}`;
-    }
-    // already MM/DD/YYYY
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
-    return null; // invalid
-  }
-
-  // --- Save permit (DATE REQUIRED) ---
-  $('#btnSavePermit').addEventListener('click', async () => {
-    const btn = $('#btnSavePermit'); const btnDel = $('#btnDeletePermit'); const msg = $('#msgPermit');
-    try {
-      btn.disabled = true; btnDel.disabled = true; msg.textContent = 'Submitting…';
-
-      if (!UI.selectedPoleKey) { msg.textContent = 'Select a pole first.'; return; }
-      const [job_name, tag, SCID] = UI.selectedPoleKey.split('::');
-
-      const isExisting = $('#selPermit').value !== '__new';
-      let permit_id = isExisting ? $('#selPermit').value : ($('#permit_id').value||'').trim();
-      if (!permit_id) { msg.textContent='Permit ID is required for new permits.'; return; }
-
-      const permit_status = $('#permit_status').value;
-      const submitted_by  = ($('#submitted_by').value||'').trim();
-      if (!submitted_by){ msg.textContent='Submitted By is required.'; return; }
-
-      const rawDate = $('#submitted_at').value;
-      const submitted_at = normalizeDateToMDY(rawDate);
-      if (!submitted_at) { msg.textContent='A valid "Submitted At" date is required (MM/DD/YYYY).'; return; }
-
-      const notes = $('#permit_notes').value || '';
-
-      const payload = {
-        type:'upsert_permit',
-        permit:{ permit_id, job_name, tag, SCID, permit_status, submitted_by, submitted_at, notes }
-      };
-
-      const data = await callApi(payload, `Edit permit ${permit_id}`);
-      msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-      // Start on-demand 2s watcher + progress banner
-      window.watchForRepoUpdate && window.watchForRepoUpdate(data.pr_url);
-
-    } catch (e) {
-      msg.textContent = e.message;
-    } finally {
-      btn.disabled = false; btnDel.disabled = false;
-    }
+  window.addEventListener('data:loaded', () => {
+    const st = window.STATE || {};
+    ensureJobFilterOptions(st.poles || []);
+    renderList();
   });
 
-  // --- Delete permit ---
-  $('#btnDeletePermit').addEventListener('click', async () => {
-    const btn = $('#btnDeletePermit'); const btnSave = $('#btnSavePermit'); const msg = $('#msgPermit');
-    try {
-      btn.disabled = true; btnSave.disabled = true; msg.textContent = 'Deleting…';
-      const id = $('#selPermit').value;
-      if (!id || id==='__new'){ msg.textContent='Select an existing permit to delete.'; return; }
-
-      const data = await callApi({ type:'delete_permit', permit_id:id }, `Delete permit ${id}`);
-      msg.innerHTML = `PR opened. <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
-      window.watchForRepoUpdate && window.watchForRepoUpdate(data.pr_url);
-
-    } catch (e) {
-      msg.textContent = e.message;
-    } finally {
-      btn.disabled = false; btnSave.disabled = false;
-    }
-  });
-
-  window.addEventListener('data:loaded', renderList);
+  document.addEventListener('DOMContentLoaded', wireFilters);
 })();
