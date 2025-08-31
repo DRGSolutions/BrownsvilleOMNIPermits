@@ -41,16 +41,17 @@
     .btn:disabled { opacity:.6; cursor:not-allowed }
     .btn-ghost { background:transparent; border-color:#2a3242 }
     .btn-accent { border-color:#1f3b2f; background:#0f2b22 }
+    .btn-danger { border-color:#3a1e1e; background:#2a1515 }
+
     .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .spacer { height:10px }
 
     /* Status colors */
     .badge-pending   { border-color:#7c4a03; background:#2c1f0a; color:#f59e0b } /* Submitted - Pending (orange) */
-    /* Brighter, more distinct yellow for "Created - NOT Submitted" */
-    .badge-created   { border-color:#a16207; background:#2a1f05; color:#fde047 } /* Created - NOT Submitted (yellow) */
+    .badge-created   { border-color:#eab308; background:#3b2f00; color:#fde047 } /* Created - NOT Submitted (brighter yellow) */
     .badge-approved  { border-color:#14532d; background:#0c1f16; color:#22c55e } /* Approved (green) */
     .badge-na-cannot { border-color:#5b21b6; background:#22123b; color:#a855f7 } /* Not Approved - Cannot Attach (purple) */
-    .badge-na-other  { border-color:#7f1d1d; background:#2b1111; color:#ef4444 } /* any other Not Approved - ... (red) */
+    .badge-na-other  { border-color:#7f1d1d; background:#2b1111; color:#ef4444 } /* other Not Approved* (red) */
     .badge-none      { border-color:#374151; background:#0e1520; color:#9aa3b2 } /* NONE */
     
     @media (max-width: 980px) { .grid { grid-template-columns: 1fr } .list { max-height:none } }
@@ -183,6 +184,7 @@
 
           <div class="col-12">
             <button id="btnSavePermit" class="btn btn-accent">Save Permit</button>
+            <button id="btnDeletePermit" class="btn btn-danger" disabled>Delete Permit</button>
             <span id="msgPermit" class="small muted"></span>
           </div>
         </div>
@@ -215,7 +217,7 @@
           <div class="row">
             <div class="col-12">
               <label>Permit Status</label>
-              <!-- This will be locked to "Submitted - Pending" by JS -->
+              <!-- Locked to "Submitted - Pending" by JS -->
               <select id="bulkStatus"></select>
             </div>
             <div class="col-6">

@@ -1,60 +1,72 @@
 // assets/js/state.js
-import { OWNER, REPO, DEFAULT_BRANCH, DATA_REPO_DIR } from './config.js';
+import { OWNER, REPO, DEFAULT_BRANCH, DATA_REPO_PATH } from './config.js';
 
-let _state = {
-  poles: [],
-  permits: [],
-  sha: null
-};
+let poles = [];
+let permits = [];
+let sha = null;
 
-export function get(){ return _state; }
-export function set(p){ _state = { ..._state, ...p }; }
+let watcher = null;
+const refreshCallbacks = [];
 
-/**
- * Fetch latest commit SHA for the default branch,
- * then fetch poles/permits from that exact commit (cache-safe).
- */
-export async function refreshFromGitHub(statusEl){
-  try{
-    if (statusEl) statusEl.textContent = 'Loading…';
-
-    // Latest commit on branch
-    const sha = await latestSha();
-    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_REPO_DIR}`;
-    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-    const [pRes, rRes] = await Promise.all([
-      fetch(`${base}/poles.json${bust}`,   { cache:'no-store' }),
-      fetch(`${base}/permits.json${bust}`, { cache:'no-store' })
-    ]);
-
-    if (!pRes.ok || !rRes.ok) {
-      // Show explicit error
-      const msg = `HTTP ${pRes.status}/${rRes.status} fetching data files`;
-      if (statusEl) statusEl.innerHTML = `<span class="err">${msg}</span>`;
-      throw new Error(msg);
-    }
-
-    const [poles, permits] = await Promise.all([pRes.json(), rRes.json()]);
-    set({ poles, permits, sha });
-
-    if (statusEl) statusEl.innerHTML = `<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`;
-  }catch(e){
-    console.error('refreshFromGitHub failed:', e);
-    if (statusEl) statusEl.innerHTML = `<span class="err">${e.message}</span>`;
-  }
+/** Public getters/setters */
+export function get(){ return { poles, permits, sha }; }
+export function set(next){
+  if ('poles'   in next) poles   = next.poles;
+  if ('permits' in next) permits = next.permits;
+  if ('sha'     in next) sha     = next.sha;
 }
 
-async function latestSha(){
+/** Subscribe to refresh events */
+export function onRefresh(cb){
+  if (typeof cb === 'function') refreshCallbacks.push(cb);
+}
+
+/** GitHub HEAD sha */
+export async function getLatestSha(){
   const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
-  const r = await fetch(url, { cache:'no-store' });
-  if (!r.ok) {
-    // Try to show GitHub rate limit body if present
-    let msg = `GitHub API ${r.status}`;
-    try { const j = await r.json(); if (j && j.message) msg += `: ${j.message}`; } catch {}
-    throw new Error(msg);
-  }
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
   const j = await r.json();
-  if (!j || !j.sha) throw new Error('Could not read latest commit SHA');
   return j.sha;
+}
+
+/** Load data from raw.githubusercontent using a specific sha (auto-discovers latest) */
+export async function refreshFromGitHub(statusEl){
+  const newSha = await getLatestSha();
+
+  const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${newSha}/${DATA_REPO_PATH}`;
+  const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  const [r1, r2] = await Promise.all([
+    fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
+    fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
+  ]);
+  if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status} (poles/permits)`);
+
+  const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
+  poles = j1;
+  permits = j2;
+  sha = newSha;
+
+  if (statusEl) statusEl.innerHTML = `<span class="ok">Loaded from <code>${sha.slice(0,7)}</code>.</span>`;
+  refreshCallbacks.forEach(cb => { try { cb({ sha, poles, permits }); } catch {} });
+}
+
+/** Start polling HEAD; refresh when it changes */
+export function startWatcher(intervalMs = 2000, statusEl){
+  if (watcher) return;
+  watcher = setInterval(async () => {
+    try {
+      const latest = await getLatestSha();
+      if (latest !== sha) {
+        await refreshFromGitHub(statusEl);
+      }
+    } catch {
+      // swallow polling errors
+    }
+  }, intervalMs);
+}
+
+export function stopWatcher(){
+  if (watcher) { clearInterval(watcher); watcher = null; }
 }

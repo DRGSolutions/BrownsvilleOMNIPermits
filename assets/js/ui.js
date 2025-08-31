@@ -35,6 +35,7 @@ const permitBy     = $('permitBy');
 const permitAt     = $('permitAt');
 const permitNotes  = $('permitNotes');
 const btnSavePermit= $('btnSavePermit');
+const btnDelete    = $('btnDeletePermit');
 const msgPermit    = $('msgPermit');
 
 /* Admin */
@@ -185,6 +186,8 @@ function selectPole(p){
   permitNotes.value = '';
   msgPermit.textContent = '';
 
+  btnDelete.disabled = true;
+
   updateBulkAvailability();
 }
 
@@ -193,7 +196,10 @@ async function onSavePermit(){
   const p = S.get().currentPole;
   if (!p){ msgPermit.textContent = 'Select a pole first.'; return; }
 
-  const selId = permitPicker.value || permitId.value.trim();
+  const existingId = permitPicker.value;
+  const newId = permitId.value.trim();
+  const selId = existingId || newId;
+
   if (!selId){ msgPermit.textContent = 'Permit ID is required for new permits.'; return; }
   if (!permitBy.value.trim()){ msgPermit.textContent = 'Submitted By is required.'; return; }
 
@@ -218,6 +224,25 @@ async function onSavePermit(){
   msgPermit.textContent = 'Submitting…';
   try{
     const res = await API.callApi(payload);
+    msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${res.pr_url}">View PR</a>`;
+  }catch(e){
+    msgPermit.innerHTML = `<span class="err">${e.message}</span>`;
+  }
+}
+
+/* ---------- Delete permit ---------- */
+async function onDeletePermit(){
+  const id = permitPicker.value;
+  if (!id){ msgPermit.textContent = 'Select a permit to delete.'; return; }
+  if (!confirm(`Delete permit ${id}? This opens a PR that removes it.`)) return;
+
+  msgPermit.textContent = 'Submitting delete…';
+  try{
+    const res = await API.callApi({
+      actorName: 'Website User',
+      reason: `Delete permit ${id}`,
+      change: { type: 'delete_permit', permit_id: id }
+    });
     msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${res.pr_url}">View PR</a>`;
   }catch(e){
     msgPermit.innerHTML = `<span class="err">${e.message}</span>`;
@@ -399,6 +424,8 @@ export async function initUI(){
 
     permitPicker.addEventListener('change', ()=>{
       const id = permitPicker.value;
+      btnDelete.disabled = !id;
+
       const { currentPole } = S.get();
       if (!currentPole || !id) return;
       const r = S.get().permits.find(x => x.permit_id === id);
@@ -412,10 +439,11 @@ export async function initUI(){
     });
 
     btnSavePermit.addEventListener('click', onSavePermit);
+    btnDelete.addEventListener('click', onDeletePermit);
     btnExportCsv.addEventListener('click', onExportCsv);
     btnBulk.addEventListener('click', onBulkCreate);
 
-    // load data
+    // initial load
     await S.refreshFromGitHub(statusBox);
 
     // populate UI
@@ -427,6 +455,19 @@ export async function initUI(){
     kPermits.textContent = fmt(permits.length);
     kLoaded.textContent  = new Date().toLocaleString();
     kCommit.textContent  = sha ? sha.slice(0,7) : '—';
+
+    // auto-refresh when HEAD changes
+    S.onRefresh(() => {
+      populateFilters();
+      renderList();
+      const { poles, permits, sha } = S.get();
+      kPoles.textContent   = fmt(poles.length);
+      kPermits.textContent = fmt(permits.length);
+      kLoaded.textContent  = new Date().toLocaleString();
+      kCommit.textContent  = sha ? sha.slice(0,7) : '—';
+      updateBulkAvailability();
+    });
+    S.startWatcher(2000, statusBox);
   }catch(e){
     console.error(e);
     statusBox.innerHTML = `<span class="err">${e.message}</span>`;
