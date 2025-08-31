@@ -1,20 +1,46 @@
 [
   {
-    "pole_id": "BPUB-000123",
-    "location_label": "test",
+    "job_name": "BRN01-F300",
+    "tag": "1234",
+    "SCID": "076",
     "owner": "BPUB",
-    "class": "Class 4",
-    "height_ft": 50,
+    "pole_spec": "50-3",
+    "proposed_spec": "50-3",
     "lat": 26.00612,
-    "lon": -97.54631
+    "lon": -97.54631,
+    "mr_level": "Complex MR"
   },
   {
-    "pole_id": "OMNI-54270",
-    "location_label": "Location 10 NT6",
-    "owner": "Omni Fiber",
-    "class": "Class 5",
-    "height_ft": 40,
-    "lat": 26.01002,
-    "lon": -97.54011
+    "job_name": "BRN01-F300",
+    "tag": "1235",
+    "SCID": "077",
+    "owner": "BPUB",
+    "pole_spec": "45-4",
+    "proposed_spec": "50-3",
+    "lat": 26.00655,
+    "lon": -97.5469,
+    "mr_level": "Standard MR"
+  },
+  {
+    "job_name": "BRN02-X120",
+    "tag": "A-0021",
+    "SCID": "A12",
+    "owner": "AEP",
+    "pole_spec": "40-5",
+    "proposed_spec": "45-4",
+    "lat": 26.01512,
+    "lon": -97.54001,
+    "mr_level": "Standard MR"
+  },
+  {
+    "job_name": "BRN03-MV10",
+    "tag": "M-900",
+    "SCID": "M90",
+    "owner": "MVEC",
+    "pole_spec": "50-3",
+    "proposed_spec": "50-3",
+    "lat": 26.01234,
+    "lon": -97.55555,
+    "mr_level": "Complex MR"
   }
 ]

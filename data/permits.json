@@ -1,20 +1,34 @@
 [
   {
     "permit_id": "PERM-1001",
-    "pole_id": "BPUB-000123",
-    "status": "submitted",
-    "requested_by": "jdoe this is a test3",
-    "submitted_at": "2025-08-20T14:30:00Z",
-    "notes": "New ISP attachment at 22 NT6.",
-    "attachments": []
+    "job_name": "BRN01-F300",
+    "permit_status": "Not Submitted",
+    "submitted_by": "jdoe this is a test3",
+    "submitted_at": "08/21/2025",
+    "notes": "New ISP attachment at 22 NT6."
   },
   {
     "permit_id": "PERM-1002",
-    "pole_id": "OMNI-54270",
-    "status": "approved",
-    "requested_by": "kmiller",
-    "submitted_at": "2025-08-21T16:05:00Z",
-    "notes": "Make-ready complete; ready to schedule.",
-    "attachments": []
+    "job_name": "BRN01-F300",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "asmith",
+    "submitted_at": "08/28/2025",
+    "notes": "Awaiting utility review."
+  },
+  {
+    "permit_id": "PERM-2001",
+    "job_name": "BRN02-X120",
+    "permit_status": "Approved",
+    "submitted_by": "klopez",
+    "submitted_at": "08/15/2025",
+    "notes": "Approved for construction."
+  },
+  {
+    "permit_id": "PERM-3001",
+    "job_name": "BRN03-MV10",
+    "permit_status": "Not Approved - PLA Issues",
+    "submitted_by": "mgarcia",
+    "submitted_at": "08/10/2025",
+    "notes": "PLA drawing mismatch; resubmit required."
   }
 ]

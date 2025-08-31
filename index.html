@@ -3,15 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pole & Permit Manager (Web Editor)</title>
+  <title>Brownsville, TX are Pole & Permit Manager</title>
 
   <style>
     :root { --bg:#0b0c10; --panel:#121318; --muted:#9aa3b2; --fg:#f3f4f6; --accent:#6ee7b7; --danger:#ef4444; --border:#1f2430; }
     * { box-sizing:border-box }
     body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:var(--bg); color:var(--fg); }
     header { padding:20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, #0b0c10 0%, #0d0f14 100%); position:sticky; top:0; z-index:10 }
-    h1 { margin:0 0 6px 0; font-size:22px }
-    .sub { color:var(--muted); font-size:13px }
+    h1 { margin:0; font-size:22px }
     main { max-width:1100px; margin:24px auto 56px; padding:0 16px }
     .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px }
     .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px }
@@ -19,9 +18,7 @@
     .btn { appearance:none; border:1px solid var(--border); background:#161922; color:var(--fg); padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
     .btn:hover { background:#1a1f2b }
     .btn:disabled { opacity:.6; cursor:not-allowed }
-    .btn-ghost { background:transparent; border-color:#2a3242 }
     .btn-accent { border-color:#1f3b2f; background:#0f2b22 }
-    .btn-danger { border-color:#3a1e1e; background:#2a1515 }
     input, select, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3242; background:#0f1219; color:var(--fg); }
     label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px }
     .row { display:grid; grid-template-columns: repeat(12, 1fr); gap:12px }
@@ -37,7 +34,7 @@
     .status { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #283244; background:#0e1520; color:#c7d2fe }
     .ok { color:var(--accent) }
     .err { color:var(--danger) }
-    .note { background:#0f2b22; border:1px solid #1f3b2f; padding:10px 12px; border-radius:10px; color:#b7f7da; font-size:13px }
+    .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #664c00; color:#ffda6a; background:transparent; }
     .flex { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
     .spacer { height:10px }
     .link { color:#7dd3fc; text-decoration:none }
@@ -47,13 +44,12 @@
 </head>
 <body>
   <header>
-    <h1>Pole & Permit Manager</h1>
-    <div class="sub">View data from <code>/data/poles.json</code> and <code>/data/permits.json</code>. Edit via the web forms below — changes open a Pull Request automatically.</div>
+    <h1>Brownsville, TX are Pole & Permit Manager</h1>
   </header>
 
   <main>
     <div class="grid">
-      <!-- Left: Data viewer -->
+      <!-- Left: Filters + Data viewer -->
       <section class="card">
         <div class="flex" style="justify-content:space-between; align-items:flex-start;">
           <div>
@@ -65,10 +61,26 @@
               <div>Last loaded: <b id="kLoaded">—</b></div>
             </div>
           </div>
-          <div class="flex">
-            <button class="btn btn-ghost" id="btnReload">Reload</button>
-            <a class="btn btn-ghost" id="btnEditPoles"   target="_blank" rel="noopener">Open <code>poles.json</code></a>
-            <a class="btn btn-ghost" id="btnEditPermits" target="_blank" rel="noopener">Open <code>permits.json</code></a>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- Filters -->
+        <div class="row">
+          <div class="col-6">
+            <label>Utility</label>
+            <select id="filterUtility">
+              <option value="">All</option>
+              <option>BPUB</option>
+              <option>AEP</option>
+              <option>MVEC</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label>Job Name</label>
+            <select id="filterJob">
+              <option value="">All</option>
+            </select>
           </div>
         </div>
 
@@ -82,44 +94,31 @@
 
         <div class="spacer"></div>
 
-        <div class="row">
-          <div class="col-6">
-            <label>Search Poles</label>
-            <input id="searchPoles" placeholder="pole_id, owner, location_label…" />
-          </div>
-          <div class="col-6">
-            <label>Filter by Status (permits)</label>
-            <select id="filterStatus">
-              <option value="">All</option>
-              <option>submitted</option>
-              <option>approved</option>
-              <option>issued</option>
-              <option>closed</option>
-              <option>rejected</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="spacer"></div>
-
         <div id="list" class="list"></div>
       </section>
 
       <!-- Right: Editor forms -->
       <section class="card">
         <div class="title">Web Editor</div>
-        <div class="note">Edits here create a branch and Pull Request via your GitHub App. Only files in <code>/data/**</code> are modified. Your branch protection & CI still apply.</div>
-
         <div class="spacer"></div>
 
         <!-- Update or upsert a Pole -->
         <form id="formPole" class="card" style="padding:14px;">
           <div class="title" style="margin-bottom:8px;">Update / Upsert Pole</div>
           <div class="row">
-            <div class="col-6">
-              <label>Pole ID (required)</label>
-              <input name="pole_id" required />
+            <div class="col-4">
+              <label>Job Name (required)</label>
+              <input name="job_name" required />
             </div>
+            <div class="col-4">
+              <label>Tag (required)</label>
+              <input name="tag" required />
+            </div>
+            <div class="col-4">
+              <label>SCID (required)</label>
+              <input name="SCID" required />
+            </div>
+
             <div class="col-6">
               <label>Mode</label>
               <select name="mode">
@@ -127,18 +126,22 @@
                 <option value="upsert">Upsert (create if missing)</option>
               </select>
             </div>
+            <div class="col-6">
+              <label>Owner (Utility)</label>
+              <select name="owner">
+                <option>BPUB</option>
+                <option>AEP</option>
+                <option>MVEC</option>
+              </select>
+            </div>
 
-            <div class="col-4">
-              <label>Owner</label>
-              <input name="owner" placeholder="e.g., BPUB" />
+            <div class="col-6">
+              <label>Pole Spec</label>
+              <input name="pole_spec" placeholder="e.g., 50-3" />
             </div>
-            <div class="col-4">
-              <label>Class</label>
-              <input name="class" placeholder="e.g., Class 4" />
-            </div>
-            <div class="col-4">
-              <label>Height (ft)</label>
-              <input name="height_ft" type="number" min="1" max="150" />
+            <div class="col-6">
+              <label>Proposed Spec</label>
+              <input name="proposed_spec" placeholder="e.g., 50-3" />
             </div>
 
             <div class="col-6">
@@ -151,12 +154,12 @@
             </div>
 
             <div class="col-12">
-              <label>Location Label</label>
-              <input name="location_label" placeholder="e.g., Location 22 NT6" />
+              <label>MR Level</label>
+              <input name="mr_level" placeholder="e.g., Complex MR" />
             </div>
 
             <div class="col-12">
-              <label>Reason</label>
+              <label>Reason (optional)</label>
               <input name="reason" placeholder="Why are you making this change?" />
             </div>
           </div>
@@ -179,33 +182,27 @@
               <input name="permit_id" required />
             </div>
             <div class="col-6">
-              <label>Pole ID (required)</label>
-              <input name="pole_id" required />
-            </div>
-
-            <div class="col-6">
-              <label>Status</label>
-              <select name="status">
-                <option>submitted</option>
-                <option>approved</option>
-                <option>issued</option>
-                <option>closed</option>
-                <option>rejected</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label>Requested By</label>
-              <input name="requested_by" />
+              <label>Job Name (required)</label>
+              <input name="job_name" required />
             </div>
 
             <div class="col-12">
-              <label>Submitted At (ISO 8601)</label>
-              <input name="submitted_at" placeholder="2025-08-29T15:00:00Z" />
+              <label>Permit Status</label>
+              <select name="permit_status" id="permit_status_select"></select>
+            </div>
+
+            <div class="col-6">
+              <label>Submitted By</label>
+              <input name="submitted_by" />
+            </div>
+            <div class="col-6">
+              <label>Submitted At</label>
+              <input name="submitted_at" type="date" />
             </div>
 
             <div class="col-12">
               <label>Notes</label>
-              <input name="notes" />
+              <textarea name="notes" rows="3" placeholder="Add any relevant notes…"></textarea>
             </div>
           </div>
 
@@ -229,78 +226,69 @@
     const DEFAULT_BRANCH = 'main';
     const DATA_REPO_PATH = 'data'; // where poles.json & permits.json live in repo
 
-    function ghViewUrl(path){
-      return `https://github.com/${OWNER}/${REPO}/blob/${DEFAULT_BRANCH}/${path}`;
-    }
-
-    // Show script errors on the page
-    window.addEventListener('error', (e) => {
-      const s = document.getElementById('status');
-      if (s) s.innerHTML = `<span class="err">JS error: ${e.message}</span>`;
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      const s = document.getElementById('status');
-      const msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
-      if (s) s.innerHTML = `<span class="err">Async error: ${msg}</span>`;
-    });
-
-    // ======= DATA VIEWER DOM =======
-    const elStatus = document.getElementById('status');
-    const elList   = document.getElementById('list');
-    const elKPoles = document.getElementById('kPoles');
-    const elKPerms = document.getElementById('kPermits');
-    const elKLoaded= document.getElementById('kLoaded');
-    const elBtnReload   = document.getElementById('btnReload');
-    const elBtnEditPoles= document.getElementById('btnEditPoles');
-    const elBtnEditPerms= document.getElementById('btnEditPermits');
-    const elSearch = document.getElementById('searchPoles');
-    const elFilter = document.getElementById('filterStatus');
+    // ======= DOM =======
+    const elStatus   = document.getElementById('status');
+    const elList     = document.getElementById('list');
+    const elKPoles   = document.getElementById('kPoles');
+    const elKPerms   = document.getElementById('kPermits');
+    const elKLoaded  = document.getElementById('kLoaded');
+    const elUtility  = document.getElementById('filterUtility');
+    const elJob      = document.getElementById('filterJob');
 
     let poles = [], permits = [];
-    const fmt = n => new Intl.NumberFormat().format(n);
+
+    const PERMIT_STATUSES = [
+      "Not Submitted",
+      "Submitted - Pending",
+      "Approved",
+      "Not Approved - Cannot Attach",
+      "Not Approved - PLA Issues",
+      "Not Approved - MRE Issues",
+      "Not Approved - Other Issues"
+    ];
+
+    // Populate the status dropdown
+    (function initStatusSelect(){
+      const sel = document.getElementById('permit_status_select');
+      PERMIT_STATUSES.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sel.appendChild(opt);
+      });
+    })();
 
     // ======= CHANGE MONITOR =======
     let currentSha = null;              // last commit SHA we loaded
-    const pending = new Map();          // key `${kind}:${id}` -> { kind,id,expected,prUrl,state,started,appliedSha }
+    const pending = new Map();          // key -> { kind,id,expected,prUrl,state,started,appliedSha }
     let watcher = null;
 
+    function keyForPole(p) {
+      return `${String(p.job_name||'').trim()}::${String(p.tag||'').trim()}::${String(p.SCID||'').trim()}`;
+    }
     function matchesPatch(obj, expected) {
-      // Be tolerant of "123" vs 123, and tiny float diffs
       const EPS = 1e-9;
       for (const [k, vExp] of Object.entries(expected)) {
         const vObj = obj[k];
-
-        // exact match?
         if (vObj === vExp) continue;
-
-        // stringified match (handles "123" vs 123)
         if (vObj != null && vExp != null && String(vObj) === String(vExp)) continue;
-
-        // numeric & close enough?
-        const nObj = Number(vObj);
-        const nExp = Number(vExp);
+        const nObj = Number(vObj), nExp = Number(vExp);
         if (!Number.isNaN(nObj) && !Number.isNaN(nExp) && Math.abs(nObj - nExp) < EPS) continue;
-
-        // otherwise it's not a match
         return false;
       }
       return true;
     }
-
     function renderPending() {
       const panel = document.getElementById('pendingPanel');
       const list  = document.getElementById('pendingList');
-
       if (pending.size === 0) {
         panel.style.display = 'none';
         list.innerHTML = 'No pending changes.';
         return;
       }
       panel.style.display = 'block';
-
       list.innerHTML = [...pending.values()].map(it => {
         const secs = Math.floor((Date.now() - it.started) / 1000);
-        const pr = it.prUrl ? ` · <a class="link" target="_blank" rel="noopener" href="${it.prUrl}">PR</a>` : '';
+        const pr = it.prUrl ? ` · <a class="link" target="_blank" rel="noopener" href="${it.prUrl}">View PR</a>` : '';
         return `<div>
           ${it.kind} <code>${it.id}</code>
           — <span class="status" style="border-color:${it.state==='applied'?'#1f3b2f':'#664c00'};color:${it.state==='applied'?'#6ee7b7':'#ffda6a'}">
@@ -311,70 +299,38 @@
         </div>`;
       }).join('');
     }
-
     function trackPendingChange(kind, id, expected, prUrl) {
-      const key = `${kind}:${id}`;
-      pending.set(key, { kind, id, expected, prUrl, state: 'pending', started: Date.now() });
+      pending.set(id, { kind, id, expected, prUrl, state: 'pending', started: Date.now() });
       renderPending();
-      ensureWatcher();
+      if (!watcher) watcher = setInterval(checkPending, 3000);
     }
-
-    function ensureWatcher() {
-      if (watcher) return;
-      watcher = setInterval(checkPending, 2000); // poll every 2s
-    }
-
     async function checkPending() {
       if (pending.size === 0) {
-        clearInterval(watcher);
-        watcher = null;
-        return;
+        clearInterval(watcher); watcher = null; return;
       }
-
       let sha;
-      try {
-        sha = await getLatestSha();
-      } catch (e) {
-        console.warn('SHA poll failed', e);
-        return;
-      }
+      try { sha = await getLatestSha(); } catch { return; }
+      if (sha !== currentSha) await loadData(); // refresh data if repo advanced
 
-      // If repo head moved, reload data (loadData sets currentSha and re-renders once)
-      if (sha !== currentSha) {
-        await loadData();
-      }
-
-      // Verify after data is fresh; if anything applies, re-render the list too
       let anyApplied = false;
-
-      for (const [key, it] of [...pending.entries()]) {
+      for (const [id, it] of [...pending.entries()]) {
         if (it.kind === 'pole') {
-          const obj = poles.find(p => p.pole_id === it.id);
+          const [j,t,s] = id.split('::');
+          const obj = poles.find(p => String(p.job_name)===j && String(p.tag)===t && String(p.SCID)===s);
           if (obj && matchesPatch(obj, it.expected)) {
-            it.state = 'applied';
-            it.appliedSha = currentSha;
-            pending.delete(key);
-            anyApplied = true;
+            it.state = 'applied'; it.appliedSha = currentSha; pending.delete(id); anyApplied = true;
           }
         } else {
-          const obj = permits.find(p => p.permit_id === it.id);
+          const obj = permits.find(p => String(p.permit_id) === id);
           if (obj && matchesPatch(obj, it.expected)) {
-            it.state = 'applied';
-            it.appliedSha = currentSha;
-            pending.delete(key);
-            anyApplied = true;
+            it.state = 'applied'; it.appliedSha = currentSha; pending.delete(id); anyApplied = true;
           }
         }
       }
-
-      // Update the monitor panel
       renderPending();
-
-      // IMPORTANT: also refresh the pole list so "pending" chip disappears immediately
-      if (anyApplied) {
-        renderList();
-      }
+      if (anyApplied) renderList();
     }
+
     // ======= GITHUB DATA LOAD (SHA pinned) =======
     async function getLatestSha() {
       const url = `https://api.github.com/repos/${OWNER}/${REPO}/commits/${DEFAULT_BRANCH}?_=${Date.now()}`;
@@ -383,12 +339,11 @@
       const j = await r.json();
       return j.sha;
     }
-
     async function loadData() {
       try {
         elStatus.textContent = 'Loading…';
         const sha = await getLatestSha();
-        currentSha = sha; // remember what we loaded
+        currentSha = sha;
 
         const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_REPO_PATH}`;
         const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -400,13 +355,15 @@
         if (!r1.ok || !r2.ok) throw new Error(`HTTP ${r1.status}/${r2.status} (poles/permits)`);
 
         const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
-        poles = j1; permits = j2;
+        poles = Array.isArray(j1) ? j1 : [];
+        permits = Array.isArray(j2) ? j2 : [];
 
-        elKPoles.textContent  = fmt(poles.length);
-        elKPerms.textContent  = fmt(permits.length);
+        elKPoles.textContent  = new Intl.NumberFormat().format(poles.length);
+        elKPerms.textContent  = new Intl.NumberFormat().format(permits.length);
         elKLoaded.textContent = new Date().toLocaleString();
         elStatus.innerHTML = `<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`;
 
+        rebuildJobFilter();
         renderList();
         renderPending();
       } catch (err) {
@@ -415,60 +372,112 @@
       }
     }
 
-    function renderList(){
-      const q = (elSearch.value||'').toLowerCase().trim();
-      const fStatus = elFilter.value || '';
-      const byPole = {};
-      for(const p of permits){ (byPole[p.pole_id] ||= []).push(p); }
+    // ======= Filters & List =======
+    function rebuildJobFilter() {
+      // Build job list from poles, filtered by utility (owner) if selected
+      const util = elUtility.value || '';
+      const jobs = new Set(
+        poles
+          .filter(p => !util || String(p.owner) === util)
+          .map(p => String(p.job_name || '').trim())
+          .filter(Boolean)
+      );
+      const current = elJob.value;
+      elJob.innerHTML = '<option value="">All</option>' + [...jobs].sort().map(j => `<option>${j}</option>`).join('');
+      // Re-apply previous if still present
+      if (current && jobs.has(current)) elJob.value = current;
+    }
 
-      const filtered = poles.filter(p=>{
-        const hay = [p.pole_id, p.owner, p.location_label, p.class].join(' ').toLowerCase();
-        const matchQ = !q || hay.includes(q);
-        const matchStatus = !fStatus || (byPole[p.pole_id]||[]).some(x=>x.status===fStatus);
-        return matchQ && matchStatus;
+    function renderList(){
+      const util = elUtility.value || '';
+      const job  = elJob.value || '';
+
+      // Filter poles
+      const filteredPoles = poles.filter(p => {
+        const okU = !util || String(p.owner) === util;
+        const okJ = !job  || String(p.job_name) === job;
+        return okU && okJ;
       });
 
-      elList.innerHTML = '';
-      for (const p of filtered){
-        const rel = (byPole[p.pole_id]||[]).slice().sort((a,b)=>a.permit_id.localeCompare(b.permit_id));
-        const key = `pole:${p.pole_id}`;
-        const isPending = pending.has(key);
+      // Build permits-by-job map
+      const byJobPermits = {};
+      for (const perm of permits) {
+        const jn = String(perm.job_name || '').trim(); // requires job_name on permits
+        if (!jn) continue;
+        (byJobPermits[jn] ||= []).push(perm);
+      }
 
-        const li = document.createElement('div'); li.className='card';
-        li.innerHTML = `
+      elList.innerHTML = '';
+      for (const p of filteredPoles){
+        const pKey = keyForPole(p);
+        const isPending = pending.has(pKey);
+
+        const row = document.createElement('div'); row.className = 'card';
+        const coords = `${p.lat ?? '—'}, ${p.lon ?? '—'}`;
+        const specs  = `${p.pole_spec || '—'} → ${p.proposed_spec || '—'}`;
+        row.innerHTML = `
           <div class="flex" style="justify-content:space-between;align-items:flex-start;">
             <div>
               <div class="title">
-                ${p.pole_id} <span class="muted small">— ${p.location_label||''}</span>
-                ${isPending ? '<span class="status" style="margin-left:8px;border-color:#664c00;color:#ffda6a">pending</span>' : ''}
+                ${p.job_name || '—'} — tag ${p.tag || '—'} — SCID ${p.SCID || '—'}
+                ${isPending ? '<span class="chip" style="margin-left:8px;">pending</span>' : ''}
               </div>
-              <div class="small muted">Owner: ${p.owner||'—'} · Class: ${p.class||'—'} · Height: ${p.height_ft||'—'} ft</div>
-              <div class="small muted">Coords: ${p.lat ?? '—'}, ${p.lon ?? '—'}</div>
+              <div class="small muted">
+                ${p.owner || '—'} &nbsp;·&nbsp; ${specs} &nbsp;·&nbsp; MR: ${p.mr_level || '—'}
+              </div>
+              <div class="small muted">Coords: ${coords}</div>
             </div>
-            <button class="btn btn-ghost" onclick="prefillPole('${p.pole_id}')">Edit in form</button>
+            <button class="btn" onclick="prefillPole('${encodeURIComponent(p.job_name||'')}','${encodeURIComponent(p.tag||'')}','${encodeURIComponent(p.SCID||'')}')">Edit in form</button>
           </div>
           <div class="spacer"></div>
-          <div class="small muted">Permits:</div>
-          ${rel.length? `<ul style="margin:.4rem 0 .2rem 1rem;">
-              ${rel.map(r=>`<li class="small">
-                <code>${r.permit_id}</code>
-                <span class="status">${r.status}</span>
-                ${r.requested_by?` · by ${r.requested_by}`:''}
-              </li>`).join('')}
-            </ul>` : `<div class="small muted"><em>No permits</em></div>`}
+          <div class="small muted">Permits for job <code>${p.job_name || '—'}</code>:</div>
+          ${renderPermitsList(byJobPermits[p.job_name]||[])}
         `;
-        elList.appendChild(li);
+        elList.appendChild(row);
+      }
+
+      if (filteredPoles.length === 0) {
+        const empty = document.createElement('div');
+        empty.className='muted small';
+        empty.textContent = 'No poles match the selected filters.';
+        elList.appendChild(empty);
       }
     }
 
-    elBtnReload.addEventListener('click', loadData);
-    elSearch.addEventListener('input', renderList);
-    elFilter.addEventListener('change', renderList);
+    function renderPermitsList(list){
+      if (!list || list.length === 0) return `<div class="small muted"><em>No permits found for this job.</em></div>`;
+      const sorted = list.slice().sort((a,b) => String(a.permit_id).localeCompare(String(b.permit_id)));
+      return `
+        <ul style="margin:.4rem 0 .2rem 1rem;">
+          ${sorted.map(r => `
+            <li class="small">
+              <code>${r.permit_id}</code>
+              — ${r.permit_status || '—'}
+              ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
+              ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+              ${r.notes ? ` · <span class="muted">${escapeHtml(r.notes)}</span>` : ''}
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
 
-    function prefillPole(poleId){
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+    elUtility.addEventListener('change', () => { rebuildJobFilter(); renderList(); });
+    elJob.addEventListener('change', renderList);
+
+    function prefillPole(job_name, tag, SCID){
+      try {
+        job_name = decodeURIComponent(job_name);
+        tag      = decodeURIComponent(tag);
+        SCID     = decodeURIComponent(SCID);
+      } catch {}
       const form = document.getElementById('formPole');
-      form.pole_id.value = poleId;
-      form.mode.value = 'update';
+      form.job_name.value = job_name || '';
+      form.tag.value      = tag || '';
+      form.SCID.value     = SCID || '';
+      form.mode.value     = 'update';
       form.scrollIntoView({ behavior:'smooth', block:'start' });
     }
 
@@ -487,84 +496,131 @@
       return data;
     }
 
-    // ======= FORM: POLE =======
+    // ======= FORM: POLE (new schema) =======
     const formPole = document.getElementById('formPole');
     const msgPole  = document.getElementById('msgPole');
     formPole.addEventListener('submit', async (e)=>{
       e.preventDefault(); msgPole.textContent = 'Submitting…';
       const fd = new FormData(formPole);
-      const pole_id = (fd.get('pole_id')||'').trim();
-      const mode = fd.get('mode');
+
+      const job_name = (fd.get('job_name')||'').trim();
+      const tag      = (fd.get('tag')||'').trim();
+      const SCID     = (fd.get('SCID')||'').trim();
+      const mode     = fd.get('mode');
+
+      if (!job_name || !tag || !SCID) {
+        msgPole.innerHTML = `<span class="err">job_name, tag, and SCID are required.</span>`;
+        return;
+      }
 
       const patch = {};
-      const owner = (fd.get('owner')||'').trim(); if (owner) patch.owner = owner;
-      const cls   = (fd.get('class')||'').trim(); if (cls)   patch.class = cls;
-      const h     = (fd.get('height_ft')||'').trim(); if (h) patch.height_ft = parseInt(h, 10);
-      const lat   = (fd.get('lat')||'').trim(); if (lat) patch.lat = parseFloat(lat);
-      const lon   = (fd.get('lon')||'').trim(); if (lon) patch.lon = parseFloat(lon);
-      const loc   = (fd.get('location_label')||'').trim(); if (loc) patch.location_label = loc;
+      const owner = (fd.get('owner')||'').trim();           if (owner)         patch.owner = owner;
+      const pole_spec = (fd.get('pole_spec')||'').trim();   if (pole_spec)     patch.pole_spec = pole_spec;
+      const proposed_spec = (fd.get('proposed_spec')||'').trim(); if (proposed_spec) patch.proposed_spec = proposed_spec;
+      const lat   = (fd.get('lat')||'').trim();             if (lat)           patch.lat = parseFloat(lat);
+      const lon   = (fd.get('lon')||'').trim();             if (lon)           patch.lon = parseFloat(lon);
+      const mr    = (fd.get('mr_level')||'').trim();        if (mr)            patch.mr_level = mr;
 
       const reason = (fd.get('reason')||'').trim();
 
       try{
         let payload;
+        const idKey = `${job_name}::${tag}::${SCID}`;
         if (mode === 'upsert') {
-          const existing = poles.find(p=>p.pole_id===pole_id);
-          const base = existing || { pole_id, owner: patch.owner || 'Owner', height_ft: patch.height_ft || 30 };
+          const base = { job_name, tag, SCID, owner: owner || 'BPUB' };
           payload = { actorName:'Website User', reason,
-            change: { type:'upsert_pole', pole: { ...base, ...patch, pole_id } }
+            change: { type:'upsert_pole', pole: { ...base, ...patch } }
           };
         } else {
           if (Object.keys(patch).length === 0) throw new Error('Provide at least one field to update.');
           payload = { actorName:'Website User', reason,
-            change: { type:'update_pole', pole_id, patch }
+            change: { type:'update_pole', keys: { job_name, tag, SCID }, patch }
           };
         }
 
         const data = await callApi(payload);
-        msgPole.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
-        // Track only the fields actually changed
+        msgPole.innerHTML = `<span class="ok">PR opened.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
+
+        // Track pending only on fields we changed
         const expected = { ...patch };
-        trackPendingChange('pole', pole_id, expected, data.pr_url);
-        window.open(data.pr_url, '_blank');
+        trackPendingChange('pole', `${job_name}::${tag}::${SCID}`, expected, data.pr_url);
       }catch(err){
         msgPole.innerHTML = `<span class="err">${err.message}</span>`;
       }
     });
 
-    // ======= FORM: PERMIT =======
+    // ======= FORM: PERMIT (new schema) =======
     const formPermit = document.getElementById('formPermit');
     const msgPermit  = document.getElementById('msgPermit');
-    formPermit.addEventListener('submit', async (e)=>{
-      e.preventDefault(); msgPermit.textContent = 'Submitting…';
+
+    function todayYMD() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const y = d.getFullYear();
+      return `${y}-${m}-${day}`;
+    }
+    function toMDY(ymdOrMdy) {
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(ymdOrMdy)) return ymdOrMdy;
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymdOrMdy);
+      if (!m) return ymdOrMdy;
+      return `${m[2]}/${m[3]}/${m[1]}`;
+    }
+    // default the date picker to today
+    (function initPermitDateDefault(){
+      const el = document.querySelector('#formPermit input[name="submitted_at"]');
+      if (el && !el.value) el.value = todayYMD();
+    })();
+
+    formPermit.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msgPermit.textContent = 'Submitting…';
+
       const fd = new FormData(formPermit);
 
+      const permit_id     = (fd.get('permit_id')||'').trim();
+      const job_name      = (fd.get('job_name')||'').trim();       // required for linking to job
+      const status_raw    = (fd.get('permit_status')||'').trim();
+      const submitted_by  = (fd.get('submitted_by')||'').trim();
+      const submitted_at  = toMDY((fd.get('submitted_at')||'').trim() || todayYMD());
+      const notes         = (fd.get('notes')||'').trim();
+
+      if (!permit_id) { msgPermit.innerHTML = `<span class="err">Permit ID is required.</span>`; return; }
+      if (!job_name)  { msgPermit.innerHTML = `<span class="err">Job Name is required.</span>`;  return; }
+
+      const permit_status = status_raw || "Not Submitted";
+      if (!PERMIT_STATUSES.includes(permit_status)) {
+        msgPermit.innerHTML = `<span class="err">Invalid permit status.</span>`; return;
+      }
+
       const permit = {
-        permit_id: (fd.get('permit_id')||'').trim(),
-        pole_id:   (fd.get('pole_id')||'').trim(),
-        status:    (fd.get('status')||'submitted').trim(),
-        requested_by: (fd.get('requested_by')||'').trim() || undefined,
-        submitted_at: (fd.get('submitted_at')||'').trim() || new Date().toISOString(),
-        notes: (fd.get('notes')||'').trim() || undefined,
-        attachments: []
+        permit_id,
+        job_name,
+        permit_status,
+        submitted_by: submitted_by || undefined,
+        submitted_at,
+        notes: notes || undefined
       };
 
-      try{
-        const payload = { actorName:'Website User', reason:`Permit ${permit.permit_id}`, change:{ type:'upsert_permit', permit } };
+      try {
+        const payload = {
+          actorName: 'Website User',
+          reason: `Permit ${permit.permit_id} ${permit.permit_status}`,
+          change: { type: 'upsert_permit', permit }
+        };
         const data = await callApi(payload);
-        msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" target="_blank" rel="noopener" href="${data.pr_url}">View PR</a>`;
-        const expected = { pole_id: permit.pole_id, status: permit.status };
+        msgPermit.innerHTML = `<span class="ok">PR opened.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`;
+
+        // Mark pending so UI shows the chip until repo refresh confirms it
+        const expected = { job_name: permit.job_name, permit_status: permit.permit_status };
         trackPendingChange('permit', permit.permit_id, expected, data.pr_url);
-        window.open(data.pr_url, '_blank');
-      }catch(err){
+      } catch (err) {
         msgPermit.innerHTML = `<span class="err">${err.message}</span>`;
       }
     });
 
     // ======= INIT =======
     window.addEventListener('load', () => {
-      elBtnEditPoles.href  = ghViewUrl(`${DATA_REPO_PATH}/poles.json`);
-      elBtnEditPerms.href  = ghViewUrl(`${DATA_REPO_PATH}/permits.json`);
       loadData();
     });
   </script>
