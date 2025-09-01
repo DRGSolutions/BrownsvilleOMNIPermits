@@ -1,7 +1,7 @@
 // assets/js/app.js
 (function(){
   const CFG = window.APP_CONFIG || {};
-  const $ = (s) => document.querySelector(s);
+  const $   = (s) => document.querySelector(s);
   const fmt = (n) => new Intl.NumberFormat().format(n);
 
   // -------- GitHub helpers --------
@@ -24,55 +24,65 @@
     for (const base of bases) {
       const p1 = await fetchJson(`${base}/poles.json${bust}`);
       const p2 = await fetchJson(`${base}/permits.json${bust}`);
-      if (p1.ok && p2.ok) {
-        return { poles: p1.json, permits: p2.json, base };
-      }
+      if (p1.ok && p2.ok) return { poles: p1.json, permits: p2.json, base };
       if (!p1.ok) errors.push(`poles.json ${p1.status} @ ${p1.url}`);
       if (!p2.ok) errors.push(`permits.json ${p2.status} @ ${p2.url}`);
     }
-    const last = errors.slice(-1)[0] || 'Unknown fetch error';
-    throw new Error(last);
+    throw new Error(errors.slice(-1)[0] || 'Unknown fetch error');
   }
 
   // -------- Main load --------
   async function loadData() {
     const status = $('#status');
-    if (status) status.textContent = 'Loading…';
+    status && (status.textContent = 'Loading…');
 
     try {
       // Candidate directories (unique): your configured dir, plus safe fallbacks.
       const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
 
-      // 1) Try pinned SHA (strongest cache-busting)
-      let sha = await getLatestSha();
-      let bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
-      let result;
-      try {
-        result = await tryLoadBases(bases);
-        window.STATE = { ...result, sha, from: 'sha' };
-      } catch {
-        // 2) Branch fallback (in case path moved in latest commit)
-        bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
-        result = await tryLoadBases(bases);
-        window.STATE = { ...result, sha: CFG.DEFAULT_BRANCH, from: 'branch' };
+      // When the short “apply changes” watcher is running, skip commits API
+      const fastMode = !!window.WATCH_ACTIVE;
+
+      let result = null;
+      let usedSha = null;
+
+      if (!fastMode) {
+        // Try pinned SHA first (best cache-busting)
+        try {
+          const sha = await getLatestSha();
+          const bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
+          result = await tryLoadBases(bases);
+          usedSha = sha;
+        } catch (e) {
+          // Rate limited or other error -> fall through to branch fallback
+          console.warn('[loadData] getLatestSha failed, falling back to branch:', e.message || e);
+        }
       }
 
-      // Update KPIs
+      // Branch fallback (also used when fastMode is on)
+      if (!result) {
+        const bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
+        result = await tryLoadBases(bases);
+        usedSha = CFG.DEFAULT_BRANCH;
+      }
+
+      window.STATE = { ...result, sha: usedSha, from: usedSha === CFG.DEFAULT_BRANCH ? 'branch' : 'sha' };
+
+      // KPIs
       $('#kPoles')   && ($('#kPoles').textContent   = fmt(window.STATE.poles.length));
       $('#kPermits') && ($('#kPermits').textContent = fmt(window.STATE.permits.length));
       $('#kLoaded')  && ($('#kLoaded').textContent  = new Date().toLocaleString());
-      $('#kSha')     && ($('#kSha').textContent     = window.STATE.from === 'sha'
-        ? String(window.STATE.sha).slice(0,7)
-        : `${CFG.DEFAULT_BRANCH} (fallback)`);
+      $('#kSha')     && ($('#kSha').textContent     =
+        window.STATE.from === 'sha' ? String(window.STATE.sha).slice(0,7) : `${CFG.DEFAULT_BRANCH} (fallback)`);
 
-      status && (status.innerHTML = window.STATE.from === 'sha'
-        ? `<span style="color:#34d399">Loaded from commit ${String(window.STATE.sha).slice(0,7)}</span>`
-        : `<span style="color:#f59e0b">Loaded from branch (fallback)</span>`);
+      status && (status.innerHTML =
+        window.STATE.from === 'sha'
+          ? `<span style="color:#34d399">Loaded from commit ${String(window.STATE.sha).slice(0,7)}</span>`
+          : `<span style="color:#f59e0b">Loaded from branch (fallback)</span>`);
 
-      // Announce to UI/admin modules
+      // Notify UI/admin modules
       window.dispatchEvent(new Event('data:loaded'));
     } catch (e) {
-      // Helpful message incl. last failing URL & code
       $('#kPoles')   && ($('#kPoles').textContent   = '—');
       $('#kPermits') && ($('#kPermits').textContent = '—');
       $('#kLoaded')  && ($('#kLoaded').textContent  = '—');
@@ -82,15 +92,12 @@
           • Check <code>APP_CONFIG.DATA_DIR</code> in <code>assets/js/config.js</code> (e.g. <code>data</code> vs <code>docs/data</code>).<br/>
           • If the repo is <b>private</b>, raw URLs return 404. Make it public or add a data proxy endpoint.
         </div>`;
-      $('#status') && ($('#status').innerHTML = `<span style="color:#ef4444">Error: ${e.message}</span>${hint}`);
+      status && (status.innerHTML = `<span style="color:#ef4444">Error: ${e.message}</span>${hint}`);
       console.error('[loadData]', e);
     }
   }
 
-  // Expose for the 2-second watcher
-  window.getLatestRepoSha = async function() {
-    try { return await getLatestSha(); } catch { return null; }
-  };
+  // Exposed for watcher & admin
   window.reloadData = loadData;
 
   // -------- API helper (uses APP_CONFIG) --------
@@ -113,7 +120,7 @@
     return data; // { ok:true, pr_url, branch }
   }
 
-  // -------- Save / Delete handlers --------
+  // -------- Save / Delete handlers (unchanged) --------
   function msg(textHtml) {
     const el = $('#msgPermit');
     if (el) el.innerHTML = textHtml || '';
@@ -121,7 +128,6 @@
 
   async function onSavePermit(ev) {
     if (ev) ev.preventDefault();
-
     if (typeof window.UI_collectPermitForm !== 'function') {
       msg('<span class="err">Internal error: form collector missing.</span>');
       return;
@@ -147,7 +153,7 @@
             SCID:     f.SCID,
             permit_status: f.permit_status,
             submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at, // already MM/DD/YYYY from ui.js
+            submitted_at:  f.submitted_at,
             notes:         f.notes || ''
           }
         }
@@ -169,8 +175,7 @@
       msg('Submitting…');
       const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      // kick the 2s watcher to auto-refresh until the change lands
-      window.dispatchEvent(new CustomEvent('watch:start'));
+      window.dispatchEvent(new CustomEvent('watch:start')); // 2s auto refresh (branch only)
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -190,7 +195,7 @@
         change: { type: 'delete_permit', permit_id: id }
       });
       msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      window.dispatchEvent(new CustomEvent('watch:start'));
+      window.dispatchEvent(new CustomEvent('watch:start')); // 2s auto refresh (branch only)
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -209,6 +214,5 @@
     loadData();
   });
 
-  // also re-enable buttons whenever data loads
   window.addEventListener('data:loaded', wireButtons);
 })();
