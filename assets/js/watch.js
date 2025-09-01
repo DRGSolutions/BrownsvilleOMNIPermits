@@ -1,28 +1,32 @@
 // assets/js/watch.js
 // Watches AFTER Save/Delete, shows a professional progress bar, and refreshes when data reflects the PR.
-// - Starts when the "View PR" link appears OR when 'watch:start' is dispatched by app.js
-// - Polls branch raw JSON (no commits API) every 2s for up to 120s (avoids rate limits)
-// - SAVE: verifies expected fields (tolerant to date formats & blank vs missing)
-// - DELETE: verifies the permit is gone
+// - Starts when "View PR" link appears in #msgPermit, or when 'watch:start' is dispatched.
+// - Polls branch raw JSON (no commits API) every 2s for up to 120s.
+// - SAVE: baseline-aware matcher -> only checks fields that actually changed; tolerant to blanks & date formats.
+// - DELETE: success when the permit disappears.
+// - Optionally pings PR merged status every 5s (low rate; safe). Progress shows PR merged when detected.
 // - Works with window.APP_CONFIG or window.CONFIG
 
 (function () {
   // ---- Config ----
-  const CFG = (window.APP_CONFIG || window.CONFIG || {});
+  const CFG      = (window.APP_CONFIG || window.CONFIG || {});
   const OWNER    = CFG.OWNER;
   const REPO     = CFG.REPO;
   const BRANCH   = CFG.DEFAULT_BRANCH || 'main';
   const DATA_DIR = (CFG.DATA_DIR || 'data').replace(/^\/+|\/+$/g, '');
+  const $        = (s) => document.querySelector(s);
 
-  const $ = (s) => document.querySelector(s);
-
-  // Internal state
-  let pollTimer   = null;
+  // ---- Internal state ----
+  let pollTimer   = null;  // 2s raw.json poll
+  let prTimer     = null;  // 5s PR merge check
   let deadline    = 0;
   let startedAt   = 0;
-  let ctx         = null; // { kind:'save'|'delete', expected:{...}, prUrl?:string, prNum?:string }
 
-  // --------------- UI: progress bar ----------------
+  // context of the current watch
+  // { kind:'save'|'delete', prUrl, prNum, expected:{...}, baseline:{...}, changedKeys:Set<string> }
+  let ctx = null;
+
+  // ========= UI: progress bar =========
   function renderProgress(percent, headline, subline) {
     const el = $('#msgPermit'); if (!el) return;
     const pct = Math.max(0, Math.min(100, percent|0));
@@ -72,57 +76,84 @@
     setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 5000);
   }
 
-  // --------------- Helpers ----------------
+  // ========= Helpers =========
   function parsePrNumberFromUrl(url) {
     try { const m = /\/pull\/(\d+)/.exec(url); return m ? m[1] : ''; } catch { return ''; }
   }
 
+  // Normalize date to YYYY-MM-DD for comparison; accept MM/DD/YYYY or ISO
   function canonicalDate(s) {
     if (!s) return '';
-    // accept ISO, YYYY-MM-DDTHH:mm:ssZ
-    const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+    const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(s); // YYYY-MM-DD or ISO
     if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
-    // accept MM/DD/YYYY
-    const mdy = /^(0[1-9]|1[0-2])\/([0-2][0-9]|3[01])\/(\d{4})$/.exec(s);
-    if (mdy) return `${mdy[3]}-${mdy[1]}-${mdy[2]}`;
+    const mdy = /^(0?[1-9]|1[0-2])\/([0-2]?[0-9]|3[01])\/(\d{4})$/.exec(s); // MM/DD/YYYY (allow non-padded)
+    if (mdy) return `${mdy[3]}-${String(mdy[1]).padStart(2,'0')}-${String(mdy[2]).padStart(2,'0')}`;
     return String(s);
   }
 
+  const isBlank = (v) => v === '' || v === null || v === undefined;
+  const trimStr = (v) => (typeof v === 'string' ? v.trim() : v);
+
   function eqLoose(a, b) {
-    // Treat '', null, undefined as equivalent blanks
-    const blank = (v) => v === '' || v === null || v === undefined;
-    if (blank(a) && blank(b)) return true;
+    // blanks equal
+    if (isBlank(a) && isBlank(b)) return true;
 
-    // Dates: compare canonically
+    // trim strings
+    a = trimStr(a); b = trimStr(b);
+
+    // dates equal canonically
     const ca = canonicalDate(a), cb = canonicalDate(b);
-    if (ca && cb && ca.length === 10 && cb.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(ca) && ca === cb) return true;
+    if (ca && cb && /^\d{4}-\d{2}-\d{2}$/.test(ca) && ca === cb) return true;
 
-    // Exact
+    // exact
     if (a === b) return true;
 
-    // String/number equivalence
+    // string/number equivalence
     /* eslint-disable eqeqeq */
     if (a != null && b != null && String(a) == String(b)) return true;
 
-    // Numeric close
+    // numeric close
     const n1 = Number(a), n2 = Number(b);
     if (!Number.isNaN(n1) && !Number.isNaN(n2) && Math.abs(n1 - n2) < 1e-9) return true;
 
     return false;
   }
 
-  // SAVE: does merged list contain the record with expected fields?
-  function matchesExpectedPermit(list, exp) {
-    const rec = list.find(x => String(x.permit_id) === String(exp.permit_id));
+  function findPermit(list, id) {
+    return list.find(x => String(x.permit_id) === String(id));
+  }
+
+  // Build the set of keys that actually changed vs baseline (so we only check those).
+  function computeChangedKeys(baseline, expected) {
+    const keys = new Set();
+    if (!baseline) {
+      // New permit: check core fields if provided
+      ['permit_status', 'submitted_by', 'submitted_at', 'notes', 'job_name', 'tag', 'SCID'].forEach(k => {
+        if (!isBlank(expected[k])) keys.add(k);
+      });
+      return keys;
+    }
+    for (const k of ['permit_status','submitted_by','submitted_at','notes','job_name','tag','SCID']) {
+      const b = baseline[k], e = expected[k];
+      if (!eqLoose(b, e)) keys.add(k);
+    }
+    // if nothing appears changed (e.g., user hit save without change), still require presence
+    if (keys.size === 0) keys.add('permit_id');
+    return keys;
+  }
+
+  // Success for SAVE: record exists and for all changedKeys eqLoose(rec[k], expected[k])
+  function saveSatisfied(list, expected, baseline, changedKeys) {
+    const rec = findPermit(list, expected.permit_id);
     if (!rec) return false;
-    for (const [k, vExp] of Object.entries(exp)) {
+    for (const k of changedKeys) {
       if (k === 'permit_id') continue;
-      const v = rec[k];
-      if (!eqLoose(v, vExp)) return false;
+      if (!eqLoose(rec[k], expected[k])) return false;
     }
     return true;
   }
 
+  // ========= Data reload (branch-only; cache-busted) =========
   async function reloadFromBranch() {
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${DATA_DIR}`;
@@ -140,79 +171,117 @@
     // KPIs
     const fmt = new Intl.NumberFormat();
     const now = new Date().toLocaleString();
-    const kSha = $('#kSha'), kLoaded = $('#kLoaded'), kPoles = $('#kPoles'), kPermits = $('#kPermits');
-    if (kSha)    kSha.textContent = `${BRANCH} (fallback)`;
-    if (kLoaded) kLoaded.textContent = now;
-    if (kPoles)  kPoles.textContent = fmt.format(poles.length);
-    if (kPermits)kPermits.textContent = fmt.format(permits.length);
+    $('#kSha')     && ($('#kSha').textContent = `${BRANCH} (fallback)`);
+    $('#kLoaded')  && ($('#kLoaded').textContent = now);
+    $('#kPoles')   && ($('#kPoles').textContent = fmt.format(poles.length));
+    $('#kPermits') && ($('#kPermits').textContent = fmt.format(permits.length));
 
-    // Ask UI to rebuild the list
+    // Let UI rebuild the list
     window.dispatchEvent(new CustomEvent('data:loaded'));
     return { poles, permits };
   }
 
-  // --------------- Poll loop ----------------
-  function progressForSecs(s) {
-    // UI heuristic: 15% after PR opened, up to 90% while waiting, 100% on success.
+  // ========= Optional PR merged ping (every 5s; safe) =========
+  async function checkPrMerged(prNum) {
+    if (!prNum) return null;
+    try {
+      // 204 if merged; 404 if not
+      const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls/${prNum}/merge?_=${Date.now()}`, { cache: 'no-store' });
+      if (r.status === 204) return true;
+      if (r.status === 404) return false;
+      return null;
+    } catch { return null; }
+  }
+
+  // ========= Poll loop =========
+  function progressForSecs(s, merged) {
+    // 15% after PR link, 60% while waiting, 80% once merged detected, 100% on data match
     if (s <= 2) return 15;
-    if (s >= 110) return 90;
-    return 15 + Math.floor(((s - 2) / 108) * 75); // ~15..90
+    if (merged) return Math.min(95, 80 + Math.floor((s-2)/2)); // creep towards 95%
+    return Math.min(90, 15 + Math.floor(((s - 2) / 108) * 75));
   }
 
   async function tick() {
-    // stop after 120s
     if (Date.now() > deadline) {
-      stop(false, `Still processing — it may take a few more seconds for GitHub to update.`);
+      stop(false, `Still processing — GitHub may need a few more seconds.`);
       return;
     }
-
     const secs = Math.floor((Date.now() - startedAt) / 1000);
-    renderProgress(progressForSecs(secs), `PR opened — watching for repository update…`, `Auto-refreshing every 2s (${secs}s)`);
 
+    // Optionally peek PR merged status (every ~5s)
+    let merged = false;
+    if (ctx.prNum && secs % 5 === 0) {
+      const m = await checkPrMerged(ctx.prNum);
+      merged = m === true;
+    }
+
+    renderProgress(
+      progressForSecs(secs, merged),
+      merged ? `PR merged — waiting for raw files to update…` : `PR opened — watching for repository update…`,
+      `Auto-refreshing every 2s (${secs}s)`
+    );
+
+    // Reload branch and test success condition
     try {
       const { permits } = await reloadFromBranch();
 
       if (ctx.kind === 'delete') {
-        const exists = permits.some(r => String(r.permit_id) === String(ctx.expected.permit_id));
+        const exists = !!findPermit(permits, ctx.expected.permit_id);
         if (!exists) {
           renderProgress(100, `Change applied — data is up to date.`, `PR${ctx.prNum ? ' #'+ctx.prNum : ''} merged & data refreshed.`);
           stop(true);
           return;
         }
-      } else { // save
-        if (matchesExpectedPermit(permits, ctx.expected)) {
+      } else {
+        // Save
+        if (saveSatisfied(permits, ctx.expected, ctx.baseline, ctx.changedKeys)) {
           renderProgress(100, `Change applied — data is up to date.`, `PR${ctx.prNum ? ' #'+ctx.prNum : ''} merged & data refreshed.`);
           stop(true);
           return;
         }
       }
     } catch {
-      // transient CDN propagation — keep indeterminate feel but don’t spam
-      showIndeterminate(`Waiting for repository update…`);
+      // transient CDN delay — keep going
+      showIndeterminate(merged ? 'PR merged — waiting for raw files…' : 'Waiting for repository update…');
     }
   }
 
   function startWatching(kind, expected, prUrl) {
-    ctx = { kind, expected, prUrl: prUrl || '', prNum: prUrl ? parsePrNumberFromUrl(prUrl) : '' };
+    // baseline snapshot from current STATE before polling
+    const permits = (window.STATE && window.STATE.permits) || [];
+    const baseline = findPermit(permits, expected.permit_id) || null;
+    const changedKeys = computeChangedKeys(baseline, expected);
+
+    ctx = {
+      kind,
+      expected,
+      baseline,
+      changedKeys,
+      prUrl: prUrl || '',
+      prNum: prUrl ? parsePrNumberFromUrl(prUrl) : ''
+    };
     startedAt = Date.now();
     deadline  = startedAt + 120000; // 2 minutes
 
     showIndeterminate('Submitting… PR opened — monitoring for merge & data update.');
 
     if (pollTimer) clearInterval(pollTimer);
+    if (prTimer)   clearInterval(prTimer);
+
     pollTimer = setInterval(tick, 2000);
-    tick(); // run immediately
+    tick(); // immediate first pass
   }
 
   function stop(ok, finalText) {
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    if (prTimer)   { clearInterval(prTimer);   prTimer   = null; }
     finish(finalText || (ok ? 'Done.' : 'Stopped.'), !!ok);
     ctx = null;
   }
 
-  // --------------- Wiring ----------------
-  // Capture form snapshot on click; begin watching when the PR link appears
-  let pendingAction = null; // { kind:'save'|'delete', expected:{...} }
+  // ========= Wiring =========
+  // Capture form snapshot on click; begin watching when PR link appears
+  let pendingAction = null; // { kind, expected }
 
   function captureFormExpected(kind) {
     if (typeof window.UI_collectPermitForm !== 'function') return null;
@@ -225,14 +294,12 @@
       return { permit_id: id };
     }
 
-    // Save: you require a date
+    // Save path: date is required in your UI
     if (!f.submitted_at) {
       const el = $('#msgPermit');
       if (el) el.innerHTML = '<span class="small" style="color:#fca5a5">Please select a date before saving.</span>';
       return null;
     }
-
-    // Build tolerant expected snapshot
     return {
       permit_id:     f.permit_id,
       job_name:      f.job_name,
@@ -241,7 +308,7 @@
       permit_status: f.permit_status,
       submitted_by:  f.submitted_by,
       submitted_at:  f.submitted_at, // any format; matcher normalizes
-      notes:         f.notes // matcher treats '' and undefined as equal
+      notes:         f.notes
     };
   }
 
@@ -256,7 +323,6 @@
         }
       }, { capture: true });
     }
-
     const del = $('#btnDeletePermit');
     if (del) {
       del.addEventListener('click', () => {
@@ -290,7 +356,6 @@
     if (pendingAction) return; // already waiting for PR link
     const exp = captureFormExpected('save');
     if (!exp) return;
-    // If app.js already wrote the PR link, grab it; else start without it
     const a = $('#msgPermit a[href*="/pull/"]');
     startWatching('save', exp, a?.href || '');
   });
