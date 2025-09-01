@@ -126,6 +126,12 @@
     if (el) el.innerHTML = textHtml || '';
   }
 
+  // yyyy-mm-dd -> MM/DD/YYYY (for API)
+  function toMDY(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    return m ? `${m[2]}/${m[3]}/${m[1]}` : (s || '');
+  }
+
   async function onSavePermit(ev) {
     if (ev) ev.preventDefault();
     if (typeof window.UI_collectPermitForm !== 'function') {
@@ -202,11 +208,177 @@
     }
   }
 
+  // -------- NEW: Mass Assign / Modify by SCID (small, isolated) --------
+  function setMassMsg(html) {
+    const el = $('#msgMass'); if (el) el.innerHTML = html || '';
+  }
+
+  function getSelectedJob() {
+    const el = $('#fJob');
+    return (el && el.value && el.value !== 'All') ? el.value : '';
+  }
+
+  function updateMassPanelEnabled() {
+    const job = getSelectedJob();
+    const panel = $('#massPanel');
+    const hint  = $('#massDisabledHint');
+    if (!panel) return;
+    if (!job) {
+      panel.classList.add('disabled-block');
+      if (hint) hint.style.display = '';
+    } else {
+      panel.classList.remove('disabled-block');
+      if (hint) hint.style.display = 'none';
+    }
+  }
+
+  function updateAssignOnlyVisibility() {
+    const mode = ($('#massMode')?.value || 'assign');
+    const els = document.querySelectorAll('.assign-only');
+    els.forEach(el => { el.style.display = (mode === 'assign') ? '' : 'none'; });
+  }
+
+  // Build a quick permit index by pole key
+  function indexPermitsByPole(permits) {
+    const map = new Map();
+    for (const r of (permits || [])) {
+      const key = `${r.job_name}::${r.tag}::${r.SCID}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    }
+    return map;
+  }
+
+  function scidBetween(val, a, b) {
+    // Compare SCIDs lexicographically after left-padding to the max length among inputs+value
+    const s = String(val ?? '');
+    const sA = String(a ?? '');
+    const sB = String(b ?? '');
+    const width = Math.max(s.length, sA.length, sB.length);
+    const pad = (x) => x.toString().padStart(width, '0');
+    const v = pad(s), lo = pad(sA), hi = pad(sB);
+    return lo <= v && v <= hi;
+  }
+
+  async function onMassApply(ev) {
+    if (ev) ev.preventDefault();
+    setMassMsg('');
+
+    const job     = getSelectedJob();
+    const mode    = ($('#massMode')?.value || 'assign');
+    const fromId  = ($('#massFromScid')?.value || '').trim();
+    const toId    = ($('#massToScid')?.value   || '').trim();
+    const baseId  = ($('#massBasePermit')?.value || '').trim();
+    const status  = ($('#massStatus')?.value || '').trim();
+    const by      = ($('#massBy')?.value || '').trim();
+    const dateISO = ($('#massDate')?.value || '').trim();
+    const dateMDY = toMDY(dateISO);
+
+    if (!job) { setMassMsg('<span class="err">Choose a Job on the left first.</span>'); return; }
+    if (!fromId || !toId) { setMassMsg('<span class="err">From/To SCID are required.</span>'); return; }
+    if (!status) { setMassMsg('<span class="err">Permit Status is required.</span>'); return; }
+
+    if (mode === 'assign') {
+      if (!baseId) { setMassMsg('<span class="err">Base Permit ID is required for Assign.</span>'); return; }
+      if (!by) { setMassMsg('<span class="err">Submitted By is required for Assign.</span>'); return; }
+      if (!dateMDY) { setMassMsg('<span class="err">Submitted At (date) is required for Assign.</span>'); return; }
+    }
+
+    const poles   = (window.STATE?.poles || []).filter(p => String(p.job_name) === String(job));
+    const permits = (window.STATE?.permits || []);
+    const byPole  = indexPermitsByPole(permits);
+
+    // Select poles within inclusive SCID range
+    const targets = poles.filter(p => scidBetween(p.SCID, fromId, toId));
+
+    if (targets.length === 0) {
+      setMassMsg('<span class="err">No poles found in that SCID range for the selected Job.</span>');
+      return;
+    }
+
+    $('#btnMassApply') && ($('#btnMassApply').disabled = true);
+    setMassMsg('Submitting…');
+
+    let ops = 0, oks = 0, lastPR = null, errs = [];
+
+    try {
+      if (mode === 'assign') {
+        for (const p of targets) {
+          const key = `${p.job_name}::${p.tag}::${p.SCID}`;
+          const rel = byPole.get(key) || [];
+          if (rel.length > 0) continue; // only create on poles with no permits
+
+          const permit_id = `${baseId}_${p.SCID}`;
+          const change = {
+            type: 'upsert_permit',
+            permit: {
+              permit_id,
+              job_name: p.job_name,
+              tag:      p.tag,
+              SCID:     p.SCID,
+              permit_status: status,
+              submitted_by:  by,
+              submitted_at:  dateMDY,
+              notes: ''
+            }
+          };
+          ops++;
+          try {
+            const data = await callApi({ actorName: 'Website User', reason: `Mass assign ${permit_id}`, change });
+            oks++; lastPR = data.pr_url || lastPR;
+          } catch (e) { errs.push(`${p.SCID}: ${e.message}`); }
+        }
+      } else {
+        // modify mode: update only the permit_status for all existing permits in range
+        for (const p of targets) {
+          const key = `${p.job_name}::${p.tag}::${p.SCID}`;
+          const rel = byPole.get(key) || [];
+          for (const r of rel) {
+            ops++;
+            const change = { type: 'update_permit', permit_id: r.permit_id, patch: { permit_status: status } };
+            try {
+              const data = await callApi({ actorName: 'Website User', reason: `Mass modify status ${r.permit_id}`, change });
+              oks++; lastPR = data.pr_url || lastPR;
+            } catch (e) { errs.push(`${r.permit_id}: ${e.message}`); }
+          }
+        }
+      }
+    } finally {
+      $('#btnMassApply') && ($('#btnMassApply').disabled = false);
+    }
+
+    if (ops === 0 && mode === 'assign') {
+      setMassMsg('<span class="ok">Nothing to do (all poles in range already have permits).</span>');
+      return;
+    }
+    if (ops === 0 && mode === 'modify') {
+      setMassMsg('<span class="ok">Nothing to modify (no existing permits in the range).</span>');
+      return;
+    }
+
+    let html = `<span class="ok">Submitted ${oks}/${ops} changes.</span>`;
+    if (lastPR) html += ` <a class="link" href="${lastPR}" target="_blank" rel="noopener">View latest PR</a>`;
+    if (errs.length) html += `<div class="small" style="margin-top:6px;color:#ef4444">Errors:<br>${errs.slice(0,5).map(e => `• ${e}`).join('<br>')}${errs.length>5?'…':''}</div>`;
+    setMassMsg(html);
+    window.dispatchEvent(new CustomEvent('watch:start'));
+  }
+
   function wireButtons() {
     const save = $('#btnSavePermit');
     if (save) { save.type = 'button'; save.removeEventListener('click', onSavePermit); save.addEventListener('click', onSavePermit); }
     const del = $('#btnDeletePermit');
     if (del)  { del.type  = 'button'; del.removeEventListener('click', onDeletePermit); del.addEventListener('click', onDeletePermit); }
+
+    // NEW: mass panel
+    const massApply = $('#btnMassApply');
+    if (massApply) { massApply.type = 'button'; massApply.removeEventListener('click', onMassApply); massApply.addEventListener('click', onMassApply); }
+    const massMode = $('#massMode');
+    if (massMode) { massMode.removeEventListener('change', updateAssignOnlyVisibility); massMode.addEventListener('change', updateAssignOnlyVisibility); }
+    updateAssignOnlyVisibility();
+    updateMassPanelEnabled();
+
+    // Re-evaluate enabled/disabled when filters change on the left
+    $('#fJob') && $('#fJob').addEventListener('change', updateMassPanelEnabled);
   }
 
   document.addEventListener('DOMContentLoaded', () => {

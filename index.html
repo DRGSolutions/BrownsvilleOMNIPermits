@@ -41,6 +41,8 @@
     .btn-accent{border-color:#1f3b2f;background:#0f2b22}
     .btn-danger{border-color:#402022;background:#2a1515}
     .spacer{height:10px}
+    .hint{font-size:12px;color:#9aa3b2}
+    .disabled-block{opacity:.5;pointer-events:none}
   </style>
 </head>
 <body>
@@ -158,6 +160,68 @@
       </div>
       <div class="spacer"></div>
       <div id="msgPermit" class="small muted"></div>
+
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <!-- NEW: Mass Assign / Modify by SCID (disabled unless Job chosen) -->
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <div class="spacer"></div>
+      <div class="small muted" style="margin-bottom:6px;">Mass Assign / Modify (by SCID)</div>
+      <div id="massPanel" class="card" style="padding:12px;">
+        <div id="massDisabledHint" class="hint" style="margin-bottom:8px;display:none;">
+          Select a <b>Job Name</b> on the left to enable this panel.
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <label>Mode</label>
+            <select id="massMode">
+              <option value="assign">Assign new permits (only poles with no permits)</option>
+              <option value="modify">Modify existing permits (status only)</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label>From SCID</label>
+            <input id="massFromScid" placeholder="e.g., 004"/>
+          </div>
+          <div class="col-6">
+            <label>To SCID</label>
+            <input id="massToScid" placeholder="e.g., 005"/>
+          </div>
+
+          <!-- Assign-only fields -->
+          <div class="col-12 assign-only">
+            <label>Base Permit ID (we append “_SCID”)</label>
+            <input id="massBasePermit" placeholder="e.g., BTX02-F36_BRN02-F05_SEG2"/>
+          </div>
+          <div class="col-6">
+            <label>Permit Status</label>
+            <select id="massStatus">
+              <option>Created - NOT Submitted</option>
+              <option>Submitted - Pending</option>
+              <option>Approved</option>
+              <option>Not Approved - Cannot Attach</option>
+              <option>Not Approved - PLA Issues</option>
+              <option>Not Approved - MRE Issues</option>
+              <option>Not Approved - Other Issues</option>
+            </select>
+          </div>
+          <div class="col-6 assign-only">
+            <label>Submitted By</label>
+            <input id="massBy" placeholder="Name"/>
+          </div>
+          <div class="col-6 assign-only">
+            <label>Submitted At</label>
+            <input id="massDate" type="date"/>
+          </div>
+
+          <div class="col-12">
+            <button id="btnMassApply" class="btn" type="button">Apply to SCID Range</button>
+          </div>
+          <div class="col-12">
+            <div id="msgMass" class="small muted" style="margin-top:6px"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ─────────────────────────────────────────────────────────────── -->
     </section>
   </main>
 
