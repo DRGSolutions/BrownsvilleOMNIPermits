@@ -38,7 +38,7 @@
     setTimeout(() => setMsg(''), 4000);
   }
 
-  // --------- Small helpers for tolerant compare ----------
+  // --------- Tolerant compare helpers ----------
   const isBlank = (v) => v === '' || v === null || v === undefined;
   const trimStr = (v) => (typeof v === 'string' ? v.trim() : v);
 
@@ -190,7 +190,7 @@
     const btnSave = $('#btnSavePermit');
     if (btnSave) {
       btnSave.addEventListener('click', () => {
-        if (typeof window.UI_collectPermitForm !== 'function')) return;
+        if (typeof window.UI_collectPermitForm !== 'function') return; // ✅ fixed extra parenthesis
         const f = window.UI_collectPermitForm();
 
         // Require a date (per your rule)
