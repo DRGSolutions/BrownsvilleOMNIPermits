@@ -9,9 +9,17 @@
   const API_URL = CFG.API_URL;
   const SHARED_KEY = CFG.SHARED_KEY;
 
+  // normalize dir (strip leading/trailing slashes)
+  const normDir = (d) => String(d || '')
+    .replace(/^\s+|\s+$/g,'')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '');
+
   // Try configured dir first, then common fallbacks
-  const DATA_DIR_CANDIDATES = [CFG.DATA_DIR || 'data', 'data', 'docs/data']
-    .filter((v, i, a) => v && a.indexOf(v) === i);
+  const DATA_DIR_CANDIDATES = [normDir(CFG.DATA_DIR || 'data'), 'data', 'docs/data']
+    .map(normDir)
+    .filter(Boolean)
+    .filter((v, i, a) => a.indexOf(v) === i);
 
   // ---- Status helpers ----
   const setStatus = (html) => { const el = $('#status'); if (el) el.innerHTML = html || ''; };
@@ -31,27 +39,42 @@
   }
 
   async function tryDirs(ref) {
-    const tried = [];
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const attempts = [];
 
     for (const dir of DATA_DIR_CANDIDATES) {
       const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${dir}`;
-      const u1 = `${base}/poles.json${bust}`;
-      const u2 = `${base}/permits.json${bust}`;
-      const [r1, r2] = await Promise.all([
-        fetch(u1, { cache: 'no-store' }),
-        fetch(u2, { cache: 'no-store' })
-      ]);
-      tried.push({ dir, s1: r1.status, s2: r2.status });
+      const polesUrl   = `${base}/poles.json${bust}`;
+      const permitsUrl = `${base}/permits.json${bust}`;
 
-      if (r1.ok && r2.ok) {
-        const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
-        return { poles, permits, dirUsed: dir };
+      const [r1, r2] = await Promise.allSettled([
+        fetch(polesUrl,   { cache: 'no-store' }),
+        fetch(permitsUrl, { cache: 'no-store' })
+      ]);
+
+      // record attempt details for debugging
+      attempts.push({
+        dir,
+        polesUrl,
+        permitsUrl,
+        polesStatus:   r1.status === 'fulfilled' ? r1.value.status : `ERR:${r1.reason}`,
+        permitsStatus: r2.status === 'fulfilled' ? r2.value.status : `ERR:${r2.reason}`
+      });
+
+      const ok1 = r1.status === 'fulfilled' && r1.value.ok;
+      const ok2 = r2.status === 'fulfilled' && r2.value.ok;
+      if (ok1 && ok2) {
+        const [poles, permits] = await Promise.all([r1.value.json(), r2.value.json()]);
+        return { poles, permits, dirUsed: dir, attempts };
       }
     }
 
-    const detail = tried.map(t => `${t.dir} (${t.s1}/${t.s2})`).join(', ');
-    throw new Error(`raw 404/404 (tried: ${detail})`);
+    const detail = attempts
+      .map(a => `${a.dir}: poles(${a.polesStatus}) ${a.polesUrl} | permits(${a.permitsStatus}) ${a.permitsUrl}`)
+      .join('<br/>');
+
+    // surface very explicit info to help pinpoint the miss
+    throw new Error(`raw 404/404<br/><small>${detail}</small>`);
   }
 
   async function loadData() {
@@ -65,10 +88,15 @@
         dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
         setStatus(`<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code> (dir: <code>${dirUsed}</code>).</span>`);
       } catch (ePinned) {
-        console.warn('Pinned load failed, falling back to branch:', ePinned.message);
-        const got = await tryDirs(BRANCH);
-        dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
-        setStatus(`<span class="ok">Loaded (branch fallback, dir: <code>${dirUsed}</code>).</span>`);
+        console.warn('Pinned load failed, falling back to branch:', ePinned);
+        try {
+          const got = await tryDirs(BRANCH);
+          dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
+          setStatus(`<span class="ok">Loaded (branch fallback, dir: <code>${dirUsed}</code>).</span>`);
+        } catch (eBranch) {
+          // bubble exact attempts out so you can see the URL(s) that 404'd
+          throw eBranch;
+        }
       }
 
       const prev = window.STATE || {};
@@ -86,7 +114,6 @@
       kpi('#kLoaded',  nowLocal());
       kpi('#kSha',     sha ? sha.slice(0,7) : '—');
 
-      // Tell UI to render
       window.dispatchEvent(new CustomEvent('data:loaded'));
     } catch (err) {
       console.error(err);
@@ -111,14 +138,11 @@
       const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
       throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
     }
-    return data; // { ok:true, pr_url, branch }
+    return data;
   }
 
-  // ---- Save / Delete handlers (unchanged, with required fields) ----
-  function msg(textHtml) {
-    const el = $('#msgPermit');
-    if (el) el.innerHTML = textHtml || '';
-  }
+  // ---- Save / Delete handlers (kept as you had) ----
+  const msg = (html) => { const el = $('#msgPermit'); if (el) el.innerHTML = html || ''; };
 
   async function onSavePermit(ev) {
     if (ev) ev.preventDefault();
@@ -141,38 +165,23 @@
     const exists = (st.permits || []).some(r => String(r.permit_id) === String(f.permit_id));
 
     const change = exists
-      ? {
-          type: 'update_permit',
-          permit_id: f.permit_id,
+      ? { type: 'update_permit', permit_id: f.permit_id,
           patch: {
-            job_name: f.job_name,
-            tag:      f.tag,
-            SCID:     f.SCID,
-            permit_status: f.permit_status,
-            submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at,
-            notes:         f.notes || ''
-          }
-        }
-      : {
-          type: 'upsert_permit',
+            job_name: f.job_name, tag: f.tag, SCID: f.SCID,
+            permit_status: f.permit_status, submitted_by: f.submitted_by,
+            submitted_at: f.submitted_at, notes: f.notes || ''
+          } }
+      : { type: 'upsert_permit',
           permit: {
-            permit_id: f.permit_id,
-            job_name:  f.job_name,
-            tag:       f.tag,
-            SCID:      f.SCID,
-            permit_status: f.permit_status,
-            submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at,
-            notes:         f.notes || ''
-          }
-        };
+            permit_id: f.permit_id, job_name: f.job_name, tag: f.tag, SCID: f.SCID,
+            permit_status: f.permit_status, submitted_by: f.submitted_by,
+            submitted_at: f.submitted_at, notes: f.notes || ''
+          } };
 
     try {
       msg('Submitting…');
       const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      // watch.js handles short polling + reload
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -195,7 +204,6 @@
         change: { type: 'delete_permit', permit_id: id } // backend must support this
       });
       msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      // watch.js will poll and refresh
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -217,12 +225,9 @@
     }
   }
 
-  // ---- boot ----
   document.addEventListener('DOMContentLoaded', () => {
     wireButtons();
     loadData();
   });
-
-  // also re-enable buttons whenever data loads
   window.addEventListener('data:loaded', wireButtons);
 })();
