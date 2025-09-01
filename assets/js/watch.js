@@ -1,7 +1,12 @@
 // assets/js/watch.js
-// Watches for repo updates ONLY after Save/Delete actions, then reloads data.
-// Features kept: professional progress bar, status text, auto-refresh; avoids commit API rate limits.
+// Watches AFTER Save/Delete, shows an animated progress bar, and refreshes when data reflects the PR.
+// - Starts only when the PR link appears in #msgPermit (so we know the request succeeded).
+// - Polls branch raw JSON (no commits API) every 2s for up to 120s.
+// - For Save: verifies expected fields; For Delete: verifies the permit is gone.
+// - Compatible with window.APP_CONFIG or window.CONFIG.
+
 (function () {
+  // ---- Config ----
   const CFG = (window.APP_CONFIG || window.CONFIG || {});
   const OWNER   = CFG.OWNER;
   const REPO    = CFG.REPO;
@@ -10,39 +15,77 @@
 
   const $ = (s) => document.querySelector(s);
 
-  let timer     = null;
-  let deadline  = 0;
-  let expected  = null;   // expected fields to validate against (save) or {permit_id} for delete
-  let action    = '';     // 'save' | 'delete'
-  let startedAt = 0;
+  // Internal state
+  let pollTimer   = null;
+  let prTimer     = null;   // optional, for PR status text only (not required)
+  let deadline    = 0;
+  let startedAt   = 0;
+  let ctx         = null;   // { kind: 'save'|'delete', expected:{...}, prUrl?:string, prNum?:string }
 
-  // --------- UI helpers ----------
-  function setMsg(html) {
+  // --------------- UI: progress bar ----------------
+  function renderProgress(percent, headline, subline) {
     const el = $('#msgPermit');
     if (!el) return;
-    el.innerHTML = html || '';
-  }
-  function showProgress(text) {
-    setMsg(
-      `<div style="border:1px solid #2a3242;border-radius:8px;overflow:hidden;height:10px;background:#0f1219;margin-bottom:6px;position:relative;">
-         <div style="
-            width:40%;height:100%;background:linear-gradient(90deg,#1f2937,#334155,#1f2937);
-            animation:slide 1.2s infinite;opacity:.9;border-right:1px solid #2a3242"></div>
-         <style>@keyframes slide{0%{transform:translateX(-40%)}100%{transform:translateX(260%)}}</style>
-       </div>
-       <div class="small muted">${text}</div>`
-    );
-  }
-  function done(finalText) {
-    setMsg(`<span class="small">${finalText}</span>`);
-    // Clear message after a few seconds so the panel doesn't stay noisy
-    setTimeout(() => {
-      const el = $('#msgPermit');
-      if (el && el.textContent === finalText) el.textContent = '';
-    }, 4000);
+
+    const pct = Math.max(0, Math.min(100, percent|0));
+    el.innerHTML = `
+      <div style="border:1px solid #2a3242;border-radius:10px;padding:10px;background:#0f1219">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div class="small muted">${headline || 'Processing…'}</div>
+          <div class="small muted">${pct}%</div>
+        </div>
+        <div style="position:relative;height:12px;border:1px solid #2a3242;border-radius:8px;overflow:hidden;background:#0c1118">
+          <div style="
+              width:${pct}%;
+              height:100%;
+              background: repeating-linear-gradient(
+                45deg,
+                #223043 0px, #223043 10px,
+                #2d3b4f 10px, #2d3b4f 20px
+              );
+              box-shadow: inset 0 0 4px rgba(0,0,0,.6);">
+          </div>
+        </div>
+        ${subline ? `<div class="small muted" style="margin-top:8px">${subline}</div>` : ''}
+        ${ctx?.prUrl ? `<div class="small" style="margin-top:6px">
+            <a class="link" href="${ctx.prUrl}" target="_blank" rel="noopener">View PR #${ctx.prNum || ''}</a>
+          </div>` : ''}
+      </div>`;
   }
 
-  // --------- Branch-only data reload (no commits API; avoids 403) ----------
+  function showIndeterminate(text) {
+    const el = $('#msgPermit');
+    if (!el) return;
+    el.innerHTML = `
+      <div style="border:1px solid #2a3242;border-radius:10px;padding:10px;background:#0f1219">
+        <div class="small muted" style="margin-bottom:8px">${text || 'Processing…'}</div>
+        <div style="position:relative;height:12px;border:1px solid #2a3242;border-radius:8px;overflow:hidden;background:#0c1118">
+          <div style="
+              width:40%;height:100%;
+              background:linear-gradient(90deg,#1f2937,#334155,#1f2937);
+              animation:slideBar 1.1s infinite;opacity:.9;border-right:1px solid #2a3242"></div>
+        </div>
+        <style>@keyframes slideBar{0%{transform:translateX(-40%)}100%{transform:translateX(260%)}}</style>
+      </div>`;
+  }
+
+  function finish(msg, ok=true) {
+    const el = $('#msgPermit');
+    if (el) {
+      el.innerHTML = `<span class="small" style="color:${ok ? '#6ee7b7':'#fca5a5'}">${msg}</span>`;
+      // clear after a few seconds
+      setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 5000);
+    }
+  }
+
+  // --------------- Helpers ----------------
+  function parsePrNumberFromUrl(url) {
+    try {
+      const m = /\/pull\/(\d+)/.exec(url);
+      return m ? m[1] : '';
+    } catch { return ''; }
+  }
+
   async function reloadFromBranch() {
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${DATA_DIR}`;
@@ -53,165 +96,185 @@
     if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
     const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
 
-    // Update global STATE so UI can re-render
+    // update global STATE so UI re-renders
     const prev = window.STATE || {};
     window.STATE = {
       ...prev,
       poles, permits,
-      sha: null, // unknown (since we skipped commits API)
-      lastLoaded: new Date().toISOString(),
+      sha: null, // unknown here
+      lastLoaded: new Date().toISOString()
     };
 
-    // Update KPIs if present
-    $('#kSha')     && ($('#kSha').textContent = `${BRANCH} (fallback)`);
-    $('#kLoaded')  && ($('#kLoaded').textContent = new Date().toLocaleString());
-    $('#kPoles')   && ($('#kPoles').textContent = new Intl.NumberFormat().format(poles.length));
-    $('#kPermits') && ($('#kPermits').textContent = new Intl.NumberFormat().format(permits.length));
+    // KPIs
+    const numFmt = new Intl.NumberFormat();
+    const now = new Date().toLocaleString();
+    const kSha = $('#kSha'), kLoaded = $('#kLoaded'), kPoles = $('#kPoles'), kPermits = $('#kPermits');
+    if (kSha)    kSha.textContent = `${BRANCH} (fallback)`;
+    if (kLoaded) kLoaded.textContent = now;
+    if (kPoles)  kPoles.textContent = numFmt.format(poles.length);
+    if (kPermits)kPermits.textContent = numFmt.format(permits.length);
 
-    // Ask UI to re-render
+    // let UI rebuild the list
     window.dispatchEvent(new CustomEvent('data:loaded'));
     return { poles, permits };
   }
 
-  // Tolerant field matcher: compares only fields present in exp.
+  // tolerant expected matcher (save)
   function matchesExpectedPermit(list, exp) {
     const rec = list.find(x => String(x.permit_id) === String(exp.permit_id));
     if (!rec) return false;
-
-    // Compare only keys provided in expected; allow string/number equivalence
     const EPS = 1e-9;
     for (const [k, vExp] of Object.entries(exp)) {
       if (k === 'permit_id') continue;
       const v = rec[k];
-
-      // exact
       if (v === vExp) continue;
-
-      // loose string/number
-      /* eslint-disable eqeqeq */
-      if (v != null && vExp != null && String(v) == String(vExp)) continue;
-
+      // loose compare
+      if (v != null && vExp != null && String(v) == String(vExp)) continue; // eslint-disable-line eqeqeq
       // numeric close
       const n1 = Number(v), n2 = Number(vExp);
       if (!Number.isNaN(n1) && !Number.isNaN(n2) && Math.abs(n1 - n2) < EPS) continue;
-
-      // otherwise mismatch
       return false;
     }
     return true;
   }
 
-  // --------- Poll loop ----------
+  // --------------- Poll loop ----------------
   async function tick() {
-    // safety timeout (2 minutes)
+    // deadline
     if (Date.now() > deadline) {
-      stop(`Still processing — refresh in a moment if it doesn’t update automatically.`);
+      stop(false, `Still processing — it may take a few more seconds for GitHub to update.`);
       return;
     }
 
-    // Reload (branch only) and test expected condition
+    // Progress percent (heuristic: 15% once PR link seen, 60% once we see PR likely merged (optional), 100% when data matches)
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+    renderProgress(15, `PR opened — watching for repository update…`, `Auto-refreshing every 2s (${elapsed}s)`);
+
     try {
       const { permits } = await reloadFromBranch();
-      const secs = Math.floor((Date.now() - startedAt) / 1000);
-      const m = $('#msgPermit');
-      if (m) m.innerHTML = `<div class="small muted">Applying changes… refreshing every 2s (${secs}s)</div>`;
 
-      if (action === 'delete') {
-        const exists = permits.some(r => String(r.permit_id) === String(expected.permit_id));
-        if (!exists) {
-          stop(`Change applied — data is up to date.`);
+      if (ctx.kind === 'delete') {
+        const stillThere = permits.some(r => String(r.permit_id) === String(ctx.expected.permit_id));
+        if (!stillThere) {
+          renderProgress(100, `Change applied — data is up to date.`, `PR${ctx.prNum ? ' #'+ctx.prNum : ''} merged & data refreshed.`);
+          stop(true);
           return;
+        } else {
+          renderProgress(60, `Waiting for PR merge and CDN update…`, `Auto-refreshing every 2s (${elapsed}s)`);
         }
-      } else if (action === 'save') {
-        if (matchesExpectedPermit(permits, expected)) {
-          stop(`Change applied — data is up to date.`);
+      } else { // save
+        if (matchesExpectedPermit(permits, ctx.expected)) {
+          renderProgress(100, `Change applied — data is up to date.`, `PR${ctx.prNum ? ' #'+ctx.prNum : ''} merged & data refreshed.`);
+          stop(true);
           return;
+        } else {
+          renderProgress(60, `Waiting for PR merge and CDN update…`, `Auto-refreshing every 2s (${elapsed}s)`);
         }
       }
     } catch (e) {
-      // transient (CDN propagation); show progress and try next tick
-      const secs = Math.floor((Date.now() - startedAt) / 1000);
-      showProgress(`Waiting for repository update… (${secs}s)`);
+      // transient; keep indeterminate and try again
+      showIndeterminate(`Waiting for repository update… (${elapsed}s)`);
     }
   }
 
-  function start(exp, kind) {
-    expected  = exp;
-    action    = kind;           // 'save' or 'delete'
+  function startWatching(kind, expected, prUrl) {
+    ctx = { kind, expected, prUrl: prUrl || '', prNum: prUrl ? parsePrNumberFromUrl(prUrl) : '' };
     startedAt = Date.now();
-    deadline  = startedAt + 120000; // 2 minutes
+    deadline = startedAt + 120000; // 2 minutes max
 
-    showProgress('Submitting… waiting for repository update (auto-refreshing).');
+    // Initial progress
+    showIndeterminate('Submitting… PR opened — monitoring for merge & data update.');
 
-    if (timer) clearInterval(timer);
-    timer = setInterval(tick, 2000);
+    // begin polling
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(tick, 2000);
     tick(); // run immediately
   }
 
-  function stop(msgText) {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-    done(msgText || 'Done.');
+  function stop(ok, finalText) {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    if (prTimer)   { clearInterval(prTimer);   prTimer   = null; }
+    finish(finalText || (ok ? 'Done.' : 'Stopped.'), !!ok);
+    ctx = null;
   }
 
-  // --------- Wire to buttons (keeps your original behavior) ----------
-  function wire() {
-    // SAVE: gather expected fields from the form so we can verify later
-    const btnSave = $('#btnSavePermit');
-    if (btnSave) {
-      btnSave.addEventListener('click', () => {
-        if (typeof window.UI_collectPermitForm !== 'function') return;
-        const f = window.UI_collectPermitForm();
+  // --------------- Wiring ----------------
+  // We want to start *after* the request succeeds (when app.js writes the PR link into #msgPermit).
+  // To know *what* to look for, we capture the form snapshot at click time (save/delete)
+  // and then begin watching once the PR link appears.
+  let pendingAction = null; // { kind:'save'|'delete', expected:{...} }
 
-        // Require a date (your UX rule)
-        if (!f.submitted_at) {
-          setMsg('<span class="small" style="color:#fca5a5">Please select a date before saving.</span>');
-          return;
+  function captureFormExpected(kind) {
+    if (typeof window.UI_collectPermitForm !== 'function') return null;
+    const f = window.UI_collectPermitForm();
+    if (!f) return null;
+    if (kind === 'delete') {
+      const id = (document.querySelector('#permit_id')?.value || '').trim();
+      if (!id) return null;
+      return { permit_id: id };
+    }
+    // save: must include date per your rule
+    if (!f.submitted_at) {
+      const el = $('#msgPermit');
+      if (el) el.innerHTML = '<span class="small" style="color:#fca5a5">Please select a date before saving.</span>';
+      return null;
+    }
+    return {
+      permit_id:     f.permit_id,
+      job_name:      f.job_name,
+      tag:           f.tag,
+      SCID:          f.SCID,
+      permit_status: f.permit_status,
+      submitted_by:  f.submitted_by,
+      submitted_at:  f.submitted_at,
+      notes:         f.notes
+    };
+  }
+
+  function wireButtons() {
+    const save = $('#btnSavePermit');
+    if (save) {
+      save.addEventListener('click', () => {
+        const exp = captureFormExpected('save');
+        if (exp) {
+          pendingAction = { kind: 'save', expected: exp };
+          showIndeterminate('Submitting…');
         }
-
-        // Prepare the "expected" snapshot we’ll look for
-        start({
-          permit_id:     f.permit_id,
-          job_name:      f.job_name,
-          tag:           f.tag,
-          SCID:          f.SCID,
-          permit_status: f.permit_status,
-          submitted_by:  f.submitted_by,
-          submitted_at:  f.submitted_at,
-          notes:         f.notes
-        }, 'save');
       }, { capture: true });
     }
-
-    // DELETE: expected is simply that permit_id disappears
-    const btnDel = $('#btnDeletePermit');
-    if (btnDel) {
-      btnDel.addEventListener('click', () => {
-        const id = ($('#permit_id')?.value || '').trim();
-        if (!id) return;
-        start({ permit_id: id }, 'delete');
+    const del = $('#btnDeletePermit');
+    if (del) {
+      del.addEventListener('click', () => {
+        const exp = captureFormExpected('delete');
+        if (exp) {
+          pendingAction = { kind: 'delete', expected: exp };
+          showIndeterminate('Submitting delete…');
+        }
       }, { capture: true });
     }
-
-    // Optional compatibility: allow app.js to kick the watcher programmatically
-    window.addEventListener('watch:start', () => {
-      if (typeof window.UI_collectPermitForm !== 'function') return;
-      const f = window.UI_collectPermitForm();
-      if (!f || !f.permit_id) return;
-      start({
-        permit_id:     f.permit_id,
-        job_name:      f.job_name,
-        tag:           f.tag,
-        SCID:          f.SCID,
-        permit_status: f.permit_status,
-        submitted_by:  f.submitted_by,
-        submitted_at:  f.submitted_at,
-        notes:         f.notes
-      }, 'save');
-    });
   }
 
-  document.addEventListener('DOMContentLoaded', wire);
+  // Observe #msgPermit for the "View PR" link that app.js renders on success
+  function wireObserver() {
+    const target = $('#msgPermit');
+    if (!target) return;
+    const mo = new MutationObserver(() => {
+      if (!pendingAction) return;
+
+      const a = target.querySelector('a[href*="/pull/"]');
+      if (a && a.href) {
+        // We have the PR URL -> start full watch flow
+        const prUrl = a.href;
+        const { kind, expected } = pendingAction;
+        pendingAction = null;
+        startWatching(kind, expected, prUrl);
+      }
+    });
+    mo.observe(target, { childList: true, subtree: true });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    wireButtons();
+    wireObserver();
+  });
 })();
