@@ -18,15 +18,5 @@
     "submitted_by": "joe",
     "submitted_at": "08/31/2025",
     "notes": ""
-  },
-  {
-    "permit_id": "TEST",
-    "job_name": "BRN01-F300",
-    "tag": "1234",
-    "SCID": "076",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "Joe",
-    "submitted_at": "08/30/2025",
-    "notes": "test"
   }
 ]
