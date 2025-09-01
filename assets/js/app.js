@@ -37,29 +37,23 @@
     status && (status.textContent = 'Loading…');
 
     try {
-      // Candidate directories (unique): your configured dir, plus safe fallbacks.
       const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
-
-      // When the short “apply changes” watcher is running, skip commits API
       const fastMode = !!window.WATCH_ACTIVE;
 
       let result = null;
       let usedSha = null;
 
       if (!fastMode) {
-        // Try pinned SHA first (best cache-busting)
         try {
           const sha = await getLatestSha();
           const bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
           result = await tryLoadBases(bases);
           usedSha = sha;
         } catch (e) {
-          // Rate limited or other error -> fall through to branch fallback
           console.warn('[loadData] getLatestSha failed, falling back to branch:', e.message || e);
         }
       }
 
-      // Branch fallback (also used when fastMode is on)
       if (!result) {
         const bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
         result = await tryLoadBases(bases);
@@ -181,7 +175,7 @@
       msg('Submitting…');
       const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      window.dispatchEvent(new CustomEvent('watch:start')); // 2s auto refresh (branch only)
+      window.dispatchEvent(new CustomEvent('watch:start')); // overlay + auto refresh (bulk watcher path handles all)
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -201,14 +195,14 @@
         change: { type: 'delete_permit', permit_id: id }
       });
       msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      window.dispatchEvent(new CustomEvent('watch:start')); // 2s auto refresh (branch only)
+      window.dispatchEvent(new CustomEvent('watch:start'));
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
     }
   }
 
-  // -------- NEW: Mass Assign / Modify by SCID (small, isolated) --------
+  // -------- NEW: Mass Assign / Modify by SCID (batch -> single PR) --------
   function setMassMsg(html) {
     const el = $('#msgMass'); if (el) el.innerHTML = html || '';
   }
@@ -249,24 +243,23 @@
     return map;
   }
 
-  // Replace the existing scidBetween with this one in assets/js/app.js
+  // Inclusive SCID range comparison (handles '4' vs '004', and reversed bounds)
   function scidBetween(val, a, b) {
     const s  = String(val ?? '').trim();
     const sA = String(a   ?? '').trim();
     const sB = String(b   ?? '').trim();
     if (!s || !sA || !sB) return false;
 
-    // Normalize widths so lexicographic compare works
     const width = Math.max(s.length, sA.length, sB.length);
     const pad = (x) => String(x).padStart(width, '0');
 
     let lo = pad(sA), hi = pad(sB);
-    if (lo > hi) [lo, hi] = [hi, lo];      // auto-swap if user entered reversed bounds
+    if (lo > hi) [lo, hi] = [hi, lo];
 
     const v = pad(s);
-    return lo <= v && v <= hi;              // inclusive range
+    return lo <= v && v <= hi; // inclusive
   }
-  
+
   async function onMassApply(ev) {
     if (ev) ev.preventDefault();
     setMassMsg('');
@@ -303,71 +296,70 @@
       return;
     }
 
-    $('#btnMassApply') && ($('#btnMassApply').disabled = true);
-    setMassMsg('Submitting…');
+    // Build ONE batch of changes (-> single PR)
+    const changes = [];
+    if (mode === 'assign') {
+      for (const p of targets) {
+        const key = `${p.job_name}::${p.tag}::${p.SCID}`;
+        const rel = byPole.get(key) || [];
+        if (rel.length > 0) continue; // only create on poles with no permits
 
-    let ops = 0, oks = 0, lastPR = null, errs = [];
-
-    try {
-      if (mode === 'assign') {
-        for (const p of targets) {
-          const key = `${p.job_name}::${p.tag}::${p.SCID}`;
-          const rel = byPole.get(key) || [];
-          if (rel.length > 0) continue; // only create on poles with no permits
-
-          const permit_id = `${baseId}_${p.SCID}`;
-          const change = {
-            type: 'upsert_permit',
-            permit: {
-              permit_id,
-              job_name: p.job_name,
-              tag:      p.tag,
-              SCID:     p.SCID,
-              permit_status: status,
-              submitted_by:  by,
-              submitted_at:  dateMDY,
-              notes: ''
-            }
-          };
-          ops++;
-          try {
-            const data = await callApi({ actorName: 'Website User', reason: `Mass assign ${permit_id}`, change });
-            oks++; lastPR = data.pr_url || lastPR;
-          } catch (e) { errs.push(`${p.SCID}: ${e.message}`); }
-        }
-      } else {
-        // modify mode: update only the permit_status for all existing permits in range
-        for (const p of targets) {
-          const key = `${p.job_name}::${p.tag}::${p.SCID}`;
-          const rel = byPole.get(key) || [];
-          for (const r of rel) {
-            ops++;
-            const change = { type: 'update_permit', permit_id: r.permit_id, patch: { permit_status: status } };
-            try {
-              const data = await callApi({ actorName: 'Website User', reason: `Mass modify status ${r.permit_id}`, change });
-              oks++; lastPR = data.pr_url || lastPR;
-            } catch (e) { errs.push(`${r.permit_id}: ${e.message}`); }
+        const permit_id = `${baseId}_${p.SCID}`;
+        changes.push({
+          type: 'upsert_permit',
+          permit: {
+            permit_id,
+            job_name: p.job_name,
+            tag:      p.tag,
+            SCID:     p.SCID,
+            permit_status: status,
+            submitted_by:  by,
+            submitted_at:  dateMDY,
+            notes: ''
           }
+        });
+      }
+    } else {
+      // modify mode: update only the permit_status for all existing permits in range
+      for (const p of targets) {
+        const key = `${p.job_name}::${p.tag}::${p.SCID}`;
+        const rel = byPole.get(key) || [];
+        for (const r of rel) {
+          changes.push({ type: 'update_permit', permit_id: r.permit_id, patch: { permit_status: status } });
         }
       }
+    }
+
+    if (changes.length === 0) {
+      setMassMsg(mode === 'assign'
+        ? '<span class="ok">Nothing to do (all poles in range already have permits).</span>'
+        : '<span class="ok">Nothing to modify (no existing permits in range).</span>');
+      return;
+    }
+
+    // Submit ONE request -> ONE PR
+    const btn = $('#btnMassApply');
+    if (btn) btn.disabled = true;
+    try {
+      setMassMsg(`Submitting ${changes.length} change(s)…`);
+      const data = await callApi({
+        actorName: 'Website User',
+        reason: `${mode === 'assign' ? 'Mass assign' : 'Mass modify'} (${changes.length})`,
+        changes
+      });
+      setMassMsg(
+        `<span class="ok">Submitted ${changes.length} change(s).</span> ` +
+        (data.pr_url ? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>` : '')
+      );
+
+      // Trigger the same overlay + polling used by Save/Delete (bulk mode in watch.js)
+      window.dispatchEvent(new CustomEvent('watch:start'));
+    } catch (e) {
+      console.error(e);
+      setMassMsg(`<span class="err">${e.message}</span>`);
     } finally {
-      $('#btnMassApply') && ($('#btnMassApply').disabled = false);
+      if (btn) btn.disabled = false;
     }
-
-    if (ops === 0 && mode === 'assign') {
-      setMassMsg('<span class="ok">Nothing to do (all poles in range already have permits).</span>');
-      return;
-    }
-    if (ops === 0 && mode === 'modify') {
-      setMassMsg('<span class="ok">Nothing to modify (no existing permits in the range).</span>');
-      return;
-    }
-
-    let html = `<span class="ok">Submitted ${oks}/${ops} changes.</span>`;
-    if (lastPR) html += ` <a class="link" href="${lastPR}" target="_blank" rel="noopener">View latest PR</a>`;
-    if (errs.length) html += `<div class="small" style="margin-top:6px;color:#ef4444">Errors:<br>${errs.slice(0,5).map(e => `• ${e}`).join('<br>')}${errs.length>5?'…':''}</div>`;
-    setMassMsg(html);
-    window.dispatchEvent(new CustomEvent('watch:start'));
   }
 
   function wireButtons() {
@@ -376,7 +368,7 @@
     const del = $('#btnDeletePermit');
     if (del)  { del.type  = 'button'; del.removeEventListener('click', onDeletePermit); del.addEventListener('click', onDeletePermit); }
 
-    // NEW: mass panel
+    // Mass panel
     const massApply = $('#btnMassApply');
     if (massApply) { massApply.type = 'button'; massApply.removeEventListener('click', onMassApply); massApply.addEventListener('click', onMassApply); }
     const massMode = $('#massMode');
