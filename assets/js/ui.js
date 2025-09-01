@@ -109,6 +109,13 @@
                     ${statusChipHTML(r.permit_status)}
                     ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
                     ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+                    ${
+                        r.notes
+                        ? `<div class="small muted" style="margin-top:2px; white-space:pre-wrap;">
+                            Notes: ${(String(r.notes)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+                            </div>`
+                        : ''
+                    }
                     <button class="btn" style="margin-left:8px" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
                   </div>
                 `).join('')
