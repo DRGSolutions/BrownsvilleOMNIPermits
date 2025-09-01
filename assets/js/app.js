@@ -6,21 +6,18 @@
   const OWNER  = CFG.OWNER;
   const REPO   = CFG.REPO;
   const BRANCH = CFG.DEFAULT_BRANCH || 'main';
-  const DATA_DIR = CFG.DATA_DIR || 'data';
   const API_URL = CFG.API_URL;
   const SHARED_KEY = CFG.SHARED_KEY;
 
+  // Try configured dir first, then common fallbacks
+  const DATA_DIR_CANDIDATES = [CFG.DATA_DIR || 'data', 'data', 'docs/data']
+    .filter((v, i, a) => v && a.indexOf(v) === i);
+
   // ---- Status helpers ----
-  function setStatus(msgHtml) {
-    const el = $('#status');
-    if (el) el.innerHTML = msgHtml || '';
-  }
-  function kpi(id, val) {
-    const el = $(id);
-    if (el) el.textContent = val;
-  }
-  function fmt(n) { return new Intl.NumberFormat().format(n); }
-  function nowLocal() { return new Date().toLocaleString(); }
+  const setStatus = (html) => { const el = $('#status'); if (el) el.innerHTML = html || ''; };
+  const kpi = (sel, val) => { const el = $(sel); if (el) el.textContent = val; };
+  const fmt = (n) => new Intl.NumberFormat().format(n);
+  const nowLocal = () => new Date().toLocaleString();
 
   // ---- GitHub fetch (pinned-to-SHA, branch fallback) ----
   async function getLatestSha() {
@@ -33,56 +30,61 @@
     return j.sha;
   }
 
-  async function fetchDataAtSha(sha) {
+  async function tryDirs(ref) {
+    const tried = [];
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_DIR}`;
-    const [r1, r2] = await Promise.all([
-      fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
-    ]);
-    if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
-    const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
-    return { poles, permits, sha };
-  }
 
-  async function fetchDataBranchFallback() {
-    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${DATA_DIR}`;
-    const [r1, r2] = await Promise.all([
-      fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
-    ]);
-    if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
-    const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
-    return { poles, permits, sha: null };
+    for (const dir of DATA_DIR_CANDIDATES) {
+      const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/${dir}`;
+      const u1 = `${base}/poles.json${bust}`;
+      const u2 = `${base}/permits.json${bust}`;
+      const [r1, r2] = await Promise.all([
+        fetch(u1, { cache: 'no-store' }),
+        fetch(u2, { cache: 'no-store' })
+      ]);
+      tried.push({ dir, s1: r1.status, s2: r2.status });
+
+      if (r1.ok && r2.ok) {
+        const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
+        return { poles, permits, dirUsed: dir };
+      }
+    }
+
+    const detail = tried.map(t => `${t.dir} (${t.s1}/${t.s2})`).join(', ');
+    throw new Error(`raw 404/404 (tried: ${detail})`);
   }
 
   async function loadData() {
     try {
       setStatus('Loading…');
-      let data;
+      let sha = null, dirUsed = null, poles = [], permits = [];
+
       try {
-        const sha = await getLatestSha();
-        data = await fetchDataAtSha(sha);
-        setStatus(`<span class="ok">Loaded from commit <code>${data.sha.slice(0,7)}</code>.</span>`);
-      } catch {
-        data = await fetchDataBranchFallback();
-        setStatus(`<span class="ok">Loaded (branch fallback).</span>`);
+        sha = await getLatestSha();
+        const got = await tryDirs(sha);
+        dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
+        setStatus(`<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code> (dir: <code>${dirUsed}</code>).</span>`);
+      } catch (ePinned) {
+        console.warn('Pinned load failed, falling back to branch:', ePinned.message);
+        const got = await tryDirs(BRANCH);
+        dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
+        setStatus(`<span class="ok">Loaded (branch fallback, dir: <code>${dirUsed}</code>).</span>`);
       }
 
       const prev = window.STATE || {};
       window.STATE = {
         ...prev,
-        poles: data.poles || [],
-        permits: data.permits || [],
-        sha: data.sha,
+        poles: poles || [],
+        permits: permits || [],
+        sha,
+        dataDirUsed: dirUsed,
         lastLoaded: new Date().toISOString()
       };
 
       kpi('#kPoles',   fmt((window.STATE.poles || []).length));
       kpi('#kPermits', fmt((window.STATE.permits || []).length));
       kpi('#kLoaded',  nowLocal());
-      if (window.STATE.sha) kpi('#kSha', window.STATE.sha.slice(0,7));
+      kpi('#kSha',     sha ? sha.slice(0,7) : '—');
 
       // Tell UI to render
       window.dispatchEvent(new CustomEvent('data:loaded'));
@@ -112,7 +114,7 @@
     return data; // { ok:true, pr_url, branch }
   }
 
-  // ---- Save / Delete handlers ----
+  // ---- Save / Delete handlers (unchanged, with required fields) ----
   function msg(textHtml) {
     const el = $('#msgPermit');
     if (el) el.innerHTML = textHtml || '';
@@ -120,7 +122,6 @@
 
   async function onSavePermit(ev) {
     if (ev) ev.preventDefault();
-    // Ensure buttons never submit any form
     const btn = $('#btnSavePermit');
     if (btn && (!btn.type || btn.type.toLowerCase() === 'submit')) btn.type = 'button';
 
@@ -130,7 +131,6 @@
     }
 
     const f = window.UI_collectPermitForm();
-    // Required fields
     if (!f.job_name || !f.tag || !f.SCID) { msg('<span class="err">Missing pole keys (job_name, tag, SCID).</span>'); return; }
     if (!f.permit_id) { msg('<span class="err">Permit ID is required.</span>'); return; }
     if (!f.permit_status) { msg('<span class="err">Permit Status is required.</span>'); return; }
@@ -150,7 +150,7 @@
             SCID:     f.SCID,
             permit_status: f.permit_status,
             submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at, // already MM/DD/YYYY from ui.js
+            submitted_at:  f.submitted_at,
             notes:         f.notes || ''
           }
         }
@@ -172,7 +172,7 @@
       msg('Submitting…');
       const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      // watch.js will start polling on click; nothing else to do here
+      // watch.js handles short polling + reload
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -192,7 +192,7 @@
       const data = await callApi({
         actorName: 'Website User',
         reason: `Delete ${id}`,
-        change: { type: 'delete_permit', permit_id: id } // needs backend support
+        change: { type: 'delete_permit', permit_id: id } // backend must support this
       });
       msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
       // watch.js will poll and refresh
