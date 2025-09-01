@@ -1,193 +1,214 @@
 // assets/js/app.js
-(function () {
+(function(){
+  const CFG = window.APP_CONFIG || {};
   const $ = (s) => document.querySelector(s);
+  const fmt = (n) => new Intl.NumberFormat().format(n);
 
-  // --- small helpers ---
-  function setStatus(msgHtml) { const el = document.querySelector('#status'); if (el) el.innerHTML = msgHtml || ''; }
-  function kpi(sel, v){ const el = document.querySelector(sel); if (el) el.textContent = v; }
-  const fmt = (n)=> new Intl.NumberFormat().format(n);
-  const nowLocal = ()=> new Date().toLocaleString();
-  const cfg = (k, d='') => (window.CONFIG && window.CONFIG[k]) || d;
-
-  // --- GitHub data fetch ---
-  async function getLatestSha(owner, repo, branch){
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits/${branch}?_=${Date.now()}`, { cache:'no-store' });
+  // -------- GitHub helpers --------
+  async function getLatestSha() {
+    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
+    const r = await fetch(url, { cache: 'no-store' });
     if (!r.ok) throw new Error(`GitHub API ${r.status} (latest commit)`);
     const j = await r.json();
     return j.sha;
   }
 
-  async function tryLoadRaw(owner, repo, ref, dir){
-    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const base = `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${dir}`;
-    const urls = {
-      poles:   `${base}/poles.json${bust}`,
-      permits: `${base}/permits.json${bust}`
-    };
-
-    const [r1, r2] = await Promise.all([
-      fetch(urls.poles,   { cache:'no-store' }),
-      fetch(urls.permits, { cache:'no-store' })
-    ]);
-
-    if (r1.ok && r2.ok) {
-      const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
-      return { ok:true, poles, permits, urls };
-    }
-    return { ok:false, status:`${r1.status}/${r2.status}`, urls };
+  async function fetchJson(url) {
+    const r = await fetch(url, { cache: 'no-store' });
+    return { ok: r.ok, status: r.status, json: r.ok ? await r.json() : null, url };
   }
 
-  async function loadData(){
-    const OWNER   = cfg('OWNER');
-    const REPO    = cfg('REPO');
-    const BRANCH  = cfg('DEFAULT_BRANCH','main');
-    const DATA_DIR= cfg('DATA_DIR','data');
+  async function tryLoadBases(bases) {
+    const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const errors = [];
+    for (const base of bases) {
+      const p1 = await fetchJson(`${base}/poles.json${bust}`);
+      const p2 = await fetchJson(`${base}/permits.json${bust}`);
+      if (p1.ok && p2.ok) {
+        return { poles: p1.json, permits: p2.json, base };
+      }
+      if (!p1.ok) errors.push(`poles.json ${p1.status} @ ${p1.url}`);
+      if (!p2.ok) errors.push(`permits.json ${p2.status} @ ${p2.url}`);
+    }
+    const last = errors.slice(-1)[0] || 'Unknown fetch error';
+    throw new Error(last);
+  }
 
-    if (!OWNER || !REPO) {
-      setStatus('<span class="err">Missing CONFIG.OWNER/REPO</span>');
-      console.error('CONFIG missing:', window.CONFIG);
+  // -------- Main load --------
+  async function loadData() {
+    const status = $('#status');
+    if (status) status.textContent = 'Loading…';
+
+    try {
+      // Candidate directories (unique): your configured dir, plus safe fallbacks.
+      const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
+
+      // 1) Try pinned SHA (strongest cache-busting)
+      let sha = await getLatestSha();
+      let bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`);
+      let result;
+      try {
+        result = await tryLoadBases(bases);
+        window.STATE = { ...result, sha, from: 'sha' };
+      } catch {
+        // 2) Branch fallback (in case path moved in latest commit)
+        bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
+        result = await tryLoadBases(bases);
+        window.STATE = { ...result, sha: CFG.DEFAULT_BRANCH, from: 'branch' };
+      }
+
+      // Update KPIs
+      $('#kPoles')   && ($('#kPoles').textContent   = fmt(window.STATE.poles.length));
+      $('#kPermits') && ($('#kPermits').textContent = fmt(window.STATE.permits.length));
+      $('#kLoaded')  && ($('#kLoaded').textContent  = new Date().toLocaleString());
+      $('#kSha')     && ($('#kSha').textContent     = window.STATE.from === 'sha'
+        ? String(window.STATE.sha).slice(0,7)
+        : `${CFG.DEFAULT_BRANCH} (fallback)`);
+
+      status && (status.innerHTML = window.STATE.from === 'sha'
+        ? `<span style="color:#34d399">Loaded from commit ${String(window.STATE.sha).slice(0,7)}</span>`
+        : `<span style="color:#f59e0b">Loaded from branch (fallback)</span>`);
+
+      // Announce to UI/admin modules
+      window.dispatchEvent(new Event('data:loaded'));
+    } catch (e) {
+      // Helpful message incl. last failing URL & code
+      $('#kPoles')   && ($('#kPoles').textContent   = '—');
+      $('#kPermits') && ($('#kPermits').textContent = '—');
+      $('#kLoaded')  && ($('#kLoaded').textContent  = '—');
+      $('#kSha')     && ($('#kSha').textContent     = '—');
+      const hint = `
+        <div class="small muted" style="margin-top:6px">
+          • Check <code>APP_CONFIG.DATA_DIR</code> in <code>assets/js/config.js</code> (e.g. <code>data</code> vs <code>docs/data</code>).<br/>
+          • If the repo is <b>private</b>, raw URLs return 404. Make it public or add a data proxy endpoint.
+        </div>`;
+      $('#status') && ($('#status').innerHTML = `<span style="color:#ef4444">Error: ${e.message}</span>${hint}`);
+      console.error('[loadData]', e);
+    }
+  }
+
+  // Expose for the 2-second watcher
+  window.getLatestRepoSha = async function() {
+    try { return await getLatestSha(); } catch { return null; }
+  };
+  window.reloadData = loadData;
+
+  // -------- API helper (uses APP_CONFIG) --------
+  async function callApi(payload) {
+    const API_URL   = CFG.API_URL;
+    const SHARED_KEY= CFG.SHARED_KEY;
+    if (!API_URL) throw new Error('Missing CONFIG.API_URL');
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Permits-Key': SHARED_KEY || '' },
+      body: JSON.stringify(payload)
+    });
+
+    let data; try { data = await res.json(); } catch { data = { ok:false, error:'Invalid server response' }; }
+    if (!res.ok || !data.ok) {
+      const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
+      throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
+    }
+    return data; // { ok:true, pr_url, branch }
+  }
+
+  // -------- Save / Delete handlers --------
+  function msg(textHtml) {
+    const el = $('#msgPermit');
+    if (el) el.innerHTML = textHtml || '';
+  }
+
+  async function onSavePermit(ev) {
+    if (ev) ev.preventDefault();
+
+    if (typeof window.UI_collectPermitForm !== 'function') {
+      msg('<span class="err">Internal error: form collector missing.</span>');
       return;
     }
 
-    setStatus('Loading…');
+    const f = window.UI_collectPermitForm();
+    // Required fields
+    if (!f.job_name || !f.tag || !f.SCID) { msg('<span class="err">Missing pole keys (job_name, tag, SCID).</span>'); return; }
+    if (!f.permit_id) { msg('<span class="err">Permit ID is required.</span>'); return; }
+    if (!f.permit_status) { msg('<span class="err">Permit Status is required.</span>'); return; }
+    if (!f.submitted_by) { msg('<span class="err">Submitted By is required.</span>'); return; }
+    if (!f.submitted_at) { msg('<span class="err">Submitted At (date) is required.</span>'); return; }
 
-    const dirsToTry = [DATA_DIR, 'docs/data'].filter((v,i,a)=> v && a.indexOf(v)===i);
-    const tried = [];
+    const exists = (window.STATE?.permits || []).some(r => String(r.permit_id) === String(f.permit_id));
 
-    // 1) pinned to latest commit
-    try {
-      const sha = await getLatestSha(OWNER, REPO, BRANCH);
-      for (const dir of dirsToTry) {
-        const res = await tryLoadRaw(OWNER, REPO, sha, dir);
-        tried.push({ ref: sha.slice(0,7), dir, urls: res.urls, ok: res.ok, status: res.status });
-        if (res.ok) {
-          applyData(res.poles, res.permits, sha);
-          setStatus(`<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code>.</span>`);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn('Could not pin to commit:', e?.message || e);
-    }
-
-    // 2) branch fallback
-    for (const dir of dirsToTry) {
-      const res = await tryLoadRaw(OWNER, REPO, BRANCH, dir);
-      tried.push({ ref: BRANCH, dir, urls: res.urls, ok: res.ok, status: res.status });
-      if (res.ok) {
-        applyData(res.poles, res.permits, null);
-        setStatus('<span class="ok">Loaded (branch fallback).</span>');
-        return;
-      }
-    }
-
-    // 3) everything failed; show exactly what we tried
-    const lines = tried.map(t =>
-      `${t.ok?'OK':'fail'} @ ${t.ref}/${t.dir} (status ${t.status})`
-    ).join('<br>');
-    setStatus(`<span class="err">Error: raw 404/404</span><div class="small muted">${lines}</div>`);
-    console.error('Tried URLs:', tried);
-  }
-
-  function applyData(poles, permits, sha){
-    const prev = window.STATE || {};
-    window.STATE = {
-      ...prev,
-      poles: poles || [],
-      permits: permits || [],
-      sha: sha || null,
-      lastLoaded: new Date().toISOString()
-    };
-    kpi('#kPoles', fmt((window.STATE.poles||[]).length));
-    kpi('#kPermits', fmt((window.STATE.permits||[]).length));
-    kpi('#kLoaded', nowLocal());
-    if (window.STATE.sha) kpi('#kSha', window.STATE.sha.slice(0,7));
-    window.dispatchEvent(new CustomEvent('data:loaded'));
-  }
-
-  // --- API (read CONFIG lazily so cache can’t bite us) ---
-  async function callApi(payload){
-    const API_URL    = cfg('API_URL');
-    const SHARED_KEY = cfg('SHARED_KEY');
-
-    if (!API_URL) {
-      const msg = 'Missing CONFIG.API_URL';
-      console.error(msg, window.CONFIG);
-      throw new Error(msg);
-    }
-    const res = await fetch(API_URL, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'X-Permits-Key': SHARED_KEY || '' },
-      body: JSON.stringify(payload)
-    });
-    let data; try { data = await res.json(); } catch { data = { ok:false, error:'Invalid server response' }; }
-    if (!res.ok || !data.ok) {
-      const details = data && data.details ? `\n${JSON.stringify(data.details,null,2)}` : '';
-      throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
-    }
-    return data;
-  }
-
-  // --- Save/Delete handlers (unchanged) ---
-  function msg(html){ const el = document.querySelector('#msgPermit'); if (el) el.innerHTML = html || ''; }
-
-  async function onSavePermit(ev){
-    if (ev) ev.preventDefault();
-    const f = (typeof window.UI_collectPermitForm==='function') ? window.UI_collectPermitForm() : null;
-    if (!f){ msg('<span class="err">Internal error: form collector missing.</span>'); return; }
-
-    if (!f.job_name || !f.tag || !f.SCID){ msg('<span class="err">Missing pole keys (job_name, tag, SCID).</span>'); return; }
-    if (!f.permit_id){ msg('<span class="err">Permit ID is required.</span>'); return; }
-    if (!f.permit_status){ msg('<span class="err">Permit Status is required.</span>'); return; }
-    if (!f.submitted_by){ msg('<span class="err">Submitted By is required.</span>'); return; }
-    if (!f.submitted_at){ msg('<span class="err">Submitted At (date) is required.</span>'); return; }
-
-    const exists = (window.STATE?.permits||[]).some(r => String(r.permit_id) === String(f.permit_id));
     const change = exists
-      ? { type:'update_permit', permit_id:f.permit_id, patch:{
-          job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-          permit_status:f.permit_status, submitted_by:f.submitted_by,
-          submitted_at:f.submitted_at, notes:f.notes||''
-        } }
-      : { type:'upsert_permit', permit:{
-          permit_id:f.permit_id, job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-          permit_status:f.permit_status, submitted_by:f.submitted_by,
-          submitted_at:f.submitted_at, notes:f.notes||''
-        } };
+      ? {
+          type: 'update_permit',
+          permit_id: f.permit_id,
+          patch: {
+            job_name: f.job_name,
+            tag:      f.tag,
+            SCID:     f.SCID,
+            permit_status: f.permit_status,
+            submitted_by:  f.submitted_by,
+            submitted_at:  f.submitted_at, // already MM/DD/YYYY from ui.js
+            notes:         f.notes || ''
+          }
+        }
+      : {
+          type: 'upsert_permit',
+          permit: {
+            permit_id: f.permit_id,
+            job_name:  f.job_name,
+            tag:       f.tag,
+            SCID:      f.SCID,
+            permit_status: f.permit_status,
+            submitted_by:  f.submitted_by,
+            submitted_at:  f.submitted_at,
+            notes:         f.notes || ''
+          }
+        };
 
-    try{
+    try {
       msg('Submitting…');
-      const data = await callApi({ actorName:'Website User', reason:`Permit ${f.permit_id}`, change });
+      const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
+      // kick the 2s watcher to auto-refresh until the change lands
       window.dispatchEvent(new CustomEvent('watch:start'));
-    }catch(err){
+    } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
     }
   }
 
-  async function onDeletePermit(ev){
+  async function onDeletePermit(ev) {
     if (ev) ev.preventDefault();
-    const id = (document.querySelector('#permit_id')?.value || '').trim();
-    if (!id){ msg('<span class="err">Permit ID is required to delete.</span>'); return; }
-    try{
+    const id = ($('#permit_id')?.value || '').trim();
+    if (!id) { msg('<span class="err">Permit ID is required to delete.</span>'); return; }
+
+    try {
       msg('Submitting delete…');
-      const data = await callApi({ actorName:'Website User', reason:`Delete ${id}`, change:{ type:'delete_permit', permit_id:id } });
+      const data = await callApi({
+        actorName: 'Website User',
+        reason: `Delete ${id}`,
+        change: { type: 'delete_permit', permit_id: id }
+      });
       msg(`<span class="ok">Delete submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
       window.dispatchEvent(new CustomEvent('watch:start'));
-    }catch(err){
+    } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
     }
   }
 
-  function wireButtons(){
-    const save = document.querySelector('#btnSavePermit');
-    if (save){ save.type='button'; save.onclick = onSavePermit; }
-    const del  = document.querySelector('#btnDeletePermit');
-    if (del){ del.type='button'; del.onclick = onDeletePermit; }
+  function wireButtons() {
+    const save = $('#btnSavePermit');
+    if (save) { save.type = 'button'; save.removeEventListener('click', onSavePermit); save.addEventListener('click', onSavePermit); }
+    const del = $('#btnDeletePermit');
+    if (del)  { del.type  = 'button'; del.removeEventListener('click', onDeletePermit); del.addEventListener('click', onDeletePermit); }
   }
 
-  document.addEventListener('DOMContentLoaded', () => { wireButtons(); loadData(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    wireButtons();
+    loadData();
+  });
+
+  // also re-enable buttons whenever data loads
   window.addEventListener('data:loaded', wireButtons);
 })();
