@@ -88,49 +88,69 @@
         ? rel
         : (status === 'NONE' ? [] : rel.filter(r => r.permit_status === status));
 
-      const card = document.createElement('div');
-      card.className = 'pole';
-      card.innerHTML = `
-        <div class="title">
-          ${p.job_name}
-          <span class="muted small"> · Tag: <b>${p.tag}</b> · SCID: <b>${p.SCID}</b></span>
+        const card = document.createElement('div');
+        card.className = 'pole';
+        card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div>
+            <div class="title">${p.job_name}</div>
+            <div class="small muted" style="margin-top:2px;">
+                <b>Owner:</b> ${p.owner || '—'} ·
+                <b>Tag:</b> ${p.tag || '—'} ·
+                <b>SCID:</b> ${p.SCID || '—'}
+            </div>
+            <div class="small muted" style="margin-top:2px;">
+                <b>Spec:</b> ${p.pole_spec || '—'} → ${p.proposed_spec || '—'} ·
+                <b>MR:</b> ${p.mr_level || '—'}
+            </div>
+            </div>
+            <div>
+            <button class="btn" onclick="window.UI_editPermit('${key}','__new')">New Permit</button>
+            </div>
         </div>
-        <div class="small muted">
-          Owner: ${p.owner || '—'} · Spec: ${p.pole_spec || '—'} → ${p.proposed_spec || '—'} · MR: ${p.mr_level || '—'}
-        </div>
+
         <div class="spacer"></div>
-        <div class="small muted">Permits:</div>
+        <div class="small muted" style="margin-bottom:4px;">Permits</div>
         <div>
-          ${
+            ${
             showRel.length
-              ? showRel.map(r => `
-                  <div class="small" style="margin:4px 0;">
-                    <code>${r.permit_id}</code>
-                    ${statusChipHTML(r.permit_status)}
-                    ${r.submitted_by ? ` · by ${r.submitted_by}` : ''}
-                    ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+                ? showRel.map(r => `
+                    <div style="border:1px solid var(--border);background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                        <div class="small">
+                        <code>${r.permit_id}</code>
+                        ${statusChipHTML(r.permit_status)}
+                        ${r.submitted_by ? ` · by ${(String(r.submitted_by)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}` : ''}
+                        ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+                        </div>
+                        <div>
+                        <button class="btn" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
+                        </div>
+                    </div>
                     ${
                         r.notes
-                        ? `<div class="small muted" style="margin-top:2px; white-space:pre-wrap;">
-                            Notes: ${(String(r.notes)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+                        ? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap;">
+                            <b>Notes:</b> ${(String(r.notes)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
                             </div>`
                         : ''
                     }
-                    <button class="btn" style="margin-left:8px" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
-                  </div>
+                    </div>
                 `).join('')
-              : (
-                  rel.length === 0
+                : (
+                    rel.length === 0
                     ? `<div class="small" style="margin:6px 0;">
-                         ${statusChipHTML('NONE')}
-                         <button class="btn" style="margin-left:8px" onclick="window.UI_editPermit('${key}','__new')">New permit for this pole</button>
-                       </div>`
-                    : `<div class="small muted" style="margin:6px 0;"><em>No permits match this status for this pole.</em></div>`
+                        ${statusChipHTML('NONE')}
+                        <span class="muted">No permits yet for this pole.</span>
+                        </div>`
+                    : `<div class="small muted" style="margin:6px 0;">
+                        <em>No permits match this status for this pole.</em>
+                        </div>`
                 )
-          }
+            }
         </div>
-      `;
-      listEl.appendChild(card);
+        `;
+        listEl.appendChild(card);
+
     }
   }
 
