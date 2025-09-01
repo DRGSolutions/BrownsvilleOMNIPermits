@@ -2,9 +2,23 @@
 (function () {
   const $ = (s) => document.querySelector(s);
 
+  // ----- CONFIG + SAFE FALLBACKS -----
   const CFG = window.CONFIG || {};
-  const OWNER  = CFG.OWNER;
-  const REPO   = CFG.REPO;
+
+  function guessOwnerRepo() {
+    try {
+      const host = location.hostname;
+      const parts = location.pathname.split('/').filter(Boolean);
+      if (host.endsWith('github.io') && parts.length >= 1) {
+        return { owner: host.split('.')[0], repo: parts[0] };
+      }
+    } catch { /* ignore */ }
+    return { owner: null, repo: null };
+  }
+  const g = guessOwnerRepo();
+
+  const OWNER  = CFG.OWNER  || g.owner || 'DRGSolutions';
+  const REPO   = CFG.REPO   || g.repo  || 'BrownsvilleOMNIPermits';
   const BRANCH = CFG.DEFAULT_BRANCH || 'main';
   const API_URL = CFG.API_URL;
   const SHARED_KEY = CFG.SHARED_KEY;
@@ -15,19 +29,21 @@
     .replace(/^\/+/, '')
     .replace(/\/+$/, '');
 
-  // Try configured dir first, then common fallbacks
   const DATA_DIR_CANDIDATES = [normDir(CFG.DATA_DIR || 'data'), 'data', 'docs/data']
     .map(normDir)
     .filter(Boolean)
     .filter((v, i, a) => a.indexOf(v) === i);
 
-  // ---- Status helpers ----
+  // Debug the effective targets once in console (helps if something goes wrong)
+  console.debug('[app] Using repo:', { OWNER, REPO, BRANCH, DATA_DIR_CANDIDATES });
+
+  // ----- UI helpers -----
   const setStatus = (html) => { const el = $('#status'); if (el) el.innerHTML = html || ''; };
   const kpi = (sel, val) => { const el = $(sel); if (el) el.textContent = val; };
   const fmt = (n) => new Intl.NumberFormat().format(n);
   const nowLocal = () => new Date().toLocaleString();
 
-  // ---- GitHub fetch (pinned-to-SHA, branch fallback) ----
+  // ----- GitHub fetch (pinned-to-SHA, branch fallback) -----
   async function getLatestSha() {
     const r = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}?_=${Date.now()}`,
@@ -52,11 +68,8 @@
         fetch(permitsUrl, { cache: 'no-store' })
       ]);
 
-      // record attempt details for debugging
       attempts.push({
-        dir,
-        polesUrl,
-        permitsUrl,
+        dir, polesUrl, permitsUrl,
         polesStatus:   r1.status === 'fulfilled' ? r1.value.status : `ERR:${r1.reason}`,
         permitsStatus: r2.status === 'fulfilled' ? r2.value.status : `ERR:${r2.reason}`
       });
@@ -72,8 +85,6 @@
     const detail = attempts
       .map(a => `${a.dir}: poles(${a.polesStatus}) ${a.polesUrl} | permits(${a.permitsStatus}) ${a.permitsUrl}`)
       .join('<br/>');
-
-    // surface very explicit info to help pinpoint the miss
     throw new Error(`raw 404/404<br/><small>${detail}</small>`);
   }
 
@@ -89,14 +100,9 @@
         setStatus(`<span class="ok">Loaded from commit <code>${sha.slice(0,7)}</code> (dir: <code>${dirUsed}</code>).</span>`);
       } catch (ePinned) {
         console.warn('Pinned load failed, falling back to branch:', ePinned);
-        try {
-          const got = await tryDirs(BRANCH);
-          dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
-          setStatus(`<span class="ok">Loaded (branch fallback, dir: <code>${dirUsed}</code>).</span>`);
-        } catch (eBranch) {
-          // bubble exact attempts out so you can see the URL(s) that 404'd
-          throw eBranch;
-        }
+        const got = await tryDirs(BRANCH);
+        dirUsed = got.dirUsed; poles = got.poles; permits = got.permits;
+        setStatus(`<span class="ok">Loaded (branch fallback, dir: <code>${dirUsed}</code>).</span>`);
       }
 
       const prev = window.STATE || {};
@@ -121,19 +127,15 @@
     }
   }
 
-  // ---- API call helper ----
+  // ----- API call helper -----
   async function callApi(payload) {
     if (!API_URL) throw new Error('Missing CONFIG.API_URL');
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Permits-Key': SHARED_KEY || ''
-      },
+      headers: { 'Content-Type': 'application/json', 'X-Permits-Key': SHARED_KEY || '' },
       body: JSON.stringify(payload)
     });
-    let data;
-    try { data = await res.json(); } catch { data = { ok: false, error: 'Invalid server response' }; }
+    let data; try { data = await res.json(); } catch { data = { ok:false, error:'Invalid server response' }; }
     if (!res.ok || !data.ok) {
       const details = data && data.details ? `\n${JSON.stringify(data.details, null, 2)}` : '';
       throw new Error((data && data.error) ? (data.error + details) : `HTTP ${res.status}`);
@@ -141,7 +143,7 @@
     return data;
   }
 
-  // ---- Save / Delete handlers (kept as you had) ----
+  // ----- Save / Delete handlers (unchanged in behavior) -----
   const msg = (html) => { const el = $('#msgPermit'); if (el) el.innerHTML = html || ''; };
 
   async function onSavePermit(ev) {
@@ -150,8 +152,7 @@
     if (btn && (!btn.type || btn.type.toLowerCase() === 'submit')) btn.type = 'button';
 
     if (typeof window.UI_collectPermitForm !== 'function') {
-      msg('<span class="err">Internal error: form collector missing.</span>');
-      return;
+      msg('<span class="err">Internal error: form collector missing.</span>'); return;
     }
 
     const f = window.UI_collectPermitForm();
@@ -212,17 +213,11 @@
 
   function wireButtons() {
     const save = $('#btnSavePermit');
-    if (save) {
-      if (!save.type || save.type.toLowerCase() === 'submit') save.type = 'button';
-      save.removeEventListener('click', onSavePermit);
-      save.addEventListener('click', onSavePermit);
-    }
+    if (save) { if (!save.type || save.type.toLowerCase() === 'submit') save.type = 'button';
+      save.removeEventListener('click', onSavePermit); save.addEventListener('click', onSavePermit); }
     const del = $('#btnDeletePermit');
-    if (del) {
-      if (!del.type || del.type.toLowerCase() === 'submit') del.type = 'button';
-      del.removeEventListener('click', onDeletePermit);
-      del.addEventListener('click', onDeletePermit);
-    }
+    if (del) { if (!del.type || del.type.toLowerCase() === 'submit') del.type = 'button';
+      del.removeEventListener('click', onDeletePermit); del.addEventListener('click', onDeletePermit); }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
