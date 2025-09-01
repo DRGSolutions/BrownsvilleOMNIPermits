@@ -1,19 +1,20 @@
 // assets/js/watch.js
-// Watches for repo updates ONLY after Save/Delete actions, then reloads data
+// Watches for repo updates ONLY after Save/Delete actions, then reloads data.
+// Features kept: professional progress bar, status text, auto-refresh; avoids commit API rate limits.
 (function () {
+  const CFG = (window.APP_CONFIG || window.CONFIG || {});
+  const OWNER   = CFG.OWNER;
+  const REPO    = CFG.REPO;
+  const BRANCH  = CFG.DEFAULT_BRANCH || 'main';
+  const DATA_DIR= (CFG.DATA_DIR || 'data').replace(/^\/+|\/+$/g, '');
+
   const $ = (s) => document.querySelector(s);
 
-  const CFG = window.CONFIG || {};
-  const OWNER  = CFG.OWNER;
-  const REPO   = CFG.REPO;
-  const BRANCH = CFG.DEFAULT_BRANCH || 'main';
-  const DATA_DIR = CFG.DATA_DIR || 'data';
-
-  let polling = null;
-  let deadline = 0;
-  let startSha = null;
-  let expected = null;   // expected fields to validate against (save) or {permit_id} for delete
-  let action = '';       // 'save' | 'delete'
+  let timer     = null;
+  let deadline  = 0;
+  let expected  = null;   // expected fields to validate against (save) or {permit_id} for delete
+  let action    = '';     // 'save' | 'delete'
+  let startedAt = 0;
 
   // --------- UI helpers ----------
   function setMsg(html) {
@@ -23,159 +24,193 @@
   }
   function showProgress(text) {
     setMsg(
-      `<div style="border:1px solid #2a3242;border-radius:8px;overflow:hidden;height:10px;background:#0f1219;margin-bottom:6px;">
-         <div style="width:100%;height:100%;background:linear-gradient(90deg,#1f2937,#334155,#1f2937);opacity:.8"></div>
+      `<div style="border:1px solid #2a3242;border-radius:8px;overflow:hidden;height:10px;background:#0f1219;margin-bottom:6px;position:relative;">
+         <div style="
+            width:40%;height:100%;background:linear-gradient(90deg,#1f2937,#334155,#1f2937);
+            animation:slide 1.2s infinite;opacity:.9;border-right:1px solid #2a3242"></div>
+         <style>@keyframes slide{0%{transform:translateX(-40%)}100%{transform:translateX(260%)}}</style>
        </div>
        <div class="small muted">${text}</div>`
     );
   }
   function done(finalText) {
     setMsg(`<span class="small">${finalText}</span>`);
-    setTimeout(() => setMsg(''), 4000);
+    // Clear message after a few seconds so the panel doesn't stay noisy
+    setTimeout(() => {
+      const el = $('#msgPermit');
+      if (el && el.textContent === finalText) el.textContent = '';
+    }, 4000);
   }
 
-  // --------- Data helpers ----------
-  async function getLatestSha() {
-    const r = await fetch(
-      `https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}?_=${Date.now()}`,
-      { cache: 'no-store' }
-    );
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
-    const j = await r.json();
-    return j.sha;
-  }
-
-  async function reloadAtSha(sha) {
+  // --------- Branch-only data reload (no commits API; avoids 403) ----------
+  async function reloadFromBranch() {
     const bust = `?ts=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${DATA_DIR}`;
+    const base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${DATA_DIR}`;
     const [r1, r2] = await Promise.all([
       fetch(`${base}/poles.json${bust}`,   { cache: 'no-store' }),
-      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' }),
+      fetch(`${base}/permits.json${bust}`, { cache: 'no-store' })
     ]);
     if (!r1.ok || !r2.ok) throw new Error(`raw ${r1.status}/${r2.status}`);
     const [poles, permits] = await Promise.all([r1.json(), r2.json()]);
 
+    // Update global STATE so UI can re-render
     const prev = window.STATE || {};
     window.STATE = {
       ...prev,
       poles, permits,
-      sha,
+      sha: null, // unknown (since we skipped commits API)
       lastLoaded: new Date().toISOString(),
     };
 
-    // Update quick labels if present
-    $('#kSha')    && ($('#kSha').textContent = sha.slice(0, 7));
-    $('#kLoaded') && ($('#kLoaded').textContent = new Date().toLocaleString());
-    $('#kPoles')  && ($('#kPoles').textContent = new Intl.NumberFormat().format(poles.length));
-    $('#kPermits')&& ($('#kPermits').textContent = new Intl.NumberFormat().format(permits.length));
+    // Update KPIs if present
+    $('#kSha')     && ($('#kSha').textContent = `${BRANCH} (fallback)`);
+    $('#kLoaded')  && ($('#kLoaded').textContent = new Date().toLocaleString());
+    $('#kPoles')   && ($('#kPoles').textContent = new Intl.NumberFormat().format(poles.length));
+    $('#kPermits') && ($('#kPermits').textContent = new Intl.NumberFormat().format(permits.length));
 
     // Ask UI to re-render
     window.dispatchEvent(new CustomEvent('data:loaded'));
+    return { poles, permits };
   }
 
+  // Tolerant field matcher: compares only fields present in exp.
   function matchesExpectedPermit(list, exp) {
-    // Save: ensure a record with permit_id exists and matches fields present in exp
-    const r = list.find(x => String(x.permit_id) === String(exp.permit_id));
-    if (!r) return false;
-    for (const [k, v] of Object.entries(exp)) {
+    const rec = list.find(x => String(x.permit_id) === String(exp.permit_id));
+    if (!rec) return false;
+
+    // Compare only keys provided in expected; allow string/number equivalence
+    const EPS = 1e-9;
+    for (const [k, vExp] of Object.entries(exp)) {
       if (k === 'permit_id') continue;
-      if (String(r[k] ?? '') !== String(v ?? '')) return false;
+      const v = rec[k];
+
+      // exact
+      if (v === vExp) continue;
+
+      // loose string/number
+      /* eslint-disable eqeqeq */
+      if (v != null && vExp != null && String(v) == String(vExp)) continue;
+
+      // numeric close
+      const n1 = Number(v), n2 = Number(vExp);
+      if (!Number.isNaN(n1) && !Number.isNaN(n2) && Math.abs(n1 - n2) < EPS) continue;
+
+      // otherwise mismatch
+      return false;
     }
     return true;
   }
 
   // --------- Poll loop ----------
   async function tick() {
+    // safety timeout (2 minutes)
     if (Date.now() > deadline) {
       stop(`Still processing — refresh in a moment if it doesn’t update automatically.`);
       return;
     }
 
-    let sha;
+    // Reload (branch only) and test expected condition
     try {
-      sha = await getLatestSha();
-    } catch {
-      // transient; try next tick
-      return;
-    }
-    if (!startSha) startSha = sha;
+      const { permits } = await reloadFromBranch();
+      const secs = Math.floor((Date.now() - startedAt) / 1000);
+      const m = $('#msgPermit');
+      if (m) m.innerHTML = `<div class="small muted">Applying changes… refreshing every 2s (${secs}s)</div>`;
 
-    if (sha !== startSha) {
-      try {
-        await reloadAtSha(sha);
-      } catch {
-        return; // try again next tick
-      }
-
-      const permits = (window.STATE && window.STATE.permits) || [];
       if (action === 'delete') {
         const exists = permits.some(r => String(r.permit_id) === String(expected.permit_id));
         if (!exists) {
-          stop(`Change applied in commit ${sha.slice(0,7)}.`);
+          stop(`Change applied — data is up to date.`);
           return;
         }
       } else if (action === 'save') {
         if (matchesExpectedPermit(permits, expected)) {
-          stop(`Change applied in commit ${sha.slice(0,7)}.`);
+          stop(`Change applied — data is up to date.`);
           return;
         }
       }
+    } catch (e) {
+      // transient (CDN propagation); show progress and try next tick
+      const secs = Math.floor((Date.now() - startedAt) / 1000);
+      showProgress(`Waiting for repository update… (${secs}s)`);
     }
   }
 
-  function start(kind, exp, act) {
-    expected = exp;
-    action = act;         // 'save' or 'delete'
-    startSha = null;
-    deadline = Date.now() + 120000; // ~2 minutes
+  function start(exp, kind) {
+    expected  = exp;
+    action    = kind;           // 'save' or 'delete'
+    startedAt = Date.now();
+    deadline  = startedAt + 120000; // 2 minutes
+
     showProgress('Submitting… waiting for repository update (auto-refreshing).');
-    if (polling) clearInterval(polling);
-    polling = setInterval(tick, 2000);
+
+    if (timer) clearInterval(timer);
+    timer = setInterval(tick, 2000);
+    tick(); // run immediately
   }
 
-  function stop(msg) {
-    if (polling) {
-      clearInterval(polling);
-      polling = null;
+  function stop(msgText) {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
     }
-    done(msg || 'Done.');
+    done(msgText || 'Done.');
   }
 
-  // --------- Wire to buttons (no changes to your app needed) ----------
+  // --------- Wire to buttons (keeps your original behavior) ----------
   function wire() {
-    // Save -> gather expected fields from the form so we can verify later
+    // SAVE: gather expected fields from the form so we can verify later
     const btnSave = $('#btnSavePermit');
     if (btnSave) {
       btnSave.addEventListener('click', () => {
         if (typeof window.UI_collectPermitForm !== 'function') return;
         const f = window.UI_collectPermitForm();
-        // Require a date (you asked to always require a date)
+
+        // Require a date (your UX rule)
         if (!f.submitted_at) {
           setMsg('<span class="small" style="color:#fca5a5">Please select a date before saving.</span>');
           return;
         }
-        start('permit', {
-          permit_id: f.permit_id,
-          job_name: f.job_name,
-          tag: f.tag,
-          SCID: f.SCID,
+
+        // Prepare the "expected" snapshot we’ll look for
+        start({
+          permit_id:     f.permit_id,
+          job_name:      f.job_name,
+          tag:           f.tag,
+          SCID:          f.SCID,
           permit_status: f.permit_status,
-          submitted_by: f.submitted_by,
-          submitted_at: f.submitted_at,
-          notes: f.notes
+          submitted_by:  f.submitted_by,
+          submitted_at:  f.submitted_at,
+          notes:         f.notes
         }, 'save');
       }, { capture: true });
     }
 
-    // Delete -> expected is simply that permit_id disappears
+    // DELETE: expected is simply that permit_id disappears
     const btnDel = $('#btnDeletePermit');
     if (btnDel) {
       btnDel.addEventListener('click', () => {
         const id = ($('#permit_id')?.value || '').trim();
         if (!id) return;
-        start('permit', { permit_id: id }, 'delete');
+        start({ permit_id: id }, 'delete');
       }, { capture: true });
     }
+
+    // Optional compatibility: allow app.js to kick the watcher programmatically
+    window.addEventListener('watch:start', () => {
+      if (typeof window.UI_collectPermitForm !== 'function') return;
+      const f = window.UI_collectPermitForm();
+      if (!f || !f.permit_id) return;
+      start({
+        permit_id:     f.permit_id,
+        job_name:      f.job_name,
+        tag:           f.tag,
+        SCID:          f.SCID,
+        permit_status: f.permit_status,
+        submitted_by:  f.submitted_by,
+        submitted_at:  f.submitted_at,
+        notes:         f.notes
+      }, 'save');
+    });
   }
 
   document.addEventListener('DOMContentLoaded', wire);
