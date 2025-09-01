@@ -249,17 +249,24 @@
     return map;
   }
 
+  // Replace the existing scidBetween with this one in assets/js/app.js
   function scidBetween(val, a, b) {
-    // Compare SCIDs lexicographically after left-padding to the max length among inputs+value
-    const s = String(val ?? '');
-    const sA = String(a ?? '');
-    const sB = String(b ?? '');
-    const width = Math.max(s.length, sA.length, sB.length);
-    const pad = (x) => x.toString().padStart(width, '0');
-    const v = pad(s), lo = pad(sA), hi = pad(sB);
-    return lo <= v && v <= hi;
-  }
+    const s  = String(val ?? '').trim();
+    const sA = String(a   ?? '').trim();
+    const sB = String(b   ?? '').trim();
+    if (!s || !sA || !sB) return false;
 
+    // Normalize widths so lexicographic compare works
+    const width = Math.max(s.length, sA.length, sB.length);
+    const pad = (x) => String(x).padStart(width, '0');
+
+    let lo = pad(sA), hi = pad(sB);
+    if (lo > hi) [lo, hi] = [hi, lo];      // auto-swap if user entered reversed bounds
+
+    const v = pad(s);
+    return lo <= v && v <= hi;              // inclusive range
+  }
+  
   async function onMassApply(ev) {
     if (ev) ev.preventDefault();
     setMassMsg('');

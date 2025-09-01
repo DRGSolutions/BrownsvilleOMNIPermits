@@ -17,7 +17,7 @@
   let deadline = 0;
   let startSha = null;
   let expected = null;  // expected fields to validate against (save) or {permit_id} for delete
-  let action   = '';    // 'save' | 'delete'
+  let action   = '';    // 'save' | 'delete' | 'bulk'
 
   // Track for overlay step 2
   let sawRepoUpdate = false;
@@ -282,6 +282,16 @@
       }
 
       const permits = (window.STATE && window.STATE.permits) || [];
+
+      // NEW: bulk mode just completes after successful reload
+      if (action === 'bulk') {
+        overlayStep(3);
+        overlayText('Change applied — data refreshed.');
+        overlayPercent(100);
+        stop(`Change applied in commit ${sha.slice(0,7)}.`);
+        return;
+      }
+
       if (action === 'delete') {
         const exists = permits.some(r => String(r.permit_id) === String(expected.permit_id));
         if (!exists) {
@@ -313,7 +323,7 @@
 
   function start(kind, exp, act) {
     expected = exp;
-    action   = act;         // 'save' or 'delete'
+    action   = act;         // 'save' or 'delete' or 'bulk'
     startSha = null;
     sawRepoUpdate = false;
     startedAt = Date.now();
@@ -374,4 +384,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', wire);
+
+  // NEW: allow external triggers (e.g., mass Apply) to reuse the same overlay + polling
+  window.addEventListener('watch:start', () => {
+    // bulk mode: no single-record expectation; we complete after repo updates & reload succeeds
+    start('bulk', null, 'bulk');
+  }, { passive: true });
 })();
