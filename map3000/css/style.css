@@ -60,7 +60,6 @@ select,input{
 .chip.na_cannot{background:var(--chip-na-cannot);color:#18132b}
 
 /* Areas (boundaries) */
-/* JS sets pane z-index and pointer-events; this adds glow and ensures visibility */
 .leaflet-pane.areas-pane path{
   filter: drop-shadow(0 0 8px rgba(128, 208, 255, .45));
 }
@@ -91,4 +90,12 @@ canvas, svg{max-width:100%}
 @media print{
   #tools,#filters,#legend,#toast,#bgfx{display:none!important}
   #map{position:relative; height:100vh}
+}
+
+/* === HARD OVERRIDES FOR BORDERS (added) === */
+.leaflet-pane.areas-pane path {
+  stroke: #00FFFF !important;   /* neon cyan stroke */
+  stroke-width: 4px !important;
+  stroke-opacity: 1 !important;
+  fill-opacity: 0.4 !important; /* stronger fill */
 }
