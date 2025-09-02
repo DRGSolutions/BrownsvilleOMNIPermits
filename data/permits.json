@@ -150,6 +150,156 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_019",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01624",
+    "SCID": "019",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_020",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01623",
+    "SCID": "020",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_021",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80334",
+    "SCID": "021",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_022",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "61510",
+    "SCID": "022",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_023",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01620",
+    "SCID": "023",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_024",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01619",
+    "SCID": "024",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_025",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "61323",
+    "SCID": "025",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_026",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01617",
+    "SCID": "026",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_027",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01616",
+    "SCID": "027",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_028",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "01615",
+    "SCID": "028",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_029",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80333",
+    "SCID": "029",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_030",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80377",
+    "SCID": "030",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_031",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80332",
+    "SCID": "031",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_032",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80335",
+    "SCID": "032",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F33_BRN02-F11_SEG2_033",
+    "job_name": "BRN02-F11 PLA",
+    "tag": "80330",
+    "SCID": "033",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/01/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F36_BRN02-F05_SEG1_016",
     "job_name": "BRN02-F05 PLA",
     "tag": "81286",
