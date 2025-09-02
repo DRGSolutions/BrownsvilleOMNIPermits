@@ -1,11 +1,11 @@
-import { loadPolesAndPermits, poleKey, statusColor } from './data.js';
+import { loadPolesAndPermits, poleKey, statusColor, watchForGithubUpdates } from './data.js';
 import { buildMarkers } from './markers.js';
 import { buildJobAreas } from './areas.js';
 import { ruleRow, readRules, matchRule } from './filters.js';
 import { popupHTML, toast } from './ui.js';
 import { openReport, closeReport } from './report.js';
 
-const STATE = { poles:[], permits:[], byKey:new Map(), cluster:null, areas:[], areasVisible:true, bounds:null };
+const STATE = { poles:[], permits:[], byKey:new Map(), cluster:null, areas:[], areasVisible:true, bounds:null, shas:{poles:null,permits:null}, watcherStop:null };
 
 const map = L.map('map', { zoomControl:false, preferCanvas:true });
 L.control.zoom({ position:'bottomright' }).addTo(map);
@@ -13,7 +13,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { a
 
 /* ========= Cluster coloring by dominant permit status (worst → best) ========= */
 const STATUS_ORDER = [
-  s => String(s||'').startsWith('Not Approved -'), // any NA*
+  s => String(s||'').startsWith('Not Approved -'),
   s => s === 'Submitted - Pending',
   s => s === 'Created - NOT Submitted',
   s => s === 'Approved',
@@ -37,6 +37,7 @@ function pickDominantStatus(markers){
   return 'NONE';
 }
 
+// cluster instance
 STATE.cluster = L.markerClusterGroup({
   disableClusteringAtZoom: 18,
   spiderfyOnMaxZoom: true,
@@ -67,7 +68,30 @@ function renderAll(filtered=null){
   }
 }
 
-/* ============================= Filters UI ============================= */
+function applyFilters(){
+  const spec = readRules();
+  const result = STATE.poles.filter(p=>{
+    const rel = STATE.byKey.get(poleKey(p)) || [];
+    const q = spec.q;
+    if (q.owner && p.owner!==q.owner) return false;
+    if (q.status){
+      if (q.status==='NONE'){ if (rel.length!==0) return false; }
+      else if (!rel.some(r=>r.permit_status===q.status)) return false;
+    }
+    if (q.search){
+      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
+      if (!hay.includes(q.search)) return false;
+    }
+    if (spec.rules.length){
+      const hits = spec.rules.map(r=> matchRule(p,r,rel));
+      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
+    }
+    return true;
+  });
+  renderAll(result);
+}
+
+/* ============================= UI wiring ============================= */
 document.getElementById('btnAddRule').addEventListener('click', ()=> {
   document.getElementById('rules').appendChild(ruleRow());
 });
@@ -98,14 +122,28 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-/* ============================= Insights wiring ============================= */
-document.getElementById('btnReport').addEventListener('click', ()=>{
-  const { poles, permits, byKey } = STATE;
+// NEW: manual refresh button (fetches latest SHAs and reloads)
+const btnRefresh = document.getElementById('btnRefresh');
+if (btnRefresh) {
+  btnRefresh.addEventListener('click', async ()=>{
+    try{
+      toast('Refreshing data…');
+      const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
+      STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
+      renderAll();
+      toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
+    }catch(e){
+      console.error(e);
+      toast('Refresh failed');
+    }
+  });
+}
 
-  // mark poles with permit yes/no for KPI
+/* ============================= Insights wiring ============================= */
+document.getElementById('btnReport')?.addEventListener('click', ()=>{
+  const { poles, permits, byKey } = STATE;
   const enriched = poles.map(p => ({ ...p, __hasPermit: (byKey.get(poleKey(p))||[]).length>0 }));
 
-  // counts
   const statusCounts = {
     'Approved':0,'Submitted - Pending':0,'Created - NOT Submitted':0,
     'Not Approved - Cannot Attach':0,'Not Approved - PLA Issues':0,'Not Approved - MRE Issues':0,'Not Approved - Other Issues':0,
@@ -121,7 +159,6 @@ document.getElementById('btnReport').addEventListener('click', ()=>{
 
     const rel = byKey.get(poleKey(p)) || [];
     if (!rel.length){ statusCounts['NONE']++; continue; }
-    // decide worst/dominant for counting
     const ss = rel.map(r => String(r.permit_status||''));
     const order = [
       s => s.startsWith('Not Approved - Cannot Attach'),
@@ -133,15 +170,11 @@ document.getElementById('btnReport').addEventListener('click', ()=>{
       s => s === 'Approved'
     ];
     let chosen = 'Approved';
-    for(const pred of order){
-      const hit = ss.find(pred);
-      if (hit){ chosen = hit.startsWith('Not Approved -') ? hit : hit; break; }
-    }
+    for(const pred of order){ const hit = ss.find(pred); if (hit){ chosen = hit; break; } }
     statusCounts[chosen] = (statusCounts[chosen]||0)+1;
     if (chosen.startsWith('Not Approved -')) naByJob[p.job_name] = (naByJob[p.job_name]||0)+1;
   }
 
-  // jobs meta
   const polesPerJob = Object.values(byJob).sort((a,b)=>a-b);
   const mid = Math.floor(polesPerJob.length/2);
   const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length%2? polesPerJob[mid] : Math.round((polesPerJob[mid-1]+polesPerJob[mid])/2)) : 0;
@@ -153,50 +186,28 @@ document.getElementById('btnReport').addEventListener('click', ()=>{
     naByJob
   };
 
-  openReport({
-    poles: enriched,
-    permits,
-    counts,
-    ownerCounts,
-    statusCounts
-  });
+  openReport({ poles: enriched, permits: STATE.permits, counts, ownerCounts, statusCounts });
 });
 
-document.getElementById('btnReportClose').addEventListener('click', ()=> closeReport());
-
-function applyFilters(){
-  const spec = readRules();
-  const result = STATE.poles.filter(p=>{
-    const rel = STATE.byKey.get(poleKey(p)) || [];
-    // quick
-    const q = spec.q;
-    if (q.owner && p.owner!==q.owner) return false;
-    if (q.status){
-      if (q.status==='NONE'){ if (rel.length!==0) return false; }
-      else if (!rel.some(r=>r.permit_status===q.status)) return false;
-    }
-    if (q.search){
-      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
-      if (!hay.includes(q.search)) return false;
-    }
-    // advanced
-    if (spec.rules.length){
-      const hits = spec.rules.map(r=> matchRule(p,r,rel));
-      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
-    }
-    return true;
-  });
-  renderAll(result);
-}
+document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeReport());
 
 /* =============================== Boot =============================== */
 (async function(){
   try{
     toast('Loading poles & permits…');
-    const { poles, permits, byKey } = await loadPolesAndPermits();
-    STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey;
+    const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
+    STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll();
-    toast(`Loaded ${poles.length} poles, ${permits.length} permits`);
+    toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
+
+    // start GH SHA watcher if configured
+    if (watchForGithubUpdates !== undefined) {
+      STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
+        STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
+        renderAll();
+        toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
+      }, 60000); // check every 60s (adjust if you like)
+    }
   }catch(e){
     console.error(e);
     toast('Error loading data. Place neo-map next to poles.json & permits.json', 4500);
