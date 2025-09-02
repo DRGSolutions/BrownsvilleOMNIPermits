@@ -1,158 +1,187 @@
-// /map3000/js/areas.js — boundaries: bold & undeniable
+// /map3000/js/areas.js — robust job borders (always-visible)
 import { poleKey } from './config.js';
 
 const PANE_NAME = 'areas-pane';
 
-export function init(map, state){
-  // Dedicated pane with high z-index (tiles ~200, overlay ~400, markers ~600)
-  map.createPane(PANE_NAME);
-  const pane = map.getPane(PANE_NAME);
-  pane.classList.add('areas-pane');
-  pane.style.zIndex = 625;              // sits under markers, over overlays
-  pane.style.pointerEvents = 'none';    // never block clicks on markers
+// ---- helpers ----------------------------------------------------
+const normJob = (s) => String(s ?? '')
+  .normalize('NFKC')
+  .replace(/\s+/g, ' ')      // collapse runs of whitespace
+  .trim();                   // trim edges
+const colorFromString = (s) => { let h=0; for (let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return `hsl(${h%360} 70% 52%)`; };
 
-  state.areas = [];
+// Build a visible shape even for sparse jobs:
+// - 1 point  -> point buffer (~35m)
+// - 2 points -> line buffer  (~35m)
+// - 3+       -> concave hull (tight), fallback to convex
+function makeHull(ptsLngLat){
+  if (!ptsLngLat || !ptsLngLat.length) return null;
+
+  if (ptsLngLat.length === 1) {
+    return turf.buffer(turf.point(ptsLngLat[0]), 0.035, { units:'kilometers' });
+  }
+  if (ptsLngLat.length === 2) {
+    return turf.buffer(turf.lineString(ptsLngLat), 0.035, { units:'kilometers' });
+  }
+
+  const fc = turf.featureCollection(ptsLngLat.map(c => turf.point(c)));
+  let poly = null;
+
+  try {
+    poly = turf.concave(fc, { maxEdge: 0.45, units: 'kilometers' });  // tighter than default
+  } catch (_) {}
+
+  if (!poly) {
+    try { poly = turf.convex(fc); } catch (_) {}
+  }
+  if (!poly) {
+    // extremely scattered — union small point buffers
+    const rings = ptsLngLat.map(c => turf.buffer(turf.point(c), 0.03, { units: 'kilometers' }));
+    try { poly = turf.union(...rings); } catch (_) { poly = rings[0]; }
+  }
+
+  // Smooth and flatten to guarantee Polygon/MultiPolygon only
+  let simplified = poly;
+  try { simplified = turf.simplify(poly, { tolerance: 0.00004, highQuality: true }); } catch (_) {}
+  try { simplified = turf.flatten(simplified); } catch (_) {}
+
+  return simplified;
 }
 
-function colorFromString(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return `hsl(${h%360} 70% 52%)`; }
-
-// Create a tight hull; if concave fails or points are sparse, fallback to convex;
-// if both fail or <3 points, synthesize a buffered hull so you still see a boundary.
-function hullForPoints(pts){
-  if(!pts || pts.length === 0) return null;
-  if(pts.length === 1){
-    // single point → small circle (~30m)
-    return turf.buffer(turf.point(pts[0]), 0.03, { units: 'kilometers' });
-  }
-  if(pts.length === 2){
-    // two points → buffer their midpoint line (~30m)
-    const line = turf.lineString(pts);
-    return turf.buffer(line, 0.03, { units: 'kilometers' });
-  }
-  const fc = turf.featureCollection(pts.map(c=>turf.point(c)));
-  let poly = turf.concave(fc, { maxEdge: 0.5, units: 'kilometers' });
-  if(!poly) poly = turf.convex(fc);
-  if(!poly){
-    // wildly scattered → very light buffer around all points
-    const u = turf.union(...pts.map(c=>turf.buffer(turf.point(c), 0.02, {units:'kilometers'})));
-    poly = u || null;
-  }
-  if(!poly) return null;
-  // Smooth but keep shape — tiny tolerance, then ensure Polygon/MultiPolygon only
-  const simplified = turf.simplify(poly,{tolerance:0.00004,highQuality:true});
-  const flattened = turf.flatten(simplified || poly);  // handles GeometryCollection
-  return flattened;
-}
-
-// clip earlier/larger areas out of later ones to avoid overlap “violations”
-function clipOverlaps(jobPolys){
-  // sort by area (desc) so big keeps shape, smalls are clipped
-  const entries = [...jobPolys.entries()]
-    .map(([job,geo])=>[job, geo, turf.area(geo)])
-    .sort((a,b)=>b[2]-a[2]);
+// Clip overlaps so neighboring jobs don’t “violate” each other.
+// We sort by area (big first), then subtract earlier ones from later ones.
+// We ignore microscopic overlaps; if subtraction erases a feature, we keep it.
+function clipOverlaps(jobToGeo){
+  const entries = [...jobToGeo.entries()]
+    .map(([job, geo]) => [job, geo, safeArea(geo)])
+    .sort((a,b) => b[2] - a[2]);
 
   const out = [];
-  for(let i=0;i<entries.length;i++){
+  for (let i=0; i<entries.length; i++){
     const [job, geo] = entries[i];
+    const feats = toFeatures(geo);
+    let cur = feats;
 
-    // turf.flatten returns FeatureCollection; iterate features
-    const feats = geo.type === 'FeatureCollection' ? geo.features : [geo];
-    let current = feats;
-
-    for(let j=0;j<i;j++){
-      const other = out[j].geo;
-
-      current = current.map(f=>{
-        try{
+    for (let j=0; j<i; j++){
+      const other = out[j].geo; // previously placed geometry
+      cur = cur.flatMap(f => {
+        try {
           const inter = turf.intersect(f, other);
-          if(!inter) return f;
-          // ignore microscopic overlaps
-          if(turf.area(inter) < 20) return f;
+          if (!inter || safeArea(inter) < 15) return [f]; // ignore tiny overlaps
           const diff = turf.difference(f, other);
-          return diff || f;
-        }catch(e){ return f; }
-      }).flatMap(f=> (f?.type === 'GeometryCollection')
-        ? turf.flatten(f).features
-        : [f]);
+          return diff ? toFeatures(diff) : [f];           // never lose the piece entirely
+        } catch (_) {
+          return [f];
+        }
+      });
     }
 
-    // recompose
-    const fc = turf.featureCollection(current.filter(Boolean));
-    // if everything got clipped away, keep original to *ensure visible*
-    out.push({ job, geo: (fc.features.length ? fc : geo) });
+    const fc = turf.featureCollection(cur);
+    out.push({ job, geo: fc.features.length ? fc : geo });
   }
   return out;
 }
 
-function draw(map, state, clipped){
-  // clear old
-  state.areas.forEach(a=>{ map.removeLayer(a.fill); map.removeLayer(a.label); });
-  state.areas = [];
+const toFeatures = g =>
+  (g?.type === 'FeatureCollection') ? g.features
+  : (g?.type === 'GeometryCollection') ? turf.flatten(g).features
+  : (g ? [g] : []);
 
-  clipped.forEach(({job, geo})=>{
+const safeArea = g => { try { return turf.area(g) || 0; } catch (_) { return 0; } };
+
+// ---- lifecycle ---------------------------------------------------
+export function init(map, state){
+  // Create pane above overlays but below markers
+  map.createPane(PANE_NAME);
+  const pane = map.getPane(PANE_NAME);
+  pane.classList.add('areas-pane');
+  pane.style.zIndex = 625;            // markers are usually ~650
+  pane.style.pointerEvents = 'none';  // don’t intercept clicks
+
+  state.areas = [];                   // [{fill: L.GeoJSON, label: L.Marker}]
+}
+
+// Draw everything for the current dataset (or a provided sample)
+export function rebuild(sample=null){
+  const s = state;
+  const list = sample || s.poles;
+
+  // 1) Group by normalized job name and collect [lng,lat]
+  const byJob = new Map();
+  for (const p of list){
+    const job = normJob(p.job_name);
+    if (!job) continue;
+    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+    if (!byJob.has(job)) byJob.set(job, []);
+    byJob.get(job).push([p.lon, p.lat]);
+  }
+
+  if (byJob.size === 0){
+    // Nothing to render — clear layers if any
+    clearLayers(s.map, s);
+    return;
+  }
+
+  // 2) Create per-job hulls
+  const raw = new Map();
+  byJob.forEach((pts, job) => {
+    const hull = makeHull(pts);
+    if (hull) raw.set(job, hull);
+  });
+
+  // 3) De-overlap
+  const clipped = clipOverlaps(raw);
+
+  // 4) Render
+  draw(s.map, s, clipped);
+}
+
+function clearLayers(map, state){
+  state.areas.forEach(a => { map.removeLayer(a.fill); map.removeLayer(a.label); });
+  state.areas = [];
+}
+
+function draw(map, state, list){
+  clearLayers(map, state);
+
+  for (const {job, geo} of list){
     const col = colorFromString(job);
 
-    const layer = L.geoJSON(geo, {
+    const fill = L.geoJSON(geo, {
       pane: PANE_NAME,
       style: {
         color: col,
-        weight: 3,                 // thicker edge
-        opacity: 0.95,             // bright line
+        weight: 3.2,          // thicker neon edge
+        opacity: 0.98,        // bright stroke
         fillColor: col,
-        fillOpacity: 0.38          // clearly visible on dark tiles
+        fillOpacity: 0.36     // clearly visible on dark tiles
       }
     }).addTo(map);
 
-    // Bring above any other overlays on the same pane
-    try { layer.bringToFront(); } catch(e){}
+    // Ensure it sits above other overlays
+    try { fill.bringToFront(); } catch (_) {}
 
-    // center label
+    // Center label
     let center;
-    try { center = turf.centerOfMass(geo).geometry.coordinates; }
-    catch(e){ center = turf.center(turf.bboxPolygon(turf.bbox(geo))).geometry.coordinates; }
+    try {
+      center = turf.centerOfMass(geo).geometry.coordinates;
+    } catch (_) {
+      const bb = turf.bbox(geo);
+      center = turf.center(turf.bboxPolygon(bb)).geometry.coordinates;
+    }
 
     const label = L.marker([center[1], center[0]], {
       pane: PANE_NAME, interactive:false,
       icon: L.divIcon({
         className: '',
-        html: `<div style="font-weight:900;letter-spacing:.4px;font-size:14px;color:#e2e8f0;text-shadow:0 2px 6px rgba(0,0,0,.85)">
-                 ${job}
-               </div>`
+        html: `<div style="font-weight:900;letter-spacing:.4px;font-size:14px;color:#e2e8f0;text-shadow:0 2px 6px rgba(0,0,0,.9)">${job}</div>`
       })
     }).addTo(map);
 
-    state.areas.push({ fill: layer, label });
-  });
-
-  if(!state.areasVisible){
-    state.areas.forEach(a=>{ map.removeLayer(a.fill); map.removeLayer(a.label); });
-  }
-}
-
-export function rebuild(sample=null){
-  const s = state, list = sample || s.poles;
-
-  // group points by job (GeoJSON wants [lng,lat])
-  const byJob = new Map();
-  for(const p of list){
-    const job = String(p.job_name||'').trim();
-    if(!job || typeof p.lat!=='number' || typeof p.lon!=='number') continue;
-    if(!byJob.has(job)) byJob.set(job, []);
-    byJob.get(job).push([p.lon, p.lat]);
+    state.areas.push({ fill, label });
   }
 
-  // build hulls
-  const raw = new Map();
-  byJob.forEach((pts, job)=>{
-    const hull = hullForPoints(pts);
-    if(hull) raw.set(job, hull);
-  });
-
-  if(raw.size === 0){
-    // nothing to draw; silently return (avoids console noise)
-    return;
+  if (!state.areasVisible){
+    state.areas.forEach(a => { map.removeLayer(a.fill); map.removeLayer(a.label); });
   }
-
-  const clipped = clipOverlaps(raw);
-  draw(s.map, s, clipped);
 }
