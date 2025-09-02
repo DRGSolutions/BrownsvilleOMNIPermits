@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pole & Permit Map — YEAR 3000</title>
+<title>Pole & Permit Map — Modular (Fixed)</title>
+
 <link rel="stylesheet" href="./css/style.css" />
-<link rel="preconnect" href="https://unpkg.com" />
+
+<!-- Leaflet + MarkerCluster + Heat + Turf -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -13,12 +15,11 @@
 <script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 <script defer src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
 <style>
-  /* Inline minimal error overlay so you SEE failures */
+  /* tiny inline overlay in case something goes wrong */
   #boot-error{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0a0f18;color:#fff;z-index:9999}
-  #boot-error .box{max-width:760px;border:1px solid #162032;border-radius:12px;padding:16px;background:#0b111d;font-family:ui-sans-serif,system-ui}
+  #boot-error .box{max-width:820px;border:1px solid #162032;border-radius:12px;padding:16px;background:#0b111d;font-family:ui-sans-serif,system-ui}
   #boot-error pre{white-space:pre-wrap;word-break:break-word;color:#eab308;margin:8px 0 0}
 </style>
 </head>
@@ -26,7 +27,7 @@
 <div id="map"></div>
 <div id="bgfx"></div>
 
-<!-- Panels (populated by JS) -->
+<!-- Panels (JS populates content) -->
 <div id="filters" class="panel"></div>
 <div id="legend"  class="panel"></div>
 <div id="tools"   class="panel"></div>
@@ -36,29 +37,25 @@
 <!-- Error overlay -->
 <div id="boot-error"><div class="box">
   <strong>Map failed to start.</strong>
-  <div class="muted" style="margin-top:6px">Most common causes: not running from a local server, a module path typo, or a CDN being blocked.</div>
+  <div class="muted" style="margin-top:6px">Common causes: double boot, module path typo, or blocked CDN.</div>
   <pre id="boot-msg"></pre>
 </div></div>
 
-<!-- Single, safe boot: dynamically import app; if it throws, show overlay -->
+<!-- Single, safe boot -->
 <script type="module">
   const showBootError = (msg) => {
-    const el = document.getElementById('boot-error'); const pre = document.getElementById('boot-msg');
-    pre.textContent = String(msg || 'Unknown error');
-    el.style.display = 'flex';
+    document.getElementById('boot-msg').textContent = String(msg || 'Unknown error');
+    document.getElementById('boot-error').style.display = 'flex';
     console.error('[boot]', msg);
   };
   try {
-    // Give the globals time to attach if the browser lags on deferred scripts
-    await new Promise(r => setTimeout(r, 0));
-    if (!window.L) throw new Error('Leaflet (L) not loaded. Are CDNs blocked?');
-    const app = await import('./js/app.js');           // centralized boot
-    await app.start();                                  // run app
+    await new Promise(r => setTimeout(r, 0));  // let deferred scripts attach
+    if (!window.L) throw new Error('Leaflet not loaded (CDN blocked?)');
+    const app = await import('./js/app.js');
+    await app.start();
   } catch (e) {
     showBootError(e && (e.stack || e.message || e));
   }
-  import { start } from './js/app.js';
-  start();
 </script>
 </body>
 </html>

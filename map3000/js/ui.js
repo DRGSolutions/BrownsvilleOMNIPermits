@@ -1,11 +1,19 @@
 // /map3000/js/ui.js — panels + fixed Toggle Job Areas (matches {layer,label})
 export function initMap(){
+  // Reuse existing map if any (prevents "already initialized")
+  if (window.__leafletMap && window.__leafletMap instanceof L.Map) return window.__leafletMap;
+
+  const container = L.DomUtil.get('map');
+  if (container && container._leaflet_id) container._leaflet_id = null;
+
   const map = L.map('map', { zoomControl:false, preferCanvas:true });
   L.control.zoom({ position:'bottomright' }).addTo(map);
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     { attribution: '&copy; OpenStreetMap & CARTO' }
   ).addTo(map);
+
+  window.__leafletMap = map;
   return map;
 }
 
@@ -18,13 +26,10 @@ export function initState(map){
     bounds: null, heat: null,
     ui: {},
     toast(msg, ms=1400){
-      const t = document.getElementById('toast');
-      if(!t) return;
-      t.textContent = msg; t.style.display='block';
-      setTimeout(()=> t.style.display='none', ms);
+      const t = document.getElementById('toast'); if(!t) return;
+      t.textContent = msg; t.style.display='block'; setTimeout(()=> t.style.display='none', ms);
     }
   };
-  // also expose globally
   window.state = state;
   return state;
 }
@@ -97,54 +102,44 @@ export function mountPanels(map, s, CFG, mods){
       <div class="field"><small>Cluster</small>
         <select id="clusterMode"><option value="on">ON (status pies)</option><option value="off">OFF (every pole)</option></select>
       </div>
-      <div class="field" style="min-width:180px"><small>Boundary Strictness</small><input id="strict" type="range" min="1" max="8" value="5" /></div>
     </div>
-    <small class="muted">Heatmap hides markers so the density pops. Strictness 1 = looser, 8 = tightest boundaries.</small>
+    <small class="muted">Heatmap hides markers so the density pops.</small>
   `;
 
-  // Keep refs
   s.ui.report      = document.getElementById('report');
   s.ui.clusterMode = document.getElementById('clusterMode');
   s.ui.viewMode    = document.getElementById('viewMode');
-  s.ui.strict      = document.getElementById('strict');
 
-  // Buttons
-  document.getElementById('btnFit').onclick = ()=>{ if(s.bounds) s.map.fitBounds(s.bounds.pad(0.15)); };
-
-  // FIXED: Toggle Job Areas must add/remove BOTH {layer,label}
-  const btnAreas = document.getElementById('btnAreas') || document.getElementById('btnToggleAreas');
-  if (btnAreas){
-    btnAreas.onclick = ()=>{
-      s.areasVisible = !s.areasVisible;
-      if (s.areasVisible){
-        s.areas.forEach(a => { s.map.addLayer(a.layer); s.map.addLayer(a.label); });
-      } else {
-        s.areas.forEach(a => { s.map.removeLayer(a.layer); s.map.removeLayer(a.label); });
-      }
-    };
-  }
-
+  document.getElementById('btnFit').onclick    = ()=>{ if(s.bounds) s.map.fitBounds(s.bounds.pad(0.15)); };
   document.getElementById('btnReport').onclick = ()=> mods.RPT.open();
 
-  // Selects
+  // Toggle Job Areas — add/remove BOTH {layer,label}
+  document.getElementById('btnAreas').onclick = ()=>{
+    s.areasVisible = !s.areasVisible;
+    if (s.areasVisible){
+      s.areas.forEach(a => { s.map.addLayer(a.layer); s.map.addLayer(a.label); });
+    } else {
+      s.areas.forEach(a => { s.map.removeLayer(a.layer); s.map.removeLayer(a.label); });
+    }
+  };
+
   s.ui.clusterMode.onchange = ()=>{
     const on = s.ui.clusterMode.value === 'on';
     mods.MARK.render({ cluster: on });
     updateViewMode();
   };
   s.ui.viewMode.onchange = updateViewMode;
-  s.ui.strict.oninput    = ()=>{ mods.AREAS.rebuild(); updateViewMode(); };
 
   // Filters
   document.getElementById('btnApply').onclick = applyFilters;
-  document.getElementById('btnReset').onclick = ()=>{
+  document.getElementById('btnReset')?.addEventListener('click', ()=>{
     document.getElementById('qOwner').value  = '';
     document.getElementById('qStatus').value = '';
     document.getElementById('qSearch').value = '';
-    mods.MARK.render({ cluster: s.ui.clusterMode.value==='on' });
+    mods.MARK.render({ cluster: s.ui.clusterMode.value === 'on' });
     mods.AREAS.rebuild();
     updateViewMode();
-  };
+  });
   document.getElementById('qSearch').addEventListener('input', ()=>{
     clearTimeout(window.__qT); window.__qT = setTimeout(applyFilters, 200);
   });
@@ -179,7 +174,7 @@ export function mountPanels(map, s, CFG, mods){
 }
 
 export function updateViewMode(){
-  const s = state; // global
+  const s = state;
   const mode = s.ui.viewMode.value;
 
   if (s.heat){ s.map.removeLayer(s.heat); s.heat = null; }

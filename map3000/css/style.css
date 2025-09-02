@@ -11,7 +11,6 @@
 body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
 #map{position:fixed; inset:0}
 
-/* soft neon background auras */
 #bgfx::before,#bgfx::after{content:""; position:fixed; inset:0; pointer-events:none; z-index:1}
 #bgfx::before{background:var(--g1); opacity:.26}
 #bgfx::after{background:var(--g2); opacity:.18}
@@ -27,15 +26,9 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,sys
 
 .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 .field{display:flex; flex-direction:column; gap:4px}
-.btn{
-  border:1px solid var(--border); background:#0a0f18; color:var(--fg);
-  padding:8px 12px; border-radius:10px; cursor:pointer
-}
+.btn{border:1px solid var(--border); background:#0a0f18; color:var(--fg); padding:8px 12px; border-radius:10px; cursor:pointer}
 .btn:hover{background:#0d131f}
-select,input{
-  border:1px solid var(--border); background:#0a0f18; color:var(--fg);
-  padding:8px 10px; border-radius:10px
-}
+select,input{border:1px solid var(--border); background:#0a0f18; color:var(--fg); padding:8px 10px; border-radius:10px}
 .muted{color:var(--muted)}
 
 /* Legend */
@@ -44,25 +37,16 @@ select,input{
 .swatch{width:16px; height:16px; border:1px solid #000; border-radius:4px}
 
 /* Popups */
-.leaflet-popup-content-wrapper{
-  background:#0a0f18;color:var(--fg);border-radius:12px;border:1px solid var(--border)
-}
+.leaflet-popup-content-wrapper{background:#0a0f18;color:var(--fg);border-radius:12px;border:1px solid var(--border)}
 .leaflet-popup-tip{background:#0a0f18}
 .popup-title{font-weight:800;margin-bottom:4px}
 .popup-sub{color:var(--muted); font-size:12px; margin-bottom:8px}
-.chip{
-  display:inline-block;font-size:11px;border:1px solid #283244;border-radius:999px;padding:2px 8px;margin-left:6px
-}
+.chip{display:inline-block;font-size:11px;border:1px solid #283244;border-radius:999px;padding:2px 8px;margin-left:6px}
 .chip.pending{background:var(--chip-pending);color:#111}
 .chip.approved{background:var(--chip-approved);color:#0b261a}
 .chip.created{background:var(--chip-created);color:#211f06}
 .chip.na_other{background:var(--chip-na-other);color:#fff}
 .chip.na_cannot{background:var(--chip-na-cannot);color:#18132b}
-
-/* Areas (boundaries) */
-.leaflet-pane.areas-pane path{
-  filter: drop-shadow(0 0 8px rgba(128, 208, 255, .45));
-}
 
 /* Drawer (report) */
 .drawer{
@@ -92,15 +76,7 @@ canvas, svg{max-width:100%}
   #map{position:relative; height:100vh}
 }
 
-/* === HARD OVERRIDES FOR BORDERS (added) === */
-.leaflet-pane.areas-pane path {
-  stroke: #00FFFF !important;   /* neon cyan stroke */
-  stroke-width: 4px !important;
-  stroke-opacity: 1 !important;
-  fill-opacity: 0.4 !important; /* stronger fill */
-}
-
-/* HARD OVERRIDE while testing: ensure strokes/fill are visible on overlay pane */
+/* Safety while testing: ensure polygons visible on overlay pane */
 .leaflet-overlay-pane svg path {
   stroke-opacity: 1 !important;
   fill-opacity: 0.25 !important;

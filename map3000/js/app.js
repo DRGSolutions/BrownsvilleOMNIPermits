@@ -1,5 +1,8 @@
-// /map3000/js/app.js — centralized boot, exposes global `state`
-export async function start() {
+// /map3000/js/app.js — centralized boot, single-run guard, exposes `state`
+export async function start(){
+  if (window.__APP_STARTED__) return;     // avoid double boot
+  window.__APP_STARTED__ = true;
+
   const CFG   = await import('./config.js');
   const DATA  = await import('./data.js');
   const MARK  = await import('./markers.js');
@@ -10,9 +13,7 @@ export async function start() {
 
   const map   = UI.initMap(CFG);
   const state = UI.initState(map, CFG);
-
-  // >>> CRITICAL: expose to console + lazy modules
-  window.state = state;
+  window.state = state;                   // for console & lazy modules
 
   await DATA.load(state, CFG);
 
@@ -20,7 +21,6 @@ export async function start() {
   AREAS.init(map, state, CFG);
   UI.mountPanels(map, state, CFG, { MARK, AREAS, HEAT, RPT });
 
-  // First paint — markers set bounds, then areas, then view mode styling
   MARK.render({ cluster: true });
   AREAS.rebuild();
   UI.updateViewMode();

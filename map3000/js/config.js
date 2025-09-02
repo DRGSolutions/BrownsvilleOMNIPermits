@@ -1,5 +1,4 @@
 // /map3000/js/config.js
-
 export const STATUS_ORDER = [
   'Not Approved - Cannot Attach',
   'Not Approved - PLA Issues',
@@ -26,28 +25,6 @@ export const statusColor = s => {
 export const iconSizePx = 22;
 
 export const heatOpts = { radius: 28, blur: 24, minOpacity: 0.20, maxZoom: 18 };
-
-/**
- * OPTIONAL ABSOLUTE OVERRIDES
- * If your JSON lives in a different repo (e.g., a separate “data” repo),
- * paste the exact public URLs here and the loader will use them first.
- * Example (GitHub Pages in a “data” repo):
- *   poles:   'https://drgsolutions.github.io/data/poles.json',
- *   permits: 'https://drgsolutions.github.io/data/permits.json'
- * Example (raw GitHub content from a repo named BrownsvilleData on 'main'):
- *   poles:   'https://raw.githubusercontent.com/DRGSolutions/BrownsvilleData/main/poles.json',
- *   permits: 'https://raw.githubusercontent.com/DRGSolutions/BrownsvilleData/main/permits.json'
- */
-export const ABSOLUTE_OVERRIDES = {
-  poles:   '',   // <-- put a full URL here if you know it
-  permits: ''    // <-- put a full URL here if you know it
-};
-
-// keep some relative fallbacks in case you do run locally with a /data folder
-export const files = {
-  poles:   ['poles.json','./poles.json','../poles.json','data/poles.json','./data/poles.json','../data/poles.json'],
-  permits: ['permits.json','./permits.json','../permits.json','data/permits.json','./data/permits.json','../data/permits.json']
-};
 
 export const severityWeight = status => {
   const idx = STATUS_ORDER.indexOf(status);
