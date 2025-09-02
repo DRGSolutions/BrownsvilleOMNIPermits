@@ -224,6 +224,8 @@
       panel.classList.remove('disabled-block');
       if (hint) hint.style.display = 'none';
     }
+    // NEW: gate Advanced Map button the same way
+    const adv = $('#btnAdvancedMap'); if (adv) adv.disabled = !job;
   }
 
   function updateAssignOnlyVisibility() {
@@ -373,6 +375,19 @@
     if (massApply) { massApply.type = 'button'; massApply.removeEventListener('click', onMassApply); massApply.addEventListener('click', onMassApply); }
     const massMode = $('#massMode');
     if (massMode) { massMode.removeEventListener('change', updateAssignOnlyVisibility); massMode.addEventListener('change', updateAssignOnlyVisibility); }
+
+    // NEW: Advanced Map Selection opener (disabled unless a Job is selected)
+    const adv = $('#btnAdvancedMap');
+    if (adv) {
+      adv.type = 'button';
+      adv.removeEventListener('click', () => {});
+      adv.addEventListener('click', () => {
+        const job = getSelectedJob();
+        if (!job) return;
+        window.open(`map.html?job=${encodeURIComponent(job)}`, '_blank', 'noopener');
+      });
+    }
+
     updateAssignOnlyVisibility();
     updateMassPanelEnabled();
 

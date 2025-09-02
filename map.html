@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Map Selection</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <style>
+    :root{
+      /* same palette as index.html */
+      --bg:#0b0c10;--panel:#121318;--muted:#9aa3b2;--fg:#f3f4f6;--border:#1f2430;
+      --chip-pending:#fb923c;--chip-approved:#34d399;--chip-created:#facc15;
+      --chip-na-cannot:#a78bfa;--chip-na-other:#ef4444; --chip-none:#94a3b8;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    #map{position:absolute;inset:0}
+    .panel{
+      position:absolute;top:12px;left:12px;z-index:1000;background:var(--panel);
+      border:1px solid var(--border);border-radius:12px;padding:12px;min-width:320px
+    }
+    label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
+    input,select,button{width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#0f1219;color:var(--fg)}
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
+    .col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    .btn{cursor:pointer;font-weight:600}.btn:hover{background:#1a1f2b}
+    .btn-accent{border-color:#1f3b2f;background:#0f2b22}
+    .small{font-size:12px}.muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="panel">
+    <div class="small muted" id="jobName">Job: —</div>
+    <div class="small muted" id="selInfo" style="margin:6px 0 10px">Selected poles: 0</div>
+
+    <div class="row">
+      <div class="col-12">
+        <label>Mode</label>
+        <select id="mode">
+          <option value="assign">Assign new permits (only poles with no permits)</option>
+          <option value="modify">Modify existing permits (status only)</option>
+        </select>
+      </div>
+
+      <div class="col-12 assign-only">
+        <label>Base Permit ID (we append “_SCID”)</label>
+        <input id="baseId" placeholder="e.g., BTX02-F36_BRN02-F05_SEG2"/>
+      </div>
+
+      <div class="col-6">
+        <label>Permit Status</label>
+        <select id="status">
+          <option>Created - NOT Submitted</option>
+          <option>Submitted - Pending</option>
+          <option>Approved</option>
+          <option>Not Approved - Cannot Attach</option>
+          <option>Not Approved - PLA Issues</option>
+          <option>Not Approved - MRE Issues</option>
+          <option>Not Approved - Other Issues</option>
+        </select>
+      </div>
+      <div class="col-6 assign-only">
+        <label>Submitted By</label>
+        <input id="by" placeholder="Name"/>
+      </div>
+      <div class="col-6 assign-only">
+        <label>Submitted At</label>
+        <input id="date" type="date"/>
+      </div>
+
+      <div class="col-6">
+        <button id="btnClear" type="button">Clear Selection</button>
+      </div>
+      <div class="col-6">
+        <button id="btnApply" class="btn btn-accent" type="button">Apply to Selected Poles</button>
+      </div>
+      <div class="col-12"><div id="msg" class="small muted" style="margin-top:6px"></div></div>
+    </div>
+  </div>
+
+  <!-- libs -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+  <!-- share config & run -->
+  <script src="assets/js/config.js?v=api2"></script>
+  <script src="assets/js/map.js"></script>
+</body>
+</html>
