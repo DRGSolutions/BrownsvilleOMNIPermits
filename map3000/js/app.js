@@ -1,6 +1,5 @@
-// /map3000/js/app.js — centralized boot with visible errors caught by index.html
+// /map3000/js/app.js — centralized boot, exposes global `state`
 export async function start(){
-  // Import modules in one place so index.html can catch any import/boot errors
   const CFG   = await import('./config.js');
   const DATA  = await import('./data.js');
   const MARK  = await import('./markers.js');
@@ -9,26 +8,20 @@ export async function start(){
   const RPT   = await import('./report.js');
   const UI    = await import('./ui.js');
 
-  // Map + global state
   const map   = UI.initMap(CFG);
   const state = UI.initState(map, CFG);
-  // Expose to other modules that reference window.state
+
+  // IMPORTANT: make state visible to console and any lazy modules
   window.state = state;
 
-  // Load data (poles + permits). data.js already resolves your /data/ path.
   await DATA.load(state, CFG);
 
-  // Initialize subsystems
-  MARK.init(map, state, CFG);     // clusters + single-layer + marker renderers
-  AREAS.init(map, state, CFG);    // dedicated 'areas-pane' with high z-index glow
-  UI.mountPanels(map, state, CFG, { MARK, AREAS, HEAT, RPT }); // UI wiring
+  MARK.init(map, state, CFG);
+  AREAS.init(map, state, CFG);
+  UI.mountPanels(map, state, CFG, { MARK, AREAS, HEAT, RPT });
 
-  // FIRST RENDER — ORDER MATTERS:
-  // 1) markers set bounds, 2) areas draw with neon + bringToFront, 3) view mode visuals
+  // First paint — order matters: markers → areas → apply view mode
   MARK.render({ cluster: true });
-  AREAS.rebuild();                // boundaries now unmistakable
+  AREAS.rebuild();
   UI.updateViewMode();
-
-  // Optional: re-draw areas after filters or view changes are applied by UI (UI calls these)
-  // Nothing else needed here unless you add live data streaming.
 }

@@ -1,8 +1,6 @@
-// /map3000/js/areas.js — classic working logic, modularized
-// Behavior: group strictly by job_name -> concave hull (maxEdge 1.5 km) -> convex fallback
-// -> light buffer (≈60m) -> simplify -> draw. Visibility boosted (thicker outline, higher fill).
-
-const PANE = 'areas-pane';
+// /map3000/js/areas.js — classic working job areas (default pane, {layer,label})
+// Pipeline: group by job_name → concave (maxEdge 1.5km) → convex fallback
+// → buffer (~60m) → simplify → draw with thicker stroke + higher fill.
 
 function colorFromString(s){
   let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0;
@@ -10,47 +8,39 @@ function colorFromString(s){
 }
 
 export function init(map, state){
-  // Dedicated pane so areas sit above tiles and below markers
-  if (!map.getPane(PANE)) map.createPane(PANE);
-  const pane = map.getPane(PANE);
-  pane.classList.add('areas-pane');     // your CSS glow targets this class
-  pane.style.zIndex = 625;              // markers are usually above this
-  pane.style.pointerEvents = 'none';    // never block marker clicks
-
-  state.areas = []; // [{fill:L.GeoJSON, label:L.Marker}]
+  // Use the default overlay pane (matches the first working single-file page)
+  state.areas = []; // [{ layer: L.GeoJSON, label: L.Marker }]
 }
 
 export function rebuild(sample=null){
   const s = state;
   const list = sample || s.poles;
 
-  // 1) group strictly by job_name (matches the original)
+  // 1) Strict grouping by job_name
   const byJob = new Map();
   for (const p of list){
     const job = (p.job_name ?? '').trim();
     if (!job) continue;
     if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
     if (!byJob.has(job)) byJob.set(job, []);
-    byJob.get(job).push([p.lon, p.lat]); // GeoJSON order: [lng, lat]
+    byJob.get(job).push([p.lon, p.lat]); // [lng,lat] for GeoJSON
   }
 
-  // 2) build the same “working” hull you had originally
+  // 2) Build hulls (concave → convex → buffer → simplify)
   const items = [];
   byJob.forEach((pts, job) => {
-    if (pts.length < 3) return; // original behavior: skip tiny sets
+    if (pts.length < 3) return;
 
     const fc = turf.featureCollection(pts.map(c => turf.point(c)));
-    // concave first, like before
     let poly = null;
+
     try { poly = turf.concave(fc, { maxEdge: 1.5, units: 'kilometers' }); } catch(_){}
-    if (!poly) {
-      try { poly = turf.convex(fc); } catch(_){}
-    }
+    if (!poly) { try { poly = turf.convex(fc); } catch(_){} }
     if (!poly) return;
 
-    // the same “soften/smooth” chain you used: small buffer, then simplify
     let buffered = poly;
     try { buffered = turf.buffer(poly, 0.06, { units: 'kilometers' }); } catch(_){}
+
     let simplified = buffered;
     try { simplified = turf.simplify(buffered, { tolerance: 0.0001, highQuality: true }); } catch(_){}
     try { simplified = turf.flatten(simplified); } catch(_){}
@@ -58,60 +48,45 @@ export function rebuild(sample=null){
     items.push({ job, geo: simplified });
   });
 
-  // 3) render (clear old first)
+  // 3) Draw (clear previous)
   clear(s.map, s);
-  drawAll(s.map, s, items);
-}
-
-function clear(map, state){
-  state.areas.forEach(a => {
-    map.removeLayer(a.fill);
-    map.removeLayer(a.label);
-  });
-  state.areas = [];
-}
-
-function drawAll(map, state, items){
   items.forEach(({ job, geo }) => {
     const col = colorFromString(job);
 
-    // Fill + outline in one GeoJSON layer (matching original, but boosted)
-    const fill = L.geoJSON(geo, {
-      pane: PANE,
+    const layer = L.geoJSON(geo, {
+      // default pane
       style: {
-        color: col,         // stroke
-        weight: 2.5,        // thicker than original 1.5 so it’s obvious
-        opacity: 1.0,       // full stroke opacity so edges pop
+        color: col,
+        weight: 2.5,        // stronger than original 1.5
+        opacity: 1.0,       // full stroke opacity
         fillColor: col,
-        fillOpacity: 0.25   // higher than original 0.10 for clear visibility
+        fillOpacity: 0.25   // higher than original 0.10
       }
-    }).addTo(map);
+    }).addTo(s.map);
+    try { layer.bringToFront(); } catch(_){}
 
-    // ensure it sits above other overlays
-    try { fill.bringToFront(); } catch(_){}
-
-    // label at mass center, falling back to bbox center
     let center;
     try { center = turf.centerOfMass(geo).geometry.coordinates; }
-    catch(_){
-      const bb = turf.bbox(geo);
-      center = turf.center(turf.bboxPolygon(bb)).geometry.coordinates;
-    }
+    catch(_){ const bb = turf.bbox(geo); center = turf.center(turf.bboxPolygon(bb)).geometry.coordinates; }
 
     const label = L.marker([center[1], center[0]], {
-      pane: PANE, interactive: false,
+      interactive:false,
       icon: L.divIcon({
-        className: 'job-label',
-        html: `<div style="font-weight:800; letter-spacing:.3px; font-size:14px; color:#dbeafe; text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`,
-        iconSize: [0,0]
+        className:'job-label',
+        html:`<div style="font-weight:800; letter-spacing:.3px; font-size:14px; color:#dbeafe; text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`,
+        iconSize:[0,0]
       })
-    }).addTo(map);
+    }).addTo(s.map);
 
-    state.areas.push({ fill, label });
+    s.areas.push({ layer, label });
   });
 
-  // honor current toggle
-  if (!state.areasVisible){
-    state.areas.forEach(a => { state.map.removeLayer(a.fill); state.map.removeLayer(a.label); });
+  if (!s.areasVisible){
+    s.areas.forEach(a => { s.map.removeLayer(a.layer); s.map.removeLayer(a.label); });
   }
+}
+
+function clear(map, state){
+  state.areas.forEach(a => { map.removeLayer(a.layer); map.removeLayer(a.label); });
+  state.areas = [];
 }
