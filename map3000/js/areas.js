@@ -1,126 +1,171 @@
-// /map3000/js/areas.js — back to basics (original grouping) + clearer styling
+// /map3000/js/areas.js — back-to-basics + bulletproof + debugable
 
-const PANE_NAME = 'areas-pane';
+const PANE_NAME = "areas-pane";
+const DEBUG = /[?&]areas_debug=1\b/.test(location.search || "");
+
+// lightweight color hash (stable per job)
+function colorFromString(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0; return `hsl(${h%360} 70% 52%)`; }
+const safeArea = g => { try { return turf.area(g) || 0; } catch { return 0; } };
+const toFeatures = g =>
+  g?.type === "FeatureCollection" ? g.features :
+  g?.type === "GeometryCollection" ? turf.flatten(g).features :
+  g ? [g] : [];
 
 export function init(map, state){
-  // Create a dedicated pane so areas sit above tiles and below markers
+  // Dedicated pane above overlays, below markers
   map.createPane(PANE_NAME);
   const pane = map.getPane(PANE_NAME);
-  pane.classList.add('areas-pane');
-  pane.style.zIndex = 625;            // markers are typically > 650
-  pane.style.pointerEvents = 'none';  // do not block clicks on markers
+  pane.classList.add("areas-pane");
+  pane.style.zIndex = 625;           // markers ~600; keep just above overlays
+  pane.style.pointerEvents = "none"; // never block marker clicks
 
-  state.areas = [];                   // [{ fill: L.GeoJSON, label: L.Marker }]
+  state.areas = []; // [{fill, label, debugFG?}]
 }
 
-/**
- * Build a single polygon for a set of points:
- * - Try concave (tighter) hull
- * - Fallback to convex hull
- * - Light simplify so edges look clean
- */
-function buildHull(pointsLngLat){
-  if (!pointsLngLat || pointsLngLat.length < 3) return null; // ORIGINAL behavior
-
-  const fc = turf.featureCollection(pointsLngLat.map(c => turf.point(c)));
-
-  // Original-ish settings: slightly generous maxEdge so shapes don't overfit
-  let poly = null;
-  try { poly = turf.concave(fc, { maxEdge: 0.6, units: 'kilometers' }); } catch (_){}
-  if (!poly) {
-    try { poly = turf.convex(fc); } catch (_){}
-  }
-  if (!poly) return null;
-
-  // Small simplify for smooth edges (keeps shape close to original)
-  try { poly = turf.simplify(poly, { tolerance: 0.00005, highQuality: true }); } catch (_){}
-
-  // Ensure Leaflet gets a simple Polygon/MultiPolygon
-  try { poly = turf.flatten(poly); } catch (_){}
-
-  return poly;
-}
-
-/**
- * Draw all job areas (no inter-job clipping).
- * Grouping is strictly by p.job_name with no normalization (ORIGINAL).
- */
 export function rebuild(sample=null){
   const s = state;
   const list = sample || s.poles;
 
-  // 1) Group strictly by job_name (no case/space normalization — ORIGINAL)
+  // 1) Group strictly by job_name (original behavior)
   const byJob = new Map();
-  for (const p of list){
-    const job = (p.job_name ?? '');
-    if (!job) continue;
-    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-
-    if (!byJob.has(job)) byJob.set(job, []);
+  for(const p of list){
+    const job = (p.job_name ?? "");
+    if(!job) continue;
+    if(typeof p.lat !== "number" || typeof p.lon !== "number") continue;
+    if(!byJob.has(job)) byJob.set(job, []);
     byJob.get(job).push([p.lon, p.lat]); // GeoJSON order: [lng, lat]
   }
 
-  // 2) Build one hull per job
+  console.info("[areas] jobs found:", byJob.size);
+
+  // 2) Build hull per job with robust fallbacks
   const toDraw = [];
   byJob.forEach((pts, job) => {
-    const hull = buildHull(pts);
-    if (hull) toDraw.push({ job, geo: hull });
+    const hull = buildHull(pts, job);
+    if(hull) toDraw.push({ job, geo: hull, pts });
   });
 
-  // 3) Render (clear old first)
+  // 3) Render
   clearLayers(s.map, s);
-  draw(s.map, s, toDraw);
+  drawAll(s.map, s, toDraw);
+}
+
+function buildHull(ptsLngLat, job){
+  if(!ptsLngLat || ptsLngLat.length === 0) return null;
+
+  let chosen = "none";
+  let geo = null;
+
+  // ORIGINAL rule: need at least 3 points for hulls
+  if(ptsLngLat.length >= 3){
+    const fc = turf.featureCollection(ptsLngLat.map(c => turf.point(c)));
+    try {
+      geo = turf.concave(fc, { maxEdge: 0.6, units: "kilometers" }); // tighter but safe
+      if(geo){ chosen = "concave"; }
+    } catch {}
+
+    if(!geo){
+      try { geo = turf.convex(fc); if(geo) chosen = "convex"; } catch {}
+    }
+
+    // If hull is crazy small/invalid, fall through to buffer/union/bbox
+    if(geo && safeArea(geo) < 1) { geo = null; chosen = "none"; }
+  }
+
+  // Fallback 1: buffered union of points (visually obvious blob)
+  if(!geo){
+    try {
+      const rings = ptsLngLat.map(c => turf.buffer(turf.point(c), 0.03, { units: "kilometers" }));
+      geo = rings.length === 1 ? rings[0] : turf.union(...rings);
+      if(geo) chosen = "buffer-union";
+    } catch {}
+  }
+
+  // Fallback 2: bbox polygon around all points (last resort, always visible)
+  if(!geo){
+    try {
+      const fcPts = turf.featureCollection(ptsLngLat.map(c => turf.point(c)));
+      const bb = turf.bbox(fcPts);
+      geo = turf.bboxPolygon(bb);
+      chosen = "bbox";
+    } catch {}
+  }
+
+  // Smooth & flatten for Leaflet
+  if(geo){
+    try { geo = turf.simplify(geo, { tolerance: 0.00005, highQuality: true }); } catch {}
+    try { geo = turf.flatten(geo); } catch {}
+  }
+
+  const a = safeArea(geo);
+  console.info(`[areas] ${job}: points=${ptsLngLat.length}, hull=${chosen}, area=${a.toFixed(1)} m²`);
+  return geo;
 }
 
 function clearLayers(map, state){
-  state.areas.forEach(a => { map.removeLayer(a.fill); map.removeLayer(a.label); });
+  state.areas.forEach(a => {
+    map.removeLayer(a.fill);
+    map.removeLayer(a.label);
+    if(a.debugFG) map.removeLayer(a.debugFG);
+  });
   state.areas = [];
 }
 
-function colorFromString(s){
-  let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0;
-  return `hsl(${h%360} 70% 52%)`;
-}
-
-function draw(map, state, list){
-  for (const {job, geo} of list){
+function drawAll(map, state, items){
+  for(const {job, geo, pts} of items){
     const col = colorFromString(job);
 
-    // Slightly bolder so it’s unmistakable on dark tiles
+    // Main filled border
     const fill = L.geoJSON(geo, {
       pane: PANE_NAME,
       style: {
         color: col,
-        weight: 3,          // thicker edge for visibility
-        opacity: 0.95,      // bright stroke
+        weight: 3.2,       // brighter edge
+        opacity: 0.98,
         fillColor: col,
-        fillOpacity: 0.34   // higher fill so it reads clearly
+        fillOpacity: 0.40  // HIGH so you can’t miss it
       }
     }).addTo(map);
+    try { fill.bringToFront(); } catch {}
 
-    try { fill.bringToFront(); } catch (_){}
-
-    // Center label at mass center; fallback to bbox center
+    // Label at center of mass (fallback bbox center)
     let center;
-    try {
-      center = turf.centerOfMass(geo).geometry.coordinates;
-    } catch (_){
+    try { center = turf.centerOfMass(geo).geometry.coordinates; }
+    catch {
       const bb = turf.bbox(geo);
       center = turf.center(turf.bboxPolygon(bb)).geometry.coordinates;
     }
-
     const label = L.marker([center[1], center[0]], {
       pane: PANE_NAME, interactive:false,
       icon: L.divIcon({
-        className: '',
-        html: `<div style="font-weight:900;letter-spacing:.4px;font-size:14px;color:#e2e8f0;text-shadow:0 2px 6px rgba(0,0,0,.9)">${job}</div>`
+        className: "",
+        html: `<div style="font-weight:900;letter-spacing:.4px;font-size:14px;color:#e2e8f0;text-shadow:0 2px 6px rgba(0,0,0,.95)">${job}</div>`
       })
     }).addTo(map);
 
-    state.areas.push({ fill, label });
+    // Optional DEBUG overlays (raw points + bbox outline)
+    let debugFG = null;
+    if(DEBUG){
+      const fcPts = turf.featureCollection(pts.map(c => turf.point(c)));
+      const bb = turf.bboxPolygon(turf.bbox(fcPts));
+      debugFG = L.featureGroup([], { pane: PANE_NAME }).addTo(map);
+      // raw points
+      pts.forEach(([lng,lat])=>{
+        L.circleMarker([lat,lng], {
+          pane: PANE_NAME, radius: 3, color: "#60a5fa", fillColor:"#60a5fa", fillOpacity: 0.9, weight: 1
+        }).addTo(debugFG);
+      });
+      // bbox outline
+      L.geoJSON(bb, {
+        pane: PANE_NAME,
+        style: { color: "#eab308", weight: 2, dashArray: "6,4", fillOpacity: 0 }
+      }).addTo(debugFG);
+    }
+
+    state.areas.push({ fill, label, debugFG });
   }
 
-  if (!state.areasVisible){
-    state.areas.forEach(a => { map.removeLayer(a.fill); map.removeLayer(a.label); });
+  if(!state.areasVisible){
+    state.areas.forEach(a => { map.removeLayer(a.fill); map.removeLayer(a.label); if(a.debugFG) map.removeLayer(a.debugFG); });
   }
 }
