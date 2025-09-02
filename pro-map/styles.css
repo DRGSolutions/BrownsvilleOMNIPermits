@@ -1,0 +1,78 @@
+:root{
+  --bg:#0b0c10;--panel:#0f1219;--panel2:#111521;--muted:#9aa3b2;--fg:#f3f4f6;--border:#1f2430;
+  /* From your main site (for full visual consistency) */
+  --chip-pending:#fb923c;      /* Submitted - Pending */   /* map.js statusColor */ 
+  --chip-approved:#34d399;     /* Approved */              /* map.js statusColor */
+  --chip-created:#facc15;      /* Created - NOT Submitted */
+  --chip-na-cannot:#a78bfa;    /* Not Approved - Cannot Attach */
+  --chip-na-other:#ef4444;     /* Not Approved - * */
+  --chip-none:#94a3b8;         /* NONE */
+}
+
+/* Global */
+*{box-sizing:border-box}
+html,body,#map{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+/* Panels */
+.panel{position:absolute;background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.panel .title{font-weight:800;font-size:15px}
+.panel .muted{color:var(--muted)} .small{font-size:12px}
+.panel__head{display:flex;align-items:baseline;gap:10px;padding:12px 12px;border-bottom:1px solid var(--border)}
+.panel--filters{top:12px;left:12px;width:380px;max-height:66vh;overflow:auto}
+.panel--legend{left:12px;bottom:12px;width:380px}
+.panel--details{top:12px;right:12px;width:400px;height:calc(100% - 24px);display:flex;flex-direction:column}
+.panel--report{top:12px;right:430px;width:420px;max-height:66vh;overflow:auto}
+.hidden{display:none}
+
+.filter-toolbar{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.btn{appearance:none;border:1px solid var(--border);background:#161922;color:var(--fg);padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:700}
+.btn:hover{background:#1a1f2b}
+.btn-accent{border-color:#1f3b2f;background:#0f2b22}
+
+/* Rule rows */
+#rules{padding:10px 12px 2px}
+.rule{display:grid;grid-template-columns:110px 110px 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.rule select,.rule input{width:100%;padding:8px 10px;border-radius:10px;border:1px solid #2a3242;background:#0f1219;color:var(--fg)}
+.rule .btn-del{padding:6px 8px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;border:1px solid #283244;border-radius:999px;padding:2px 8px;background:#0f1219}
+
+.details{padding:12px;overflow:auto}
+.details .kv{display:grid;grid-template-columns:88px 1fr;gap:8px;margin:6px 0}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--panel2);padding:10px 12px;margin:8px 0}
+.kv code{background:rgba(255,255,255,.05);border:1px solid var(--border);padding:2px 6px;border-radius:8px}
+.badge{display:inline-block;border-radius:999px;padding:2px 8px;border:1px solid #283244;font-size:11px}
+.badge.pending{background:var(--chip-pending);color:#111}
+.badge.approved{background:var(--chip-approved);color:#0b261a}
+.badge.created{background:var(--chip-created);color:#211f06}
+.badge.na_cannot{background:var(--chip-na-cannot);color:#18132b}
+.badge.na_other{background:var(--chip-na-other);color:#fff}
+.badge.none{background:var(--chip-none);color:#0b0c10}
+
+.legend__row{padding:12px;border-top:1px solid var(--border)}
+.legend__row:first-child{border-top:0}
+.legend__title{font-weight:700;margin-bottom:6px}
+.legend__status{display:flex;flex-wrap:wrap;gap:6px}
+.lg-item{display:inline-flex;align-items:center;gap:8px;margin-right:12px}
+.lg-shape{width:18px;height:18px;display:inline-block;position:relative}
+.lg-shape[data-shape=circle]{border-radius:999px;border:2px solid #2a3242;background:#7d8596}
+.lg-shape[data-shape=triangle]{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:16px solid #7d8596;filter:drop-shadow(0 0 0 #2a3242)}
+.lg-shape[data-shape=diamond]{transform:rotate(45deg);background:#7d8596;border:2px solid #2a3242}
+
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:9999;background:#0f1219;border:1px solid var(--border);border-radius:10px;padding:8px 12px;display:none}
+.toast.show{display:block}
+
+/* Map marker SVG base */
+.pin{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 4px rgba(0,0,0,.35))}
+.pin svg{display:block}
+.pin .ring{stroke:#2a3242;stroke-width:1.5;fill:none}
+.pin .shape{stroke:#2a3242;stroke-width:1.5}
+
+/* Selected pulse */
+.pin.selected{animation:sPulse .8s ease-out 1}
+@keyframes sPulse{0%{transform:scale(.9)}100%{transform:scale(1)}}
+
+/* Job labels */
+.job-label{background:rgba(15,18,25,.8);border:1px solid var(--border);padding:2px 8px;border-radius:999px;font-weight:700}
