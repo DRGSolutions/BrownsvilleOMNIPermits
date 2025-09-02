@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Neo Map — Poles & Permits</title>
+
+  <!-- Leaflet + MarkerCluster + Turf (CDNs) -->
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+  <link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet">
+  <link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" rel="stylesheet">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script defer src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- FILTERS (Top-Left) -->
+  <aside id="filters" class="panel panel--filters">
+    <div class="bar">
+      <h3>Advanced Filters</h3>
+      <div class="row">
+        <label class="chip">Match
+          <select id="logic">
+            <option value="AND">All (AND)</option>
+            <option value="OR">Any (OR)</option>
+          </select>
+        </label>
+        <button id="btnClear" class="btn btn-ghost" title="Reset filters">Reset</button>
+      </div>
+    </div>
+    <!-- Quick presets -->
+    <div class="row" style="margin-bottom:6px">
+      <div class="field">
+        <small>Owner</small>
+        <select id="qOwner">
+          <option value="">All</option>
+          <option>BPUB</option><option>AEP</option><option>MVEC</option>
+        </select>
+      </div>
+      <div class="field">
+        <small>Permit Status</small>
+        <select id="qStatus">
+          <option value="">All</option>
+          <option>NONE</option>
+          <option>Created - NOT Submitted</option>
+          <option>Submitted - Pending</option>
+          <option>Approved</option>
+          <option>Not Approved - Cannot Attach</option>
+          <option>Not Approved - PLA Issues</option>
+          <option>Not Approved - MRE Issues</option>
+          <option>Not Approved - Other Issues</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1">
+        <small>Search</small>
+        <input id="qSearch" placeholder="Job, Tag, SCID, MR…"/>
+      </div>
+    </div>
+
+    <div id="rules"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnAddRule" class="btn">Add Condition</button>
+      <button id="btnApply"   class="btn btn-accent">Apply</button>
+    </div>
+  </aside>
+
+  <!-- LEGEND (Bottom-Left) -->
+  <aside id="legend" class="panel panel--legend">
+    <h3>Legend</h3>
+    <div class="legend-grid">
+      <div>
+        <div class="muted mb6">Utility → Shape</div>
+        <div class="item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+          <div>BPUB (circle)</div>
+        </div>
+        <div class="item">
+          <svg viewBox="0 0 24 24"><polygon points="12,4 20,20 4,20" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+          <div>AEP (triangle)</div>
+        </div>
+        <div class="item">
+          <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="2" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+          <div>MVEC (diamond)</div>
+        </div>
+      </div>
+      <div>
+        <div class="muted mb6">Permit Status → Color</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-approved)"></span>Approved</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-pending)"></span>Submitted - Pending</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-created)"></span>Created - NOT Submitted</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-na-cannot)"></span>Not Approved - Cannot Attach</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-na-other)"></span>Not Approved - PLA/MRE/Other</div>
+        <div class="item"><span class="swatch" style="background:var(--chip-none)"></span>NONE</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOOLS (Top-Right) -->
+  <aside id="tools" class="panel panel--tools">
+    <h3>Map Tools</h3>
+    <div class="row"><button id="btnFit" class="btn">Fit to Poles</button><button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button></div>
+    <small class="muted">Click a shape to view pole & permits. Areas are precise concave hulls per job with overlap-aware outlines.</small>
+  </aside>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- Modules -->
+  <script type="module" src="./config.js"></script>
+  <script type="module" src="./data.js"></script>
+  <script type="module" src="./markers.js"></script>
+  <script type="module" src="./areas.js"></script>
+  <script type="module" src="./filters.js"></script>
+  <script type="module" src="./ui.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
