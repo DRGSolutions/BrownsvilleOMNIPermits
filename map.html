@@ -8,32 +8,53 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
   <style>
     :root{
-      /* same palette as index.html */
+      /* match app palette */
       --bg:#0b0c10;--panel:#121318;--muted:#9aa3b2;--fg:#f3f4f6;--border:#1f2430;
-      --chip-pending:#fb923c;--chip-approved:#34d399;--chip-created:#facc15;
-      --chip-na-cannot:#a78bfa;--chip-na-other:#ef4444; --chip-none:#94a3b8;
+      --chip-none:#94a3b8;
     }
     html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
     #map{position:absolute;inset:0}
+
+    /* floating control panel */
     .panel{
       position:absolute;top:12px;left:12px;z-index:1000;background:var(--panel);
-      border:1px solid var(--border);border-radius:12px;padding:12px;min-width:320px
+      border:1px solid var(--border);border-radius:12px;padding:12px;min-width:340px;max-width:420px;
+      box-shadow:0 8px 28px rgba(0,0,0,.35)
     }
+    .panel .hdr{font-size:12px;color:var(--muted);margin-bottom:6px}
     label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
-    input,select,button{width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#0f1219;color:var(--fg)}
+    input,select,button{
+      width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--border);
+      background:#0f1219;color:var(--fg)
+    }
     .row{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
     .col-6{grid-column:span 6}.col-12{grid-column:span 12}
     .btn{cursor:pointer;font-weight:600}.btn:hover{background:#1a1f2b}
     .btn-accent{border-color:#1f3b2f;background:#0f2b22}
     .small{font-size:12px}.muted{color:var(--muted)}
+    #msg{min-height:18px}
+    /* ensure Leaflet controls aren’t hidden under the panel */
+    .leaflet-top.leaflet-right{margin-right:12px;margin-top:12px}
+
+    /* pole tooltips: smaller text + status on second line */
+    .leaflet-tooltip.pole-tip{
+      background:transparent;border:none;box-shadow:none;color:#cbd5e1;
+      font-size:10px;line-height:1.15;padding:0;transform:translateY(-2px)
+    }
+    .pole-tip .id{font-weight:600}
+    .pole-tip .status{color:#9aa3b2}
+    .pole-tip.selected .id,.pole-tip.selected .status{color:#60a5fa}
+
+    /* selection hint */
+    .hint{font-size:11px;color:var(--muted);margin-top:6px}
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <div class="panel">
-    <div class="small muted" id="jobName">Job: —</div>
-    <div class="small muted" id="selInfo" style="margin:6px 0 10px">Selected poles: 0</div>
+    <div class="hdr" id="jobName">Job: —</div>
+    <div class="small muted" id="selInfo" style="margin-bottom:8px">Selected poles: 0</div>
 
     <div class="row">
       <div class="col-12">
@@ -77,6 +98,7 @@
         <button id="btnApply" class="btn btn-accent" type="button">Apply to Selected Poles</button>
       </div>
       <div class="col-12"><div id="msg" class="small muted" style="margin-top:6px"></div></div>
+      <div class="col-12"><div class="hint">Use the polygon/rectangle tools (top-right) to draw one or more areas. Selected labels turn <b style="color:#60a5fa">blue</b>.</div></div>
     </div>
   </div>
 

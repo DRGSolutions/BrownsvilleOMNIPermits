@@ -9,7 +9,7 @@
   // Show job name
   const jobEl = $('#jobName'); if (jobEl) jobEl.textContent = JOB ? `Job: ${JOB}` : 'Job: —';
 
-  // --- GitHub data loader (commit -> branch fallback, same as app.js) ---
+  // --- GitHub data loader (commit -> branch fallback, like app.js) ---
   async function getLatestSha() {
     const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
     const r = await fetch(url, { cache: 'no-store' });
@@ -95,7 +95,6 @@
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(inputDateYYYYMMDD||'');
     return m ? `${m[2]}/${m[3]}/${m[1]}` : '';
   }
-
   function indexPermitsByPole(permits){
     const map = new Map();
     for (const r of (permits||[])) {
@@ -110,16 +109,32 @@
   let map, pointsLayer, drawn, selectedSet = new Set(), pmap;
 
   function setupMap(jobPoles, permits){
-    map = L.map('map');
+    // preferCanvas reduces DOM + flicker for lots of markers; move zoom to bottom-right
+    map = L.map('map', { preferCanvas:true, zoomControl:false });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Tile layer tweaks to reduce “disappearing streets” / flicker while zooming
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 20,
+      maxNativeZoom: 19,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      keepBuffer: 6,
+      crossOrigin: true,
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
     pointsLayer = L.layerGroup().addTo(map);
     drawn = new L.FeatureGroup(); map.addLayer(drawn);
+
+    // Draw control in TOP-RIGHT so it isn't under the panel
     const drawCtl = new L.Control.Draw({
-      draw: { marker:false, circle:false, polyline:false, circlemarker:false },
+      position: 'topright',
+      draw: {
+        marker:false, circle:false, polyline:false, circlemarker:false,
+        polygon: { allowIntersection:false, showArea:false, shapeOptions:{ color:'#60a5fa', weight:2 } },
+        rectangle: { shapeOptions:{ color:'#60a5fa', weight:2 } }
+      },
       edit: { featureGroup: drawn }
     });
     map.addControl(drawCtl);
@@ -133,32 +148,44 @@
       const lat = Number(p.lat), lon = Number(p.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
       const rel = pmap.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
-      const color = statusColor(latestStatusFor(rel));
+      const latest = latestStatusFor(rel);
+      const color = statusColor(latest);
 
       const m = L.circleMarker([lat, lon], {
         radius: 4, weight: 1, color: '#2a3242', fillColor: color, fillOpacity: 1
       });
-      m.bindTooltip(`SCID ${p.SCID} · Tag ${p.tag}`, { permanent:true, direction:'top', opacity:.8 });
+      // smaller text + status on its own line; add custom class for styling
+      const tipHtml = `<div class="id">SCID ${p.SCID} · Tag ${p.tag}</div><div class="status">${latest}</div>`;
+      m.bindTooltip(tipHtml, { permanent:true, direction:'top', opacity:1, className:'pole-tip' });
+
       m._pole = p;
       pointsLayer.addLayer(m);
       bounds.push([lat,lon]);
     }
     if (bounds.length) map.fitBounds(bounds, { padding:[40,40] });
 
+    function toggleTooltipSelected(marker, on){
+      const tt = marker.getTooltip && marker.getTooltip();
+      const el = tt && tt.getElement && tt.getElement();
+      if (el) el.classList.toggle('selected', !!on);
+    }
+
     function updateSelection(){
       selectedSet.clear();
       const polys = drawn.toGeoJSON().features.filter(f => f.geometry && f.geometry.type === 'Polygon');
+      // markers
       const markers = Object.values(pointsLayer._layers || {});
       for (const m of markers) {
-        const [lat,lon] = [m.getLatLng().lat, m.getLatLng().lng];
-        const pt = turf.point([lon, lat]);
+        const { lat, lng } = m.getLatLng();
+        const pt = turf.point([lng, lat]);
         let inside = false;
         for (const poly of polys) {
           if (turf.booleanPointInPolygon(pt, poly)) { inside = true; break; }
         }
         if (inside) selectedSet.add(m);
-        // style toggle
-        m.setStyle({ radius: inside ? 6 : 4, weight: inside ? 2 : 1 });
+        // style toggle + tooltip color
+        m.setStyle({ radius: inside ? 6 : 4, weight: inside ? 2 : 1, color: inside ? '#60a5fa' : '#2a3242' });
+        toggleTooltipSelected(m, inside);
       }
       $('#selInfo').textContent = `Selected poles: ${selectedSet.size}`;
     }
@@ -168,6 +195,9 @@
     map.on(L.Draw.Event.DELETED, () => updateSelection());
 
     $('#btnClear').addEventListener('click', () => { drawn.clearLayers(); updateSelection(); });
+
+    // On first load, ensure tiles render under the fixed panel without flicker
+    setTimeout(() => map.invalidateSize(), 50);
   }
 
   // --- Apply (single PR) ---
