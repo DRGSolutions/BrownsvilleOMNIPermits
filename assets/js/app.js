@@ -114,13 +114,13 @@
     return data; // { ok:true, pr_url, branch }
   }
 
-  // -------- Save / Delete handlers (unchanged) --------
+  // -------- Save / Delete handlers --------
   function msg(textHtml) {
     const el = $('#msgPermit');
     if (el) el.innerHTML = textHtml || '';
   }
 
-  // yyyy-mm-dd -> MM/DD/YYYY (for API)
+  // yyyy-mm-dd -> MM/DD/YYYY (for API when needed)
   function toMDY(s) {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
     return m ? `${m[2]}/${m[3]}/${m[1]}` : (s || '');
@@ -153,7 +153,7 @@
             SCID:     f.SCID,
             permit_status: f.permit_status,
             submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at,
+            submitted_at:  f.submitted_at, // assuming UI collector formats MDY already
             notes:         f.notes || ''
           }
         }
@@ -166,7 +166,7 @@
             SCID:      f.SCID,
             permit_status: f.permit_status,
             submitted_by:  f.submitted_by,
-            submitted_at:  f.submitted_at,
+            submitted_at:  f.submitted_at, // assuming UI collector formats MDY already
             notes:         f.notes || ''
           }
         };
@@ -175,7 +175,7 @@
       msg('Submitting…');
       const data = await callApi({ actorName: 'Website User', reason: `Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      window.dispatchEvent(new CustomEvent('watch:start')); // overlay + auto refresh (bulk watcher path handles all)
+      window.dispatchEvent(new CustomEvent('watch:start')); // overlay + auto refresh
     } catch (err) {
       console.error(err);
       msg(`<span class="err">${err.message}</span>`);
@@ -224,7 +224,7 @@
       panel.classList.remove('disabled-block');
       if (hint) hint.style.display = 'none';
     }
-    // NEW: gate Advanced Map button the same way
+    // Gate Advanced Map button the same way
     const adv = $('#btnAdvancedMap'); if (adv) adv.disabled = !job;
   }
 
@@ -364,6 +364,13 @@
     }
   }
 
+  // -------- Advanced Map (single-tab opener) --------
+  function onAdvancedMapClick() {
+    const job = getSelectedJob();
+    if (!job) return;
+    window.open(`map.html?job=${encodeURIComponent(job)}`, '_blank', 'noopener');
+  }
+
   function wireButtons() {
     const save = $('#btnSavePermit');
     if (save) { save.type = 'button'; save.removeEventListener('click', onSavePermit); save.addEventListener('click', onSavePermit); }
@@ -376,16 +383,12 @@
     const massMode = $('#massMode');
     if (massMode) { massMode.removeEventListener('change', updateAssignOnlyVisibility); massMode.addEventListener('change', updateAssignOnlyVisibility); }
 
-    // NEW: Advanced Map Selection opener (disabled unless a Job is selected)
+    // Advanced Map Selection (disable unless a Job is selected)
     const adv = $('#btnAdvancedMap');
     if (adv) {
       adv.type = 'button';
-      adv.removeEventListener('click', () => {});
-      adv.addEventListener('click', () => {
-        const job = getSelectedJob();
-        if (!job) return;
-        window.open(`map.html?job=${encodeURIComponent(job)}`, '_blank', 'noopener');
-      });
+      adv.removeEventListener('click', onAdvancedMapClick);
+      adv.addEventListener('click', onAdvancedMapClick);
     }
 
     updateAssignOnlyVisibility();
