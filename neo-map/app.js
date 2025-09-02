@@ -3,6 +3,7 @@ import { buildMarkers } from './markers.js';
 import { buildJobAreas } from './areas.js';
 import { ruleRow, readRules, matchRule } from './filters.js';
 import { popupHTML, toast } from './ui.js';
+import { openReport, closeReport } from './report.js';
 
 const STATE = { poles:[], permits:[], byKey:new Map(), cluster:null, areas:[], areasVisible:true, bounds:null };
 
@@ -96,6 +97,72 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
+
+/* ============================= Insights wiring ============================= */
+document.getElementById('btnReport').addEventListener('click', ()=>{
+  const { poles, permits, byKey } = STATE;
+
+  // mark poles with permit yes/no for KPI
+  const enriched = poles.map(p => ({ ...p, __hasPermit: (byKey.get(poleKey(p))||[]).length>0 }));
+
+  // counts
+  const statusCounts = {
+    'Approved':0,'Submitted - Pending':0,'Created - NOT Submitted':0,
+    'Not Approved - Cannot Attach':0,'Not Approved - PLA Issues':0,'Not Approved - MRE Issues':0,'Not Approved - Other Issues':0,
+    'NONE':0
+  };
+  const ownerCounts = {};
+  const byJob = {};
+  const naByJob = {};
+
+  for(const p of enriched){
+    ownerCounts[p.owner] = (ownerCounts[p.owner]||0)+1;
+    byJob[p.job_name] = (byJob[p.job_name]||0)+1;
+
+    const rel = byKey.get(poleKey(p)) || [];
+    if (!rel.length){ statusCounts['NONE']++; continue; }
+    // decide worst/dominant for counting
+    const ss = rel.map(r => String(r.permit_status||''));
+    const order = [
+      s => s.startsWith('Not Approved - Cannot Attach'),
+      s => s.startsWith('Not Approved - PLA Issues'),
+      s => s.startsWith('Not Approved - MRE Issues'),
+      s => s.startsWith('Not Approved - Other Issues'),
+      s => s === 'Submitted - Pending',
+      s => s === 'Created - NOT Submitted',
+      s => s === 'Approved'
+    ];
+    let chosen = 'Approved';
+    for(const pred of order){
+      const hit = ss.find(pred);
+      if (hit){ chosen = hit.startsWith('Not Approved -') ? hit : hit; break; }
+    }
+    statusCounts[chosen] = (statusCounts[chosen]||0)+1;
+    if (chosen.startsWith('Not Approved -')) naByJob[p.job_name] = (naByJob[p.job_name]||0)+1;
+  }
+
+  // jobs meta
+  const polesPerJob = Object.values(byJob).sort((a,b)=>a-b);
+  const mid = Math.floor(polesPerJob.length/2);
+  const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length%2? polesPerJob[mid] : Math.round((polesPerJob[mid-1]+polesPerJob[mid])/2)) : 0;
+
+  const counts = {
+    jobs: Object.keys(byJob).length,
+    polesPerJobMedian,
+    byJob,
+    naByJob
+  };
+
+  openReport({
+    poles: enriched,
+    permits,
+    counts,
+    ownerCounts,
+    statusCounts
+  });
+});
+
+document.getElementById('btnReportClose').addEventListener('click', ()=> closeReport());
 
 function applyFilters(){
   const spec = readRules();

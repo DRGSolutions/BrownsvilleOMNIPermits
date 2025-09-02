@@ -32,7 +32,6 @@
         <button id="btnClear" class="btn btn-ghost" title="Reset filters">Reset</button>
       </div>
     </div>
-    <!-- Quick presets -->
     <div class="row" style="margin-bottom:6px">
       <div class="field">
         <small>Owner</small>
@@ -60,7 +59,6 @@
         <input id="qSearch" placeholder="Job, Tag, SCID, MR…"/>
       </div>
     </div>
-
     <div id="rules"></div>
     <div class="row" style="margin-top:10px">
       <button id="btnAddRule" class="btn">Add Condition</button>
@@ -102,12 +100,58 @@
   <!-- TOOLS (Top-Right) -->
   <aside id="tools" class="panel panel--tools">
     <h3>Map Tools</h3>
-    <div class="row"><button id="btnFit" class="btn">Fit to Poles</button><button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button></div>
+    <div class="row">
+      <button id="btnFit" class="btn">Fit to Poles</button>
+      <button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button>
+      <!-- NEW: Insights button -->
+      <button id="btnReport" class="btn btn-accent">Open Insights</button>
+    </div>
     <small class="muted">Click a shape to view pole & permits. Areas are precise concave hulls per job with overlap-aware outlines.</small>
   </aside>
 
   <!-- Toast -->
   <div id="toast"></div>
+
+  <!-- REPORT PANEL -->
+  <aside id="report" class="panel panel--report hidden">
+    <div class="report-head">
+      <div class="title">Insights & Assessment</div>
+      <div class="muted small">Live analytics from poles.json + permits.json</div>
+      <button id="btnReportClose" class="btn btn-ghost">Close</button>
+    </div>
+
+    <div class="report-grid">
+      <div class="card kpis" id="kpiCards"></div>
+
+      <div class="card">
+        <div class="card-title">Permit Status Mix</div>
+        <canvas id="chStatus"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Poles by Owner</div>
+        <canvas id="chOwner"></canvas>
+      </div>
+
+      <div class="card span-2">
+        <div class="card-title">Top Jobs by Pole Count</div>
+        <canvas id="chJobs"></canvas>
+      </div>
+
+      <div class="card span-2">
+        <div class="card-title">Permit Submissions Over Time</div>
+        <canvas id="chTimeline"></canvas>
+      </div>
+
+      <div class="card span-2">
+        <div class="card-title">Observations</div>
+        <div id="observations" class="obs"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Chart.js (CDN) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
   <!-- Modules -->
   <script type="module" src="./config.js"></script>
@@ -116,6 +160,6 @@
   <script type="module" src="./areas.js"></script>
   <script type="module" src="./filters.js"></script>
   <script type="module" src="./ui.js"></script>
+  <script type="module" src="./report.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
-</html>

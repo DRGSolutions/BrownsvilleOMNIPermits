@@ -11,7 +11,7 @@ body{margin:0;background:#0b0c10;color:var(--fg);font:14px ui-sans-serif,system-
 .panel h3{margin:0 0 8px;font-size:14px;letter-spacing:.3px}
 .panel--filters{top:16px;left:16px;width:440px}
 .panel--legend{left:16px;bottom:16px;width:360px}
-.panel--tools{top:16px;right:16px;width:300px}
+.panel--tools{top:16px;right:16px;width:360px}
 .muted{color:var(--muted)} .mb6{margin-bottom:6px}
 
 .btn{appearance:none;cursor:pointer;border:1px solid var(--border);background:#151d2e;color:var(--fg);padding:8px 12px;border-radius:10px;font-weight:700}
@@ -55,5 +55,32 @@ select,input{border:1px solid var(--border);background:#0f1219;color:var(--fg);p
   display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid rgba(255,255,255,.18)
 }
 
-/* Optional: stronger job labels */
+/* =================== REPORT PANEL =================== */
+.hidden{display:none}
+.panel--report{
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(1120px,calc(100vw - 48px)); height:min(86vh,calc(100vh - 48px));
+  overflow:auto; padding:14px;
+}
+.report-head{display:flex;gap:12px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px}
+.report-head .title{font-size:18px;font-weight:800;letter-spacing:.3px}
+.report-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
+}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--panel2);padding:12px}
+.card-title{font-weight:800;margin-bottom:6px}
+.span-2{grid-column:span 2}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi{
+  background:#0f1219;border:1px solid var(--border);border-radius:12px;padding:10px 12px;
+}
+.kpi .lbl{color:var(--muted);font-size:12px}
+.kpi .val{font-size:18px;font-weight:800;margin-top:4px}
+.kpi .sub{color:var(--muted);font-size:11px;margin-top:2px}
+
+.obs{display:grid;gap:8px}
+.obs .note{background:#0f1219;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+canvas{max-width:100%}
+
+/* Optional: stronger job labels on map */
 .job-label div{padding:2px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(10,14,22,.92)}
