@@ -1,170 +1,117 @@
-// /map3000/js/areas.js — FORCE-VISIBLE BORDERS (neon outline + semi-opaque fill)
+// /map3000/js/areas.js — classic working logic, modularized
+// Behavior: group strictly by job_name -> concave hull (maxEdge 1.5 km) -> convex fallback
+// -> light buffer (≈60m) -> simplify -> draw. Visibility boosted (thicker outline, higher fill).
 
 const PANE = 'areas-pane';
 
-// loud, impossible-to-miss defaults
-const OUTLINE_COLOR = '#00FFFF';   // neon cyan
-const OUTLINE_WEIGHT = 6;
-const FILL_COLOR    = '#FF39D1';   // neon magenta
-const FILL_OPACITY  = 0.55;        // deliberately high
-
-function colorFromString(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return `hsl(${h%360} 70% 52%)`; }
-const safeArea = g => { try { return turf.area(g) || 0; } catch { return 0; } };
-
-// Convert a GeoJSON Polygon/MultiPolygon to Leaflet [lat,lng] rings
-function toLatLngRings(geo){
-  try{
-    const feats = (geo?.type === 'FeatureCollection') ? geo.features
-               : (geo?.type === 'GeometryCollection') ? turf.flatten(geo).features
-               : [geo];
-    const rings = [];
-    feats.forEach(f=>{
-      if(!f || !f.geometry) return;
-      if(f.geometry.type === 'Polygon'){
-        f.geometry.coordinates.forEach(ring => rings.push(ring.map(([lng,lat])=>[lat,lng])));
-      }else if(f.geometry.type === 'MultiPolygon'){
-        f.geometry.coordinates.forEach(poly => poly.forEach(
-          ring => rings.push(ring.map(([lng,lat])=>[lat,lng]))
-        ));
-      }
-    });
-    return rings;
-  }catch{ return []; }
+function colorFromString(s){
+  let h=0; for(let i=0;i<s.length;i++) h=(h*31 + s.charCodeAt(i))>>>0;
+  return `hsl(${h % 360} 70% 50%)`;
 }
 
 export function init(map, state){
-  // Dedicated pane above tiles, below markers; CSS targets this pane too
+  // Dedicated pane so areas sit above tiles and below markers
   if (!map.getPane(PANE)) map.createPane(PANE);
   const pane = map.getPane(PANE);
-  pane.classList.add('areas-pane');
-  pane.style.zIndex = 625;
-  pane.style.pointerEvents = 'none';
+  pane.classList.add('areas-pane');     // your CSS glow targets this class
+  pane.style.zIndex = 625;              // markers are usually above this
+  pane.style.pointerEvents = 'none';    // never block marker clicks
 
-  state.areas = []; // [{fill, outline, label}]
+  state.areas = []; // [{fill:L.GeoJSON, label:L.Marker}]
 }
 
 export function rebuild(sample=null){
   const s = state;
   const list = sample || s.poles;
 
+  // 1) group strictly by job_name (matches the original)
   const byJob = new Map();
-  for(const p of list){
-    const job = p.job_name ?? '';
-    if(!job) continue;
-    if(typeof p.lat!=='number' || typeof p.lon!=='number') continue;
-    if(!byJob.has(job)) byJob.set(job, []);
-    byJob.get(job).push([p.lon, p.lat]); // [lng,lat]
+  for (const p of list){
+    const job = (p.job_name ?? '').trim();
+    if (!job) continue;
+    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+    if (!byJob.has(job)) byJob.set(job, []);
+    byJob.get(job).push([p.lon, p.lat]); // GeoJSON order: [lng, lat]
   }
 
+  // 2) build the same “working” hull you had originally
   const items = [];
-  byJob.forEach((pts, job)=>{
-    const geo = buildHull(pts);
-    if(geo) items.push({ job, geo });
+  byJob.forEach((pts, job) => {
+    if (pts.length < 3) return; // original behavior: skip tiny sets
+
+    const fc = turf.featureCollection(pts.map(c => turf.point(c)));
+    // concave first, like before
+    let poly = null;
+    try { poly = turf.concave(fc, { maxEdge: 1.5, units: 'kilometers' }); } catch(_){}
+    if (!poly) {
+      try { poly = turf.convex(fc); } catch(_){}
+    }
+    if (!poly) return;
+
+    // the same “soften/smooth” chain you used: small buffer, then simplify
+    let buffered = poly;
+    try { buffered = turf.buffer(poly, 0.06, { units: 'kilometers' }); } catch(_){}
+    let simplified = buffered;
+    try { simplified = turf.simplify(buffered, { tolerance: 0.0001, highQuality: true }); } catch(_){}
+    try { simplified = turf.flatten(simplified); } catch(_){}
+
+    items.push({ job, geo: simplified });
   });
 
+  // 3) render (clear old first)
   clear(s.map, s);
   drawAll(s.map, s, items);
-
-  // draw a one-time debug polygon so we can visually confirm the pane renders
-  if (!state.__areasDebugInit) {
-    state.__areasDebugInit = true;
-    try {
-      const pts = (s.poles||[]).slice(0,20).map(p=>[p.lat,p.lon]).filter(([la,lo])=>Number.isFinite(la)&&Number.isFinite(lo));
-      if (pts.length >= 3) {
-        const tri = [pts[0], pts[1], pts[2]];
-        const dbg = L.polygon(tri, {
-          pane: PANE, color:'#FFFF00', weight: 4, opacity: 1, fillColor:'#FFFF00', fillOpacity:.2
-        }).addTo(s.map);
-        setTimeout(()=> s.map.removeLayer(dbg), 2500);
-      }
-    } catch {}
-  }
-}
-
-function buildHull(pts){
-  if(!pts || !pts.length) return null;
-
-  let geo = null;
-
-  if(pts.length >= 3){
-    try{
-      const fc = turf.featureCollection(pts.map(c=>turf.point(c)));
-      geo = turf.convex(fc);
-      if(geo && safeArea(geo) < 1) geo = null;
-    }catch{}
-  }
-
-  // bbox fallback (always visible)
-  if(!geo){
-    try{
-      const fc = turf.featureCollection(pts.map(c=>turf.point(c)));
-      const bb = turf.bboxPolygon(turf.bbox(fc));
-      geo = bb;
-    }catch{}
-  }
-
-  if(geo){
-    try{ geo = turf.simplify(geo, { tolerance: 0.00005, highQuality: true }); }catch{}
-    try{ geo = turf.flatten(geo); }catch{}
-  }
-  return geo;
 }
 
 function clear(map, state){
-  state.areas.forEach(a=>{
+  state.areas.forEach(a => {
     map.removeLayer(a.fill);
-    if(a.outline) map.removeLayer(a.outline);
     map.removeLayer(a.label);
   });
   state.areas = [];
 }
 
 function drawAll(map, state, items){
-  items.forEach(({job, geo})=>{
-    const rings = toLatLngRings(geo);
-    if(!rings.length) return;
+  items.forEach(({ job, geo }) => {
+    const col = colorFromString(job);
 
-    // Fill (high opacity, fixed neon color to remove any palette/opacity doubts)
-    const fill = L.polygon(rings, {
+    // Fill + outline in one GeoJSON layer (matching original, but boosted)
+    const fill = L.geoJSON(geo, {
       pane: PANE,
-      color: FILL_COLOR,
-      weight: 0,
-      opacity: 0,
-      fillColor: FILL_COLOR,
-      fillOpacity: FILL_OPACITY
+      style: {
+        color: col,         // stroke
+        weight: 2.5,        // thicker than original 1.5 so it’s obvious
+        opacity: 1.0,       // full stroke opacity so edges pop
+        fillColor: col,
+        fillOpacity: 0.25   // higher than original 0.10 for clear visibility
+      }
     }).addTo(map);
 
-    // Outline (thick neon cyan, always on top)
-    const outline = L.polygon(rings, {
-      pane: PANE,
-      color: OUTLINE_COLOR,
-      weight: OUTLINE_WEIGHT,
-      opacity: 1,
-      fillOpacity: 0
-    }).addTo(map);
+    // ensure it sits above other overlays
+    try { fill.bringToFront(); } catch(_){}
 
-    try { outline.bringToFront(); fill.bringToFront(); } catch {}
+    // label at mass center, falling back to bbox center
+    let center;
+    try { center = turf.centerOfMass(geo).geometry.coordinates; }
+    catch(_){
+      const bb = turf.bbox(geo);
+      center = turf.center(turf.bboxPolygon(bb)).geometry.coordinates;
+    }
 
-    // Label
-    let c;
-    try { c = turf.centerOfMass(geo).geometry.coordinates; }
-    catch { const bb = turf.bbox(geo); c = turf.center(turf.bboxPolygon(bb)).geometry.coordinates; }
-    const label = L.marker([c[1], c[0]], {
-      pane: PANE, interactive:false,
+    const label = L.marker([center[1], center[0]], {
+      pane: PANE, interactive: false,
       icon: L.divIcon({
-        className:'',
-        html:`<div style="font-weight:900;letter-spacing:.4px;font-size:14px;color:#e2e8f0;text-shadow:0 2px 6px rgba(0,0,0,.95)">${job}</div>`
+        className: 'job-label',
+        html: `<div style="font-weight:800; letter-spacing:.3px; font-size:14px; color:#dbeafe; text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`,
+        iconSize: [0,0]
       })
     }).addTo(map);
 
-    state.areas.push({ fill, outline, label });
+    state.areas.push({ fill, label });
   });
 
-  if(!state.areasVisible){
-    state.areas.forEach(a=>{
-      state.map.removeLayer(a.fill);
-      if(a.outline) state.map.removeLayer(a.outline);
-      state.map.removeLayer(a.label);
-    });
+  // honor current toggle
+  if (!state.areasVisible){
+    state.areas.forEach(a => { state.map.removeLayer(a.fill); state.map.removeLayer(a.label); });
   }
 }
