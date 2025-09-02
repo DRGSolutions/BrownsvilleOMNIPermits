@@ -1,5 +1,5 @@
-// Tries to reuse your global APP_CONFIG if present (same keys as assets/js/config.js)
-// Otherwise defaults to your public repo.
+// Reuse your APP_CONFIG if present, else default to public GH location.
+// Adjust if you host poles.json/permits.json locally in /data next to this folder.
 export const CONFIG = (() => {
   const g = (window.APP_CONFIG || window.CONFIG || {});
   return {
