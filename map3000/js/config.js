@@ -1,6 +1,5 @@
 // /map3000/js/config.js
 
-// The order of statuses matters (worst first, "NONE" last).
 export const STATUS_ORDER = [
   'Not Approved - Cannot Attach',
   'Not Approved - PLA Issues',
@@ -12,12 +11,11 @@ export const STATUS_ORDER = [
   'NONE'
 ];
 
-// Map a permit status to its CSS color variable.
 export const statusColor = s => {
   s = String(s || '').trim();
   const gs = getComputedStyle(document.documentElement);
   if (s === 'Submitted - Pending') return gs.getPropertyValue('--chip-pending') || '#fb923c';
-  if (s === 'Approved') return gs.getPropertyValue('--chip-approved') || '#34d399';
+  if (s === 'Approved')            return gs.getPropertyValue('--chip-approved') || '#34d399';
   if (s === 'Created - NOT Submitted') return gs.getPropertyValue('--chip-created') || '#facc15';
   if (s === 'Not Approved - Cannot Attach') return gs.getPropertyValue('--chip-na-cannot') || '#a78bfa';
   if (s.startsWith('Not Approved -')) return gs.getPropertyValue('--chip-na-other') || '#ef4444';
@@ -25,47 +23,35 @@ export const statusColor = s => {
   return '#94a3b8';
 };
 
-// Icon size in pixels (for markers).
 export const iconSizePx = 22;
 
-// Heatmap options.
-export const heatOpts = {
-  radius: 28,
-  blur: 24,
-  minOpacity: 0.20,
-  maxZoom: 18
+export const heatOpts = { radius: 28, blur: 24, minOpacity: 0.20, maxZoom: 18 };
+
+/**
+ * OPTIONAL ABSOLUTE OVERRIDES
+ * If your JSON lives in a different repo (e.g., a separate “data” repo),
+ * paste the exact public URLs here and the loader will use them first.
+ * Example (GitHub Pages in a “data” repo):
+ *   poles:   'https://drgsolutions.github.io/data/poles.json',
+ *   permits: 'https://drgsolutions.github.io/data/permits.json'
+ * Example (raw GitHub content from a repo named BrownsvilleData on 'main'):
+ *   poles:   'https://raw.githubusercontent.com/DRGSolutions/BrownsvilleData/main/poles.json',
+ *   permits: 'https://raw.githubusercontent.com/DRGSolutions/BrownsvilleData/main/permits.json'
+ */
+export const ABSOLUTE_OVERRIDES = {
+  poles:   '',   // <-- put a full URL here if you know it
+  permits: ''    // <-- put a full URL here if you know it
 };
 
-// Where to look for your JSON data.
-// Includes relative paths AND absolute paths for GitHub Pages.
+// keep some relative fallbacks in case you do run locally with a /data folder
 export const files = {
-  poles: [
-    'poles.json',
-    './poles.json',
-    '../poles.json',
-    'data/poles.json',
-    './data/poles.json',
-    '../data/poles.json',
-    '../../data/poles.json',
-    '/BrownsvilleOMNIPermits/data/poles.json'
-  ],
-  permits: [
-    'permits.json',
-    './permits.json',
-    '../permits.json',
-    'data/permits.json',
-    './data/permits.json',
-    '../data/permits.json',
-    '../../data/permits.json',
-    '/BrownsvilleOMNIPermits/data/permits.json'
-  ]
+  poles:   ['poles.json','./poles.json','../poles.json','data/poles.json','./data/poles.json','../data/poles.json'],
+  permits: ['permits.json','./permits.json','../permits.json','data/permits.json','./data/permits.json','../data/permits.json']
 };
 
-// Used for weighting heatmap intensity (worse statuses weigh heavier).
 export const severityWeight = status => {
   const idx = STATUS_ORDER.indexOf(status);
   return idx < 0 ? 1 : 1 + (STATUS_ORDER.length - 1 - idx);
 };
 
-// Generate a unique key per pole (stable across sessions).
 export const poleKey = p => `${p.job_name}::${p.tag}::${p.SCID}`;
