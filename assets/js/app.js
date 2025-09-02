@@ -4,6 +4,21 @@
   const $   = (s) => document.querySelector(s);
   const fmt = (n) => new Intl.NumberFormat().format(n);
 
+  // -------- Cross-tab watch signal (opener + storage + BroadcastChannel) --------
+  const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('permits') : null;
+  if (bc) {
+    bc.onmessage = (ev) => {
+      if (ev && ev.data === 'watch-start') {
+        try { window.dispatchEvent(new CustomEvent('watch:start')); } catch {}
+      }
+    };
+  }
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'permits:watch-start' && e.newValue) {
+      try { window.dispatchEvent(new CustomEvent('watch:start')); } catch {}
+    }
+  });
+
   // -------- GitHub helpers --------
   async function getLatestSha() {
     const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
@@ -162,7 +177,8 @@
     const job=getSelectedJob(), mode=($('#massMode')?.value||'assign'),
           fromId=($('#massFromScid')?.value||'').trim(), toId=($('#massToScid')?.value||'').trim(),
           baseId=($('#massBasePermit')?.value||'').trim(), status=($('#massStatus')?.value||'').trim(),
-          by=($('#massBy')?.value||'').trim(), dateISO=($('#massDate')?.value||'').trim(), dateMDY=toMDY(dateISO);
+          by=($('#massBy')?.value||'').trim(), dateISO=($('#massDate')?.value||'').trim(),
+          dateMDY=(function(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?`${m[2]}/${m[3]}/${m[1]}`:''; })(dateISO);
 
     if(!job){ setMassMsg('<span class="err">Choose a Job on the left first.</span>'); return; }
     if(!fromId||!toId){ setMassMsg('<span class="err">From/To SCID are required.</span>'); return; }
@@ -192,23 +208,27 @@
       ? '<span class="ok">Nothing to do (all poles in range already have permits).</span>'
       : '<span class="ok">Nothing to modify (no existing permits in range).</span>'); return; }
 
-    const btn=$('#btnMassApply'); if(btn) btn.disabled=true;
+    const btn=$('#btnMassApply'); if(btn) btn.disabled = true;
     try{
       setMassMsg(`Submitting ${changes.length} change(s)…`);
       const data = await callApi({ actorName:'Website User', reason:`${mode==='assign'?'Mass assign':'Mass modify'} (${changes.length})`, changes });
       setMassMsg(`<span class="ok">Submitted ${changes.length} change(s).</span> ` +
         (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>` : ''));
 
-      window.dispatchEvent(new CustomEvent('watch:start')); // show overlay + refresh here
-      try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {} // notify other tabs
+      // Start watcher here…
+      window.dispatchEvent(new CustomEvent('watch:start'));
+      // …and notify other tabs robustly
+      try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
+      if (bc) { try { bc.postMessage('watch-start'); } catch {} }
     }catch(err){ console.error(err); setMassMsg(`<span class="err">${err.message}</span>`); }
     finally{ if(btn) btn.disabled=false; }
   }
 
-  // -------- Advanced Map opener (single tab; keep opener link so we can signal) --------
+  // -------- Advanced Map opener (single tab; keep opener link so map can signal) --------
   function onAdvancedMapClick(){
-    const job=getSelectedJob(); if(!job) return;
-    window.open(`map.html?job=${encodeURIComponent(job)}`, '_blank'); // no "noopener" so opener is reachable
+    const el=$('#fJob'); const job=(el && el.value && el.value!=='All') ? el.value : '';
+    if (!job) return;
+    window.open(`map.html?job=${encodeURIComponent(job)}`, '_blank'); // keep opener
   }
 
   function wireButtons(){
@@ -227,10 +247,6 @@
   document.addEventListener('DOMContentLoaded', ()=>{ wireButtons(); loadData(); });
   window.addEventListener('data:loaded', wireButtons);
 
-  // If map tab broadcasts via localStorage, start the watcher here too
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'permits:watch-start' && e.newValue) {
-      try { window.dispatchEvent(new CustomEvent('watch:start')); } catch {}
-    }
-  });
+  // If the map tab broadcasts via BroadcastChannel, start the watcher here too (fallback already above for localStorage)
+  // (Handled above in bc.onmessage)
 })();

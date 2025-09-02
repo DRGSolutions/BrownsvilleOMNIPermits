@@ -79,8 +79,14 @@
       return true;
     });
 
-    // KPIs on left are updated by app.js; we don't change them here
+    // When filtered by Job, order by SCID (numeric-aware)
+    if (job !== 'All') {
+      filteredPoles.sort((a, b) =>
+        String(a.SCID).localeCompare(String(b.SCID), undefined, { numeric: true, sensitivity: 'base' })
+      );
+    }
 
+    // Render cards
     for (const p of filteredPoles) {
       const key = poleKey(p);
       const rel = byKey.get(key) || [];
@@ -88,69 +94,68 @@
         ? rel
         : (status === 'NONE' ? [] : rel.filter(r => r.permit_status === status));
 
-        const card = document.createElement('div');
-        card.className = 'pole';
-        card.innerHTML = `
+      const card = document.createElement('div');
+      card.className = 'pole';
+      card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div>
+          <div>
             <div class="title">${p.job_name}</div>
             <div class="small muted" style="margin-top:2px;">
-                <b>Owner:</b> ${p.owner || '—'} ·
-                <b>Tag:</b> ${p.tag || '—'} ·
-                <b>SCID:</b> ${p.SCID || '—'}
+              <b>Owner:</b> ${p.owner || '—'} ·
+              <b>Tag:</b> ${p.tag || '—'} ·
+              <b>SCID:</b> ${p.SCID || '—'}
             </div>
             <div class="small muted" style="margin-top:2px;">
-                <b>Spec:</b> ${p.pole_spec || '—'} → ${p.proposed_spec || '—'} ·
-                <b>MR:</b> ${p.mr_level || '—'}
+              <b>Spec:</b> ${p.pole_spec || '—'} → ${p.proposed_spec || '—'} ·
+              <b>MR:</b> ${p.mr_level || '—'}
             </div>
-            </div>
-            <div>
+          </div>
+          <div>
             <button class="btn" onclick="window.UI_editPermit('${key}','__new')">New Permit</button>
-            </div>
+          </div>
         </div>
 
         <div class="spacer"></div>
         <div class="small muted" style="margin-bottom:4px;">Permits</div>
         <div>
-            ${
+          ${
             showRel.length
-                ? showRel.map(r => `
-                    <div style="border:1px solid var(--border);background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                        <div class="small">
-                        <code>${r.permit_id}</code>
-                        ${statusChipHTML(r.permit_status)}
-                        ${r.submitted_by ? ` · by ${(String(r.submitted_by)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}` : ''}
-                        ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
-                        </div>
-                        <div>
-                        <button class="btn" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
-                        </div>
+              ? showRel.map(r => `
+                <div style="border:1px solid var(--border);background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <div class="small">
+                      <code>${r.permit_id}</code>
+                      ${statusChipHTML(r.permit_status)}
+                      ${r.submitted_by ? ` · by ${(String(r.submitted_by)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}` : ''}
+                      ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
                     </div>
-                    ${
-                        r.notes
-                        ? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap;">
-                            <b>Notes:</b> ${(String(r.notes)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-                            </div>`
-                        : ''
-                    }
+                    <div>
+                      <button class="btn" onclick="window.UI_editPermit('${key}','${encodeURIComponent(r.permit_id)}')">Edit</button>
                     </div>
-                `).join('')
-                : (
-                    rel.length === 0
+                  </div>
+                  ${
+                    r.notes
+                      ? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap;">
+                          <b>Notes:</b> ${(String(r.notes)).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+                        </div>`
+                      : ''
+                  }
+                </div>
+              `).join('')
+              : (
+                  rel.length === 0
                     ? `<div class="small" style="margin:6px 0;">
                         ${statusChipHTML('NONE')}
                         <span class="muted">No permits yet for this pole.</span>
-                        </div>`
+                      </div>`
                     : `<div class="small muted" style="margin:6px 0;">
                         <em>No permits match this status for this pole.</em>
-                        </div>`
+                      </div>`
                 )
-            }
+          }
         </div>
-        `;
-        listEl.appendChild(card);
-
+      `;
+      listEl.appendChild(card);
     }
   }
 

@@ -4,6 +4,8 @@
   const $ = (s) => document.querySelector(s);
   const qs = new URLSearchParams(location.search);
   const JOB = qs.get('job') || '';
+  const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('permits') : null;
+
 
   // Header
   $('#jobName').textContent = JOB ? `Job: ${JOB}` : 'Job: —';
@@ -210,6 +212,7 @@
       if (window.opener && !window.opener.closed) {
         try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {}
       }
+      if (bc) { try { bc.postMessage('watch-start'); } catch {} }
       // 3) Fallback broadcast (if opener is unavailable)
       try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
     } catch(e){
