@@ -42,3 +42,18 @@ select,input{border:1px solid var(--border);background:#0f1219;color:var(--fg);p
 .badge.none{background:var(--chip-none);color:#0b0c10}
 
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:950;background:#0f1219;border:1px solid var(--border);color:var(--fg);padding:8px 12px;border-radius:10px;display:none}
+
+/* Neon cluster bubbles colored by dominant permit status */
+.cluster.neon{background:transparent;border:none}
+.cluster-ring{
+  width:44px;height:44px;border-radius:999px;
+  box-shadow:0 0 0 4px rgba(255,255,255,.06),0 0 22px rgba(255,255,255,.25) inset,0 0 18px currentColor;
+  display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25)
+}
+.cluster-core{
+  width:34px;height:34px;border-radius:999px;background:#0b0c10;color:#e8eef8;
+  display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid rgba(255,255,255,.18)
+}
+
+/* Optional: stronger job labels */
+.job-label div{padding:2px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(10,14,22,.92)}
