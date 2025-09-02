@@ -1,135 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Pole & Permit Map</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Advanced Pole & Permit Map — v2</title>
 
-<!-- Leaflet + MarkerCluster + Turf (CDNs) -->
-<link  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet" />
-<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" rel="stylesheet" />
+<!-- Core libs -->
+<link  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/>
+<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" rel="stylesheet"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <style>
   :root{
-    /* Match your existing chip/status colors */
     --bg:#0b0c10; --panel:#0f1219; --muted:#9aa3b2; --fg:#f3f4f6; --border:#1f2430;
-    --chip-pending:#fb923c;      /* orange  */  /* Submitted - Pending */
-    --chip-approved:#34d399;     /* green   */  /* Approved */
-    --chip-created:#facc15;      /* yellow  */  /* Created - NOT Submitted */
-    --chip-na-cannot:#a78bfa;    /* purple  */  /* Not Approved - Cannot Attach */
-    --chip-na-other:#ef4444;     /* red     */  /* Not Approved - PLA/MRE/Other */
-    --chip-none:#94a3b8;         /* slate   */  /* NONE (no permits) */
-    --glass: rgba(20,24,33,.75);
-    --accent:#60a5fa;
+    --chip-pending:#fb923c;   --chip-approved:#34d399; --chip-created:#facc15;
+    --chip-na-cannot:#a78bfa; --chip-na-other:#ef4444; --chip-none:#94a3b8;
+    --accent:#60a5fa; --glass: rgba(20,24,33,.75);
   }
-
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  #map{position:fixed;inset:0}
+  #map{position:fixed; inset:0}
 
-  /* Floating panels */
-  .panel{
-    position:fixed; z-index:900; border:1px solid var(--border);
-    background:var(--glass); backdrop-filter: blur(8px);
-    box-shadow:0 10px 30px rgba(0,0,0,.35); border-radius:16px;
-  }
-  .panel h3{margin:0 0 8px 0; font-size:14px; letter-spacing:.4px}
+  /* PANELS */
+  .panel{position:fixed; z-index:900; border:1px solid var(--border); background:var(--glass); backdrop-filter:blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .panel h3{margin:0 0 8px 0; font-size:14px}
   .muted{color:var(--muted)}
-  .btn{
-    appearance:none; cursor:pointer; user-select:none;
-    border:1px solid var(--border); background:#161922; color:var(--fg);
-    padding:8px 12px; border-radius:10px; font-weight:600
-  }
+  .btn{border:1px solid var(--border); background:#161922; color:var(--fg); padding:8px 12px; border-radius:10px; cursor:pointer}
   .btn:hover{background:#1a1f2b}
-  .btn-ghost{background:transparent}
-  .btn-accent{border-color:#20304a;background:#112033}
+  select,input{border:1px solid var(--border); background:#0f1219; color:var(--fg); padding:8px 10px; border-radius:10px}
   .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .field{display:flex; flex-direction:column; gap:4px}
-  select,input{border:1px solid var(--border); background:#0f1219; color:var(--fg);
-    padding:8px 10px; border-radius:10px}
 
-  /* Filter Builder (top-left) */
-  #filters{
-    top:16px; left:16px; width:420px; padding:14px;
-  }
-  #filters .rule{display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:8px; margin-top:8px}
-  #filters .rule .remove{padding:6px 10px}
-  #filters .bar{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
-  #filters .chip{display:inline-flex; align-items:center; gap:8px; font-size:11px; border:1px solid var(--border);
-    border-radius:999px; padding:3px 8px; background:#0f1219}
-  #filters small{color:var(--muted)}
+  #filters{top:16px; left:16px; width:440px; padding:14px}
+  #legend{left:16px; bottom:16px; width:340px; padding:12px}
+  #tools{top:16px; right:16px; width:340px; padding:12px; display:flex; flex-direction:column; gap:10px}
 
-  /* Legend (bottom-left) */
-  #legend{
-    left:16px; bottom:16px; width:340px; padding:12px;
-  }
+  /* Legend */
   #legend .item{display:flex; align-items:center; gap:10px; margin:6px 0}
-  #legend .swatch{width:16px; height:16px; border:1px solid #000; border-radius:4px}
   #legend svg{width:22px; height:22px; filter: drop-shadow(0 1px 0 rgba(0,0,0,.4));}
+  .swatch{width:16px; height:16px; border:1px solid #000; border-radius:4px}
 
-  /* Job Areas toggle (top-right) */
-  #tools{
-    top:16px; right:16px; width:280px; padding:12px; display:flex; flex-direction:column; gap:10px;
-  }
-
-  /* Popups look nicer */
+  /* Popups */
   .leaflet-popup-content-wrapper{background:#0f1219;color:var(--fg);border-radius:12px;border:1px solid var(--border)}
   .leaflet-popup-tip{background:#0f1219}
   .popup-title{font-weight:800;margin-bottom:4px}
   .popup-sub{color:var(--muted); font-size:12px; margin-bottom:8px}
   .chip{display:inline-block;font-size:11px;border:1px solid #283244;border-radius:999px;padding:2px 8px;margin-left:6px}
-  .chip.pending{background:var(--chip-pending);color:#111;border-color:#a45312}
-  .chip.approved{background:var(--chip-approved);color:#0b261a;border-color:#1c7a57}
-  .chip.created{background:var(--chip-created);color:#211f06;border-color:#8a7b15}
+  .chip.pending{background:var(--chip-pending);color:#111}
+  .chip.approved{background:var(--chip-approved);color:#0b261a}
+  .chip.created{background:var(--chip-created);color:#211f06}
   .chip.na_other{background:var(--chip-na-other);color:#fff}
   .chip.na_cannot{background:var(--chip-na-cannot);color:#18132b}
 
-  /* Marker SVG wrapper */
-  .shape-icon{transform: translate3d(0,0,0)}
+  /* Marker */
   .shape-icon svg{display:block}
+  /* Cluster pies */
+  .cluster-pie{border-radius:999px; box-shadow:0 2px 8px rgba(0,0,0,.4); border:2px solid rgba(255,255,255,.7)}
 
-  /* Mini toast (loading/errors) */
-  #toast{
-    position:fixed; left:50%; transform:translateX(-50%);
-    bottom:22px; z-index:950; background:#0f1219; border:1px solid var(--border);
-    color:var(--fg); padding:8px 12px; border-radius:10px; display:none;
+  /* Report drawer */
+  #report{
+    position:fixed; top:0; right:0; width:min(560px, 44vw); height:100vh; background:#0f1219; border-left:1px solid var(--border);
+    transform:translateX(100%); transition:transform .28s ease; z-index:950; display:flex; flex-direction:column;
   }
+  #report.open{transform:translateX(0)}
+  #report header{display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border)}
+  #report main{overflow:auto; padding:14px 16px; display:grid; gap:18px}
+  .card{border:1px solid var(--border); border-radius:14px; padding:12px; background:#0b0f17}
+  .card h4{margin:0 0 8px 0; font-size:14px}
+  canvas{max-width:100%}
+
+  /* Toast */
+  #toast{position:fixed; left:50%; transform:translateX(-50%); bottom:22px; z-index:980; background:#0f1219; border:1px solid var(--border); color:var(--fg); padding:8px 12px; border-radius:10px; display:none}
 </style>
 </head>
 <body>
 <div id="map"></div>
 
-<!-- FILTERS (Top-Left) -->
+<!-- Filters -->
 <div id="filters" class="panel">
-  <div class="bar">
+  <div class="row" style="justify-content:space-between">
     <h3>Advanced Filters</h3>
-    <div class="row">
-      <label class="chip">Match
-        <select id="logic">
-          <option value="AND">All (AND)</option>
-          <option value="OR">Any (OR)</option>
-        </select>
-      </label>
-      <button id="btnClear" class="btn btn-ghost" title="Reset filters">Reset</button>
-    </div>
+    <button id="btnReset" class="btn">Reset</button>
   </div>
-  <!-- Quick presets -->
-  <div class="row" style="margin-bottom:6px;">
-    <div class="field">
-      <small>Owner</small>
-      <select id="qOwner">
-        <option value="">All</option>
-        <option>BPUB</option>
-        <option>AEP</option>
-        <option>MVEC</option>
-      </select>
+  <div class="row">
+    <div class="field"><small>Owner</small>
+      <select id="qOwner"><option value="">All</option><option>BPUB</option><option>AEP</option><option>MVEC</option></select>
     </div>
-    <div class="field">
-      <small>Permit Status</small>
+    <div class="field"><small>Permit Status</small>
       <select id="qStatus">
         <option value="">All</option>
         <option>NONE</option>
@@ -142,20 +104,14 @@
         <option>Not Approved - Other Issues</option>
       </select>
     </div>
-    <div class="field" style="flex:1;">
-      <small>Search</small>
-      <input id="qSearch" placeholder="Job, Tag, SCID, MR…"/>
-    </div>
+    <div class="field" style="flex:1"><small>Search</small><input id="qSearch" placeholder="Job, Tag, SCID, MR…"/></div>
   </div>
-
-  <div id="rules"></div>
-  <div class="row" style="margin-top:10px">
-    <button id="btnAddRule" class="btn">Add Condition</button>
-    <button id="btnApply"   class="btn btn-accent">Apply</button>
+  <div class="row" style="margin-top:8px">
+    <button id="btnApply" class="btn" title="Apply filters">Apply</button>
   </div>
 </div>
 
-<!-- LEGEND (Bottom-Left) -->
+<!-- Legend -->
 <div id="legend" class="panel">
   <h3>Legend</h3>
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -170,8 +126,9 @@
         <div>AEP (triangle)</div>
       </div>
       <div class="item">
-        <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="2" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
-        <div>MVEC (rectangle)</div>
+        <!-- diamond -->
+        <svg viewBox="0 0 24 24"><polygon points="12,3 21,12 12,21 3,12" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+        <div>MVEC (diamond)</div>
       </div>
     </div>
     <div>
@@ -186,479 +143,450 @@
   </div>
 </div>
 
-<!-- TOOLS (Top-Right) -->
+<!-- Tools -->
 <div id="tools" class="panel">
   <h3>Map Tools</h3>
-  <div class="row"><button id="btnFit" class="btn">Fit to Poles</button><button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button></div>
-  <small class="muted">Click a shape to view full pole + related permits. Areas outline *clusters of poles by job* with soft boundaries and centered labels.</small>
+  <div class="row">
+    <button id="btnFit" class="btn">Fit to Poles</button>
+    <button id="btnAreas" class="btn">Toggle Job Areas</button>
+    <button id="btnReport" class="btn">Open Visual Report</button>
+  </div>
+  <div class="row">
+    <div class="field"><small>View Mode</small>
+      <select id="viewMode">
+        <option value="standard">Standard</option>
+        <option value="heat">Heatmap (severity-weighted)</option>
+        <option value="wire">Wireframe (areas only)</option>
+      </select>
+    </div>
+    <div class="field"><small>Cluster</small>
+      <select id="clusterMode">
+        <option value="on">ON (bunch by status pies)</option>
+        <option value="off">OFF (show every pole)</option>
+      </select>
+    </div>
+  </div>
+  <small class="muted">Cluster icons display a pie stack using permit-status colors. Turn **Cluster OFF** to see each pole.</small>
 </div>
+
+<!-- Report drawer -->
+<aside id="report">
+  <header>
+    <strong>Visual Report</strong>
+    <div class="row">
+      <button id="btnPrint" class="btn">Print / Save PDF</button>
+      <button id="btnCloseReport" class="btn">Close</button>
+    </div>
+  </header>
+  <main>
+    <div class="card"><h4>Totals by Permit Status</h4><canvas id="chartStatus"></canvas></div>
+    <div class="card"><h4>Totals by Owner</h4><canvas id="chartOwner"></canvas></div>
+    <div class="card"><h4>Top Jobs by “Not Approved” count</h4><canvas id="chartJobs"></canvas></div>
+    <div class="card"><h4>Timeline of Submissions</h4><canvas id="chartTime"></canvas></div>
+  </main>
+</aside>
 
 <div id="toast"></div>
 
 <script>
-/* -------------------------- UTILS & STATE -------------------------- */
+/* ========================= CONFIG & STATE ========================= */
 const STATE = {
-  poles: [],
-  permits: [],
-  byKey: new Map(),
-  markers: [],
-  cluster: null,
-  jobAreas: [],
-  areasVisible: true,
-  allBounds: null
+  poles: [], permits: [], byKey: new Map(),
+  cluster: null, markers: [], singlesLayer: L.layerGroup(),
+  areas: [], areasVisible: true, bounds: null, heat: null,
 };
 
+const STATUS_ORDER = [
+  'Not Approved - Cannot Attach',
+  'Not Approved - PLA Issues',
+  'Not Approved - MRE Issues',
+  'Not Approved - Other Issues',
+  'Submitted - Pending',
+  'Created - NOT Submitted',
+  'Approved',
+  'NONE'
+];
+
+const STATUS_COLOR = s => {
+  s = String(s||'').trim();
+  const gs = getComputedStyle(document.documentElement);
+  if (s==='Submitted - Pending') return gs.getPropertyValue('--chip-pending')||'#fb923c';
+  if (s==='Approved') return gs.getPropertyValue('--chip-approved')||'#34d399';
+  if (s==='Created - NOT Submitted') return gs.getPropertyValue('--chip-created')||'#facc15';
+  if (s==='Not Approved - Cannot Attach') return gs.getPropertyValue('--chip-na-cannot')||'#a78bfa';
+  if (s.startsWith('Not Approved -')) return gs.getPropertyValue('--chip-na-other')||'#ef4444';
+  if (s==='NONE') return gs.getPropertyValue('--chip-none')||'#94a3b8';
+  return gs.getPropertyValue('--chip-none')||'#94a3b8';
+};
+
+const statusClass = s=>{
+  s=String(s||'').trim();
+  if(s==='Submitted - Pending') return 'pending';
+  if(s==='Approved') return 'approved';
+  if(s==='Created - NOT Submitted') return 'created';
+  if(s==='Not Approved - Cannot Attach') return 'na_cannot';
+  if(s.startsWith('Not Approved -')) return 'na_other';
+  return '';
+};
+
+const poleKey = p => `${p.job_name}::${p.tag}::${p.SCID}`;
+
+/* ============================= UI ============================= */
 const TOAST = document.getElementById('toast');
-function toast(msg, ms=1800){ TOAST.textContent = msg; TOAST.style.display='block'; setTimeout(()=>TOAST.style.display='none', ms); }
+function toast(msg, ms=1600){ TOAST.textContent=msg; TOAST.style.display='block'; setTimeout(()=>TOAST.style.display='none', ms); }
 
-const poleKey = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
-function buildPermitIndex(permits){
-  const m = new Map();
-  for(const r of (permits||[])){
-    const key = `${r.job_name}::${r.tag}::${r.SCID}`;
-    if(!m.has(key)) m.set(key, []);
-    m.get(key).push(r);
-  }
-  for(const arr of m.values()){
-    arr.sort((a,b)=> String(a.permit_id).localeCompare(String(b.permit_id)));
-  }
-  return m;
+/* ========================== MAP BOOT ========================== */
+const map = L.map('map', { zoomControl:false, preferCanvas:true });
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap & CARTO'}).addTo(map);
+
+/* Cluster with custom pie icons showing status mix */
+function pieSVG(counts, total){
+  // draw clockwise arcs per STATUS_ORDER (worst → best) so red dominates
+  const R=24, C=R+2, S=2*R+4; // include border room
+  let start=0, paths='';
+  STATUS_ORDER.forEach(st=>{
+    const n = counts[st]||0; if(!n) return;
+    const frac = n/total, end = start + frac*2*Math.PI;
+    const x1=C + R*Math.cos(start), y1=C + R*Math.sin(start);
+    const x2=C + R*Math.cos(end  ), y2=C + R*Math.sin(end  );
+    const large = (end-start)>Math.PI ? 1:0;
+    paths += `<path d="M${C},${C} L${x1},${y1} A${R},${R} 0 ${large} 1 ${x2},${y2} z" fill="${STATUS_COLOR(st).trim()}"></path>`;
+    start=end;
+  });
+  return `<svg class="cluster-pie" viewBox="0 0 ${S} ${S}" width="${S}" height="${S}">${paths}
+            <circle cx="${C}" cy="${C}" r="${R-8}" fill="rgba(15,18,25,.9)" stroke="white" stroke-width="1.5"></circle>
+            <text x="${C}" y="${C+4}" text-anchor="middle" font-weight="800" font-size="14" fill="#e5e7eb">${total}</text>
+          </svg>`;
 }
 
-/* status → chip class and color variable name (mirrors your app) */
-function statusClass(status){
-  const s = String(status||'').trim();
-  if (s === 'Submitted - Pending') return 'pending';
-  else if (s === 'Approved') return 'approved';
-  else if (s === 'Created - NOT Submitted') return 'created';
-  else if (s === 'Not Approved - Cannot Attach') return 'na_cannot';
-  else if (s.startsWith('Not Approved -')) return 'na_other';
-  else return ''; // NONE handled separately
-}
-
-/* status → CSS var color */
-function statusColor(status){
-  const s = String(status||'').trim();
-  if (s === 'Submitted - Pending') return getComputedStyle(document.documentElement).getPropertyValue('--chip-pending') || '#fb923c';
-  if (s === 'Approved')            return getComputedStyle(document.documentElement).getPropertyValue('--chip-approved') || '#34d399';
-  if (s === 'Created - NOT Submitted') return getComputedStyle(document.documentElement).getPropertyValue('--chip-created') || '#facc15';
-  if (s === 'Not Approved - Cannot Attach') return getComputedStyle(document.documentElement).getPropertyValue('--chip-na-cannot') || '#a78bfa';
-  if (s.startsWith('Not Approved -')) return getComputedStyle(document.documentElement).getPropertyValue('--chip-na-other') || '#ef4444';
-  if (s === 'NONE') return getComputedStyle(document.documentElement).getPropertyValue('--chip-none') || '#94a3b8';
-  return getComputedStyle(document.documentElement).getPropertyValue('--chip-none') || '#94a3b8';
-}
-
-function statusChipHTML(status){
-  const s = String(status||'').trim();
-  let cls = statusClass(s);
-  let extra = '';
-  if (s === 'NONE') { cls = ''; extra = 'style="background:#94a3b8;color:#0b0c10"'; }
-  return `<span class="chip ${cls}" ${extra}>${s || '—'}</span>`;
-}
-
-/* Determine a single color for a pole from its related permits */
-function dominantStatusFor(permits){
-  if(!permits || permits.length===0) return 'NONE';
-  const ss = permits.map(r => String(r.permit_status||'').trim());
-
-  // Severity order (worst → best)
-  const pri = [
-    'Not Approved - Cannot Attach',
-    'Not Approved - PLA Issues',
-    'Not Approved - MRE Issues',
-    'Not Approved - Other Issues',
-    'Submitted - Pending',
-    'Created - NOT Submitted',
-    'Approved'
-  ];
-  for (const p of pri){
-    if (p.includes('Not Approved -')){
-      if (ss.some(s => s.startsWith('Not Approved -'))) return ss.find(s=>s.startsWith('Not Approved -'));
-    } else {
-      if (ss.includes(p)) return p;
+function makeCluster(){
+  if(STATE.cluster){ map.removeLayer(STATE.cluster); }
+  STATE.cluster = L.markerClusterGroup({
+    disableClusteringAtZoom: 18, spiderfyOnMaxZoom:true,
+    iconCreateFunction: cluster=>{
+      const children = cluster.getAllChildMarkers();
+      const counts = {}; let total=children.length;
+      children.forEach(m=>{
+        const st = m.options.__dominant || 'NONE';
+        counts[st]=(counts[st]||0)+1;
+      });
+      return L.divIcon({ html: pieSVG(counts,total), className:'', iconSize:[52,52] });
     }
-  }
-  return ss[0] || 'NONE';
+  });
+  map.addLayer(STATE.cluster);
 }
 
-/* hash color for job area edges/fills */
-function colorFromString(s){
-  let h=0; for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i))>>>0;
-  const hue = h % 360;
-  return `hsl(${hue} 70% 50%)`;
-}
-
-/* -------------------------- MAP INIT -------------------------- */
-const map = L.map('map', { zoomControl: false, preferCanvas: true });
-L.control.zoom({ position:'bottomright' }).addTo(map);
-const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO'
-}).addTo(map);
-STATE.cluster = L.markerClusterGroup({ disableClusteringAtZoom: 18, spiderfyOnMaxZoom: true });
-map.addLayer(STATE.cluster);
-
-/* -------------------------- MARKERS (SVG shapes) -------------------------- */
+/* Marker icons (MVEC → diamond) */
 function markerSVG(owner, fill, size=28){
-  const stroke = '#fff', sw=2;
-  const half = size/2;
-  if (owner === 'AEP'){ // triangle
-    return `<svg viewBox="0 0 ${size} ${size}">
-      <polygon points="${half},${sw} ${size-sw},${size-sw} ${sw},${size-sw}"
-        fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
-    </svg>`;
-  } else if (owner === 'MVEC'){ // rectangle
-    const w=size-8, h=size-14, x=(size-w)/2, y=(size-h)/2, rx=4;
-    return `<svg viewBox="0 0 ${size} ${size}">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}"
-        stroke="${stroke}" stroke-width="${sw}"/>
-    </svg>`;
-  } else { // BPUB (default circle)
-    return `<svg viewBox="0 0 ${size} ${size}">
-      <circle cx="${half}" cy="${half}" r="${half-4}" fill="${fill}"
-        stroke="${stroke}" stroke-width="${sw}"/>
-    </svg>`;
+  const stroke='#fff', sw=2, half=size/2;
+  if(owner==='AEP'){
+    return `<svg viewBox="0 0 ${size} ${size}"><polygon points="${half},${sw} ${size-sw},${size-sw} ${sw},${size-sw}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+  }else if(owner==='MVEC'){
+    return `<svg viewBox="0 0 ${size} ${size}"><polygon points="${half},${sw} ${size-sw},${half} ${half},${size-sw} ${sw},${half}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+  }else{
+    return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${half}" cy="${half}" r="${half-4}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
   }
 }
-
 function shapeIcon(owner, color){
-  return L.divIcon({
-    className: 'shape-icon',
-    html: markerSVG(owner, color),
-    iconSize: [28,28],
-    iconAnchor: [14,14],
-    popupAnchor: [0,-12]
-  });
+  return L.divIcon({ className:'shape-icon', html:markerSVG(owner,color), iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-12]});
 }
 
-/* -------------------------- JOB AREAS -------------------------- */
-function buildJobAreas(){
-  // clear existing
-  for (const a of STATE.jobAreas) map.removeLayer(a.layer);
-  STATE.jobAreas = [];
-
-  const byJob = new Map();
-  for (const p of STATE.poles){
-    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-    const job = String(p.job_name||'').trim();
-    if (!job) continue;
-    if (!byJob.has(job)) byJob.set(job, []);
-    byJob.get(job).push([p.lon, p.lat]); // GeoJSON is [lon,lat]
-  }
-
-  byJob.forEach((pts, job)=>{
-    if (pts.length < 3) return;
-
-    const fc = turf.featureCollection(pts.map(c => turf.point(c)));
-    let poly = turf.concave(fc, { maxEdge: 1.5, units: 'kilometers' });
-    if (!poly) poly = turf.convex(fc);
-    if (!poly) return;
-
-    // Soften / smooth boundary
-    let buffered = turf.buffer(poly, 0.06, { units:'kilometers' }); // ~60m pad
-    let simplified = turf.simplify(buffered, { tolerance: 0.0001, highQuality: true });
-
-    const col = colorFromString(job);
-    const layer = L.geoJSON(simplified, {
-      style: {
-        color: col,
-        weight: 1.5,
-        opacity: 0.7,
-        fillColor: col,
-        fillOpacity: 0.10  /* lightly opaque so map remains readable */
-      }
-    }).addTo(map);
-
-    // Center label
-    const center = turf.centerOfMass(simplified).geometry.coordinates;
-    const label = L.marker([center[1], center[0]], {
-      interactive:false,
-      icon: L.divIcon({
-        className: 'job-label',
-        html: `<div style="font-weight:800; letter-spacing:.3px; font-size:14px; color:#dbeafe; text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`,
-        iconSize:[0,0]
-      })
-    }).addTo(map);
-
-    STATE.jobAreas.push({ job, layer, label });
-  });
-
-  if (!STATE.areasVisible){
-    for (const a of STATE.jobAreas){ map.removeLayer(a.layer); map.removeLayer(a.label); }
-  }
-}
-
-/* -------------------------- POPUP HTML -------------------------- */
-function popupHTML(p, rel){
-  const title = `${p.job_name || ''}`;
-  const sub = `<b>Owner:</b> ${p.owner||'—'} · <b>Tag:</b> ${p.tag||'—'} · <b>SCID:</b> ${p.SCID||'—'}`
-  const spec = `<b>Spec:</b> ${p.pole_spec||'—'} → ${p.proposed_spec||'—'} · <b>MR:</b> ${p.mr_level||'—'}`
-  const coords = (typeof p.lat==='number' && typeof p.lon==='number') ? `(${p.lat.toFixed(6)}, ${p.lon.toFixed(6)})` : '—';
-  const permits = (rel||[]).length
-    ? rel.map(r => {
-        const safeNotes = r.notes ? String(r.notes).replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
-        return `<div style="border:1px solid var(--border);background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0;">
-          <div class="row" style="justify-content:space-between">
-            <div class="small">
-              <code>${r.permit_id || ''}</code>
-              ${statusChipHTML(r.permit_status)}
-              ${r.submitted_by ? ` · by ${String(r.submitted_by).replace(/&/g,'&amp;').replace(/</g,'&lt;')}` : ''}
-              ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
-            </div>
-          </div>
-          ${safeNotes ? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap;"><b>Notes:</b> ${safeNotes}</div>` : ''}
-        </div>`;
-      }).join('')
-    : `<div class="small"><span class="chip" style="background:var(--chip-none);color:#0b0c10">NONE</span> <span class="muted">No permits yet for this pole.</span></div>`;
-
-  return `
-    <div class="popup">
-      <div class="popup-title">${title}</div>
-      <div class="popup-sub">${sub}</div>
-      <div class="small muted" style="margin-bottom:6px">${spec} · <b>GPS:</b> ${coords}</div>
-      <div class="small muted" style="margin-bottom:4px">Permits</div>
-      ${permits}
-    </div>
-  `;
-}
-
-/* -------------------------- DATA LOADING -------------------------- */
+/* ========================== DATA LOAD ========================== */
 async function tryFetch(paths){
-  for (const p of paths){
-    try{
-      const r = await fetch(p);
-      if (r.ok) return await r.json();
-    }catch(e){}
+  for(const p of paths){
+    try{ const r=await fetch(p); if(r.ok) return await r.json(); }catch(e){}
   }
-  throw new Error('Not found in paths: '+paths.join(', '));
+  throw new Error('Unable to load: '+paths.join(', '));
 }
-
 async function loadData(){
   toast('Loading poles & permits…');
-  const polesPaths   = ['poles.json','./poles.json','../poles.json','data/poles.json','./data/poles.json'];
-  const permitsPaths = ['permits.json','./permits.json','../permits.json','data/permits.json','./data/permits.json'];
-  const [poles, permits] = await Promise.all([ tryFetch(polesPaths), tryFetch(permitsPaths) ]);
-  STATE.poles = (poles||[]).filter(p => typeof p.lat==='number' && typeof p.lon==='number');
+  const [poles, permits] = await Promise.all([
+    tryFetch(['poles.json','./poles.json','../poles.json','data/poles.json','./data/poles.json']),
+    tryFetch(['permits.json','./permits.json','../permits.json','data/permits.json','./data/permits.json'])
+  ]);
+  STATE.poles = (poles||[]).filter(p=>typeof p.lat==='number' && typeof p.lon==='number');
   STATE.permits = permits||[];
-  STATE.byKey = buildPermitIndex(STATE.permits);
+  // index permits
+  const idx=new Map();
+  for(const r of STATE.permits){
+    const key=`${r.job_name}::${r.tag}::${r.SCID}`;
+    if(!idx.has(key)) idx.set(key,[]);
+    idx.get(key).push(r);
+  }
+  STATE.byKey=idx;
   toast(`Loaded ${STATE.poles.length} poles, ${STATE.permits.length} permits`);
 }
 
-/* -------------------------- RENDER MARKERS -------------------------- */
-function buildMarkers(filtered = null){
-  const poles = filtered || STATE.poles;
-
-  // clear existing markers
-  STATE.cluster.clearLayers();
-  STATE.markers = [];
-  STATE.allBounds = null;
-
-  for(const p of poles){
-    const rel = STATE.byKey.get(poleKey(p)) || [];
-    const dominant = dominantStatusFor(rel);
-    const color = statusColor(dominant);
-    const icon = shapeIcon(p.owner, color);
-    const m = L.marker([p.lat, p.lon], { icon });
-
-    m.bindPopup(popupHTML(p, rel), { maxWidth: 420, minWidth: 320, autoPanPaddingTopLeft:[360,110] });
-    STATE.cluster.addLayer(m);
-    STATE.markers.push(m);
-
-    if (!STATE.allBounds) STATE.allBounds = L.latLngBounds(m.getLatLng(), m.getLatLng());
-    else STATE.allBounds.extend(m.getLatLng());
-  }
-
-  if (STATE.allBounds) map.fitBounds(STATE.allBounds.pad(0.15));
+/* ====================== STATUS / POPUPS ====================== */
+function dominantStatusFor(rel){
+  if(!rel||!rel.length) return 'NONE';
+  const set = new Set(rel.map(r=>String(r.permit_status||'').trim()));
+  for(const s of STATUS_ORDER){ if(s==='NONE') continue; if(s.startsWith('Not Approved -')){ if([...set].some(x=>x.startsWith('Not Approved -'))) return [...set].find(x=>x.startsWith('Not Approved -')); } else { if(set.has(s)) return s; } }
+  return 'NONE';
+}
+function statusChipHTML(s){
+  if(s==='NONE') return `<span class="chip" style="background:var(--chip-none);color:#0b0c10">NONE</span>`;
+  return `<span class="chip ${statusClass(s)}">${s}</span>`;
+}
+function popupHTML(p, rel){
+  const coords = (typeof p.lat==='number' && typeof p.lon==='number') ? `(${p.lat.toFixed(6)}, ${p.lon.toFixed(6)})` : '—';
+  const permits = (rel||[]).length ? rel.map(r=>{
+    const notes = r.notes ? String(r.notes).replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
+    return `<div style="border:1px solid var(--border);border-radius:10px;padding:8px;margin:6px 0;background:#0f1219">
+      <div class="row" style="justify-content:space-between">
+        <div class="small"><code>${r.permit_id||''}</code> ${statusChipHTML(r.permit_status)} ${r.submitted_at?`· ${r.submitted_at}`:''}</div>
+      </div>
+      ${notes?`<div class="small muted" style="margin-top:6px;white-space:pre-wrap;"><b>Notes:</b> ${notes}</div>`:''}
+    </div>`;
+  }).join('') : `<div class="small"><span class="chip" style="background:var(--chip-none);color:#0b0c10">NONE</span> <span class="muted">No permits yet.</span></div>`;
+  return `<div class="popup">
+    <div class="popup-title">${p.job_name||''}</div>
+    <div class="popup-sub"><b>Owner:</b> ${p.owner||'—'} · <b>Tag:</b> ${p.tag||'—'} · <b>SCID:</b> ${p.SCID||'—'}</div>
+    <div class="small muted" style="margin-bottom:6px"><b>Spec:</b> ${p.pole_spec||'—'} → ${p.proposed_spec||'—'} · <b>MR:</b> ${p.mr_level||'—'} · <b>GPS:</b> ${coords}</div>
+    <div class="small muted" style="margin-bottom:4px">Permits</div>
+    ${permits}
+  </div>`;
 }
 
-/* -------------------------- FILTER ENGINE -------------------------- */
-const FIELD_DEF = [
-  { key:'owner',      label:'Owner',         type:'enum',   options:['BPUB','AEP','MVEC'] },
-  { key:'job_name',   label:'Job Name',      type:'text' },
-  { key:'tag',        label:'Tag',           type:'text' },
-  { key:'SCID',       label:'SCID',          type:'text' },
-  { key:'mr_level',   label:'MR Level',      type:'text' },
-  { key:'permit_any', label:'Permit Status (any)', type:'enum', options:[
-      'NONE','Created - NOT Submitted','Submitted - Pending','Approved',
-      'Not Approved - Cannot Attach','Not Approved - PLA Issues','Not Approved - MRE Issues','Not Approved - Other Issues'
-    ]},
-];
-
-const OPS = [
-  {key:'eq', label:'='}, {key:'neq', label:'≠'}, {key:'contains', label:'contains'},
-  {key:'starts', label:'starts with'}, {key:'ends', label:'ends with'}
-];
-
-function ruleRow(){
-  const row = document.createElement('div'); row.className='rule';
-  row.innerHTML = `
-    <select class="f-field">
-      ${FIELD_DEF.map(f => `<option value="${f.key}">${f.label}</option>`).join('')}
-    </select>
-    <select class="f-op">
-      ${OPS.map(o => `<option value="${o.key}">${o.label}</option>`).join('')}
-    </select>
-    <span class="f-value-wrap">
-      <input class="f-value" placeholder="value"/>
-    </span>
-    <button class="btn remove" title="Remove">✕</button>
-  `;
-  const fieldSel = row.querySelector('.f-field');
-  const wrap = row.querySelector('.f-value-wrap');
-
-  function refreshValue(){
-    const def = FIELD_DEF.find(f => f.key===fieldSel.value);
-    wrap.innerHTML = def?.type === 'enum'
-      ? `<select class="f-value">${def.options.map(x=>`<option>${x}</option>`).join('')}</select>`
-      : `<input class="f-value" placeholder="value"/>`;
+/* ====================== MARKERS / CLUSTER ====================== */
+function clearMarkers(){
+  STATE.cluster && STATE.cluster.clearLayers();
+  STATE.singlesLayer.clearLayers();
+  STATE.markers = []; STATE.bounds = null;
+}
+function addMarker(latlng, icon, popup, dominant){
+  const m = L.marker(latlng, {icon, __dominant:dominant});
+  m.bindPopup(popup, {maxWidth:420,minWidth:320,autoPanPaddingTopLeft:[360,110]});
+  STATE.markers.push(m);
+  if(!STATE.bounds) STATE.bounds = L.latLngBounds(latlng,latlng); else STATE.bounds.extend(latlng);
+  return m;
+}
+function renderMarkers({cluster=true}={}){
+  clearMarkers();
+  (cluster ? STATE.cluster : STATE.singlesLayer).addTo(map);
+  for(const p of STATE.poles){
+    const rel = STATE.byKey.get(poleKey(p))||[];
+    const dom = dominantStatusFor(rel);
+    const icon = shapeIcon(p.owner, STATUS_COLOR(dom));
+    const m = addMarker([p.lat,p.lon], icon, popupHTML(p,rel), dom);
+    (cluster ? STATE.cluster : STATE.singlesLayer).addLayer(m);
   }
-  fieldSel.addEventListener('change', refreshValue);
-  row.querySelector('.remove').addEventListener('click', ()=> row.remove());
-  refreshValue();
-  return row;
+  if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15));
 }
 
-function readRules(){
-  const logic = (document.getElementById('logic').value || 'AND').toUpperCase();
-  const rules = [];
-  for (const el of document.querySelectorAll('#rules .rule')){
-    const field = el.querySelector('.f-field').value;
-    const op    = el.querySelector('.f-op').value;
-    const valEl = el.querySelector('.f-value');
-    const value = valEl?.value || '';
-    rules.push({field, op, value});
-  }
-  // quick filters
-  const qOwner = document.getElementById('qOwner').value;
-  const qStatus= document.getElementById('qStatus').value;
-  const qSearch= (document.getElementById('qSearch').value || '').trim().toLowerCase();
-  return { logic, rules, q: { owner:qOwner, status:qStatus, search:qSearch } };
+/* ========================= JOB AREAS (NO OVERLAP) ========================= */
+function colorFromString(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return `hsl(${h%360} 70% 50%)`; }
+
+function buildRawHulls(pointsByJob){
+  const raw=new Map();
+  pointsByJob.forEach((pts,job)=>{
+    if(pts.length<3) return;
+    const fc=turf.featureCollection(pts.map(c=>turf.point(c))); // lon,lat
+    let poly=turf.concave(fc,{maxEdge:0.6, units:'kilometers'}); // tighter than v1
+    if(!poly) poly=turf.convex(fc);
+    if(!poly) return;
+    // gentle smooth (simplify only; no global buffer that causes overlaps)
+    const simplified=turf.simplify(poly,{tolerance:0.00005, highQuality:true});
+    raw.set(job, simplified);
+  });
+  return raw;
 }
 
-function matchRule(p, r, related){
-  const v = (key)=>{
-    if (r.field === 'permit_any'){
-      // value applies to any related permit status
-      const statuses = related.map(x => x.permit_status || '');
-      if (r.value === 'NONE') return statuses.length===0 ? 'NONE' : '';
-      return statuses.find(s => {
-        if (r.op==='eq')  return s===r.value;
-        if (r.op==='neq') return s!==r.value;
-        if (r.op==='contains') return s.toLowerCase().includes(r.value.toLowerCase());
-        if (r.op==='starts')   return s.toLowerCase().startsWith(r.value.toLowerCase());
-        if (r.op==='ends')     return s.toLowerCase().endsWith(r.value.toLowerCase());
-        return false;
-      }) ? 'hit' : '';
-    } else {
-      return (p[r.field] ?? '').toString();
-    }
-  };
-  const val = v(r.field);
-
-  if (r.field === 'permit_any'){
-    // value produced is 'NONE' | 'hit' | ''
-    if (r.value === 'NONE'){
-      if (r.op==='eq')  return val==='NONE';
-      if (r.op==='neq') return val!=='NONE';
-      return false;
-    } else {
-      // for any other status, 'hit' means match
-      if (r.op==='eq' || r.op==='contains' || r.op==='starts' || r.op==='ends') return val==='hit';
-      if (r.op==='neq') return val!== 'hit';
-      return false;
-    }
-  }
-
-  const target = val.toLowerCase();
-  const cmp    = (r.value||'').toLowerCase();
-  if (r.op==='eq')      return target === cmp;
-  if (r.op==='neq')     return target !== cmp;
-  if (r.op==='contains')return target.includes(cmp);
-  if (r.op==='starts')  return target.startsWith(cmp);
-  if (r.op==='ends')    return target.endsWith(cmp);
-  return true;
-}
-
-function applyFilters(){
-  const spec = readRules();
-  const byKey = STATE.byKey;
-  let result = STATE.poles.filter(p => {
-    // quick filters
-    if (spec.q.owner && p.owner !== spec.q.owner) return false;
-    if (spec.q.status){
-      const rel = byKey.get(poleKey(p)) || [];
-      if (spec.q.status === 'NONE'){
-        if (rel.length !== 0) return false;
-      } else {
-        if (!rel.some(r => r.permit_status === spec.q.status)) return false;
+function clipOverlaps(raw){
+  // Create deterministic order (bigger areas first) so small pockets remain as holes
+  const entries=[...raw.entries()].map(([job,poly])=>[job,poly,turf.area(poly)]).sort((a,b)=>b[2]-a[2]);
+  const out=[];
+  for(let i=0;i<entries.length;i++){
+    const [job, poly] = entries[i];
+    let clipped = poly;
+    for(let j=0;j<i;j++){
+      const other = out[j].poly;
+      const inter = turf.intersect(clipped, other);
+      if(inter){ // subtract already-placed areas to avoid “violations”
+        const diff = turf.difference(clipped, other);
+        if(diff) clipped = diff; else { clipped=null; break; }
       }
     }
-    if (spec.q.search){
-      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
-      if (!hay.includes(spec.q.search)) return false;
-    }
+    if(clipped) out.push({job, poly:clipped});
+  }
+  return out;
+}
 
-    // advanced rules
-    if (spec.rules.length){
-      const rel = byKey.get(poleKey(p)) || [];
-      const hits = spec.rules.map(r => matchRule(p, r, rel));
-      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
+function drawAreas(polys){
+  // remove old
+  for(const a of STATE.areas){ map.removeLayer(a.fill); map.removeLayer(a.label); }
+  STATE.areas=[];
+  polys.forEach(({job,poly})=>{
+    const col=colorFromString(job);
+    const fill=L.geoJSON(poly,{style:{color:col, weight:1.5, opacity:.9, fillColor:col, fillOpacity:.12}}).addTo(map);
+    const ctr=turf.centerOfMass(poly).geometry.coordinates;
+    const label=L.marker([ctr[1],ctr[0]],{interactive:false, icon:L.divIcon({className:'', html:`<div style="font-weight:800;letter-spacing:.3px;font-size:14px;color:#dbeafe;text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`})}).addTo(map);
+    STATE.areas.push({fill,label});
+  });
+  if(!STATE.areasVisible){
+    for(const a of STATE.areas){ map.removeLayer(a.fill); map.removeLayer(a.label); }
+  }
+}
+
+function rebuildAreas(currentPoles=null){
+  const list = currentPoles || STATE.poles;
+  const byJob=new Map();
+  list.forEach(p=>{
+    const job=String(p.job_name||'').trim(); if(!job) return;
+    if(!byJob.has(job)) byJob.set(job,[]);
+    byJob.get(job).push([p.lon,p.lat]);
+  });
+  const raw=buildRawHulls(byJob);
+  const clipped=clipOverlaps(raw);
+  drawAreas(clipped);
+}
+
+/* ========================= HEATMAP & WIREFRAME ========================= */
+function severityWeight(status){
+  const idx = STATUS_ORDER.indexOf(status); // lower is worse
+  if(idx<0) return 1;
+  return 1 + (STATUS_ORDER.length-1-idx); // worst gets highest weight
+}
+function updateViewMode(){
+  const mode=document.getElementById('viewMode').value;
+  // clear heat
+  if(STATE.heat){ map.removeLayer(STATE.heat); STATE.heat=null; }
+  if(mode==='heat'){
+    const pts = STATE.poles.map(p=>{
+      const rel=STATE.byKey.get(poleKey(p))||[];
+      const st=dominantStatusFor(rel);
+      return [p.lat,p.lon, severityWeight(st)];
+    });
+    STATE.heat = L.heatLayer(pts,{radius:22, blur:16, minOpacity:.15, maxZoom:18}).addTo(map);
+  }
+  // wireframe = hide markers, show only areas
+  if(mode==='wire'){
+    if(STATE.cluster) map.removeLayer(STATE.cluster);
+    map.removeLayer(STATE.singlesLayer);
+    for(const a of STATE.areas){ map.addLayer(a.fill); map.addLayer(a.label); }
+  }else{
+    const clus = document.getElementById('clusterMode').value==='on';
+    if(clus){ map.addLayer(STATE.cluster); } else { map.addLayer(STATE.singlesLayer); }
+  }
+}
+
+/* ============================ FILTERS ============================ */
+function applyFilters(){
+  const owner=document.getElementById('qOwner').value;
+  const status=document.getElementById('qStatus').value;
+  const search=(document.getElementById('qSearch').value||'').toLowerCase();
+
+  const filtered = STATE.poles.filter(p=>{
+    if(owner && p.owner!==owner) return false;
+    if(search){
+      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    if(status){
+      const rel=STATE.byKey.get(poleKey(p))||[];
+      if(status==='NONE'){ if(rel.length!==0) return false; }
+      else if(!rel.some(r=>r.permit_status===status)) return false;
     }
     return true;
   });
 
-  buildMarkers(result);
-  if (STATE.areasVisible){
-    // Rebuild job areas only for currently visible poles (so it feels contextual)
-    const prev = STATE.poles;
-    STATE.poles = result;
-    buildJobAreas();
-    STATE.poles = prev; // restore full set for next pass
-  }
+  // render markers from filtered set
+  const clusterOn = document.getElementById('clusterMode').value==='on';
+  // temporarily override poles for render
+  const save = STATE.poles;
+  STATE.poles = filtered;
+  renderMarkers({cluster:clusterOn});
+  if(STATE.areasVisible){ rebuildAreas(filtered); }
+  STATE.poles = save;
 }
 
-/* -------------------------- WIRING -------------------------- */
-document.getElementById('btnAddRule').addEventListener('click', ()=> {
-  document.getElementById('rules').appendChild(ruleRow());
-});
-document.getElementById('btnApply').addEventListener('click', applyFilters);
-document.getElementById('btnClear').addEventListener('click', ()=>{
-  document.getElementById('qOwner').value='';
-  document.getElementById('qStatus').value='';
-  document.getElementById('qSearch').value='';
-  document.getElementById('rules').innerHTML='';
-  buildMarkers(); // reset
-  if (STATE.areasVisible){ buildJobAreas(); }
-});
-document.getElementById('qOwner').addEventListener('change', applyFilters);
-document.getElementById('qStatus').addEventListener('change', applyFilters);
-document.getElementById('qSearch').addEventListener('input', ()=>{
-  // debounce-lite
-  clearTimeout(window.__qT); window.__qT = setTimeout(applyFilters, 220);
-});
-document.getElementById('btnFit').addEventListener('click', ()=>{
-  if (STATE.allBounds) map.fitBounds(STATE.allBounds.pad(0.15));
-});
-document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
-  STATE.areasVisible = !STATE.areasVisible;
-  if (STATE.areasVisible){
-    buildJobAreas();
-  } else {
-    for (const a of STATE.jobAreas){ map.removeLayer(a.layer); map.removeLayer(a.label); }
-  }
-  toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
-});
+/* =========================== REPORT =========================== */
+let charts=[];
+function buildReport(){
+  // destroy existing
+  charts.forEach(c=>c.destroy()); charts=[];
+  const ctxS=document.getElementById('chartStatus'), ctxO=document.getElementById('chartOwner'),
+        ctxJ=document.getElementById('chartJobs'), ctxT=document.getElementById('chartTime');
 
-/* -------------------------- BOOT -------------------------- */
+  // Status totals (dominant per pole)
+  const counts={}; STATUS_ORDER.forEach(s=>counts[s]=0);
+  const byOwner={BPUB:0,AEP:0,MVEC:0,OTHER:0};
+  const byJobNA={}; // count of Not Approved* per job
+  const byDay={};   // submissions timeline
+
+  for(const p of STATE.poles){
+    const rel=STATE.byKey.get(poleKey(p))||[];
+    const dom=dominantStatusFor(rel);
+    counts[dom]=(counts[dom]||0)+1;
+    const ow=['BPUB','AEP','MVEC'].includes(p.owner)?p.owner:'OTHER';
+    byOwner[ow]=(byOwner[ow]||0)+1;
+
+    // NA per job
+    const na = rel.filter(r=>String(r.permit_status||'').startsWith('Not Approved -')).length;
+    if(na){ byJobNA[p.job_name]=(byJobNA[p.job_name]||0)+na; }
+
+    // timeline (by submitted_at date if present)
+    rel.forEach(r=>{
+      if(r.submitted_at){
+        const d=String(r.submitted_at).slice(0,10);
+        byDay[d]=(byDay[d]||0)+1;
+      }
+    });
+  }
+
+  const statLabels=STATUS_ORDER.filter(s=>s!=='NONE').concat('NONE');
+  charts.push(new Chart(ctxS,{type:'doughnut', data:{labels:statLabels, datasets:[{data:statLabels.map(s=>counts[s]||0), backgroundColor:statLabels.map(STATUS_COLOR)}]}, options:{plugins:{legend:{position:'bottom'}}}}));
+  const ownLabels=Object.keys(byOwner), ownVals=ownLabels.map(k=>byOwner[k]||0);
+  charts.push(new Chart(ctxO,{type:'bar', data:{labels:ownLabels, datasets:[{label:'Poles', data:ownVals, backgroundColor:ownLabels.map(l=>l==='BPUB'?'#93c5fd':l==='AEP'?'#fca5a5':l==='MVEC'?'#a7f3d0':'#c4b5fd')}]}, options:{plugins:{legend:{display:false}}}}));
+  const topJobs=Object.entries(byJobNA).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  charts.push(new Chart(ctxJ,{type:'bar', data:{labels:topJobs.map(x=>x[0]), datasets:[{label:'Not Approved count', data:topJobs.map(x=>x[1]), backgroundColor:'#ef4444'}]}, options:{indexAxis:'y', plugins:{legend:{display:false}}}}));
+  const days=Object.keys(byDay).sort(), dayVals=days.map(d=>byDay[d]);
+  charts.push(new Chart(ctxT,{type:'line', data:{labels:days, datasets:[{label:'Submissions', data:dayVals}]} , options:{plugins:{legend:{display:false}}}}));
+}
+
+/* ============================ BOOT ============================ */
 (async function(){
   try{
     await loadData();
-    buildMarkers();
-    buildJobAreas();
-  }catch(e){
-    console.error(e);
-    toast('Error loading data. Place advanced-map.html next to poles.json & permits.json', 5000);
-  }
+    makeCluster();
+    renderMarkers({cluster:true});
+    rebuildAreas();
+  }catch(e){ console.error(e); toast('Error loading data', 4000); }
 })();
+
+/* ============================ EVENTS ============================ */
+document.getElementById('btnFit').addEventListener('click', ()=>{ if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15)); });
+document.getElementById('btnAreas').addEventListener('click', ()=>{
+  STATE.areasVisible=!STATE.areasVisible;
+  if(STATE.areasVisible){ for(const a of STATE.areas){ map.addLayer(a.fill); map.addLayer(a.label);} }
+  else{ for(const a of STATE.areas){ map.removeLayer(a.fill); map.removeLayer(a.label);} }
+});
+document.getElementById('clusterMode').addEventListener('change', ()=>{
+  const on=document.getElementById('clusterMode').value==='on';
+  if(on){ map.removeLayer(STATE.singlesLayer); makeCluster(); renderMarkers({cluster:true}); }
+  else { map.removeLayer(STATE.cluster); renderMarkers({cluster:false}); }
+  updateViewMode();
+});
+document.getElementById('viewMode').addEventListener('change', updateViewMode);
+
+document.getElementById('btnApply').addEventListener('click', applyFilters);
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  document.getElementById('qOwner').value='';
+  document.getElementById('qStatus').value='';
+  document.getElementById('qSearch').value='';
+  const clus=document.getElementById('clusterMode').value==='on';
+  renderMarkers({cluster:clus});
+  if(STATE.areasVisible) rebuildAreas();
+  updateViewMode();
+});
+document.getElementById('qSearch').addEventListener('input', ()=>{ clearTimeout(window.__qT); window.__qT=setTimeout(applyFilters,220); });
+
+/* Report drawer */
+const reportEl=document.getElementById('report');
+document.getElementById('btnReport').addEventListener('click', ()=>{ buildReport(); reportEl.classList.add('open'); });
+document.getElementById('btnCloseReport').addEventListener('click', ()=>reportEl.classList.remove('open'));
+document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
 </script>
 </body>
 </html>
