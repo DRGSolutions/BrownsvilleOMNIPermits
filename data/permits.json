@@ -290,6 +290,86 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_055",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "NT",
+    "SCID": "055",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_056",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "01565",
+    "SCID": "056",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_057",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "74685",
+    "SCID": "057",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_058",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "01567",
+    "SCID": "058",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_059",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "01568",
+    "SCID": "059",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_060",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "01569",
+    "SCID": "060",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_061",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "74684",
+    "SCID": "061",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F36_BRN02-F05_SEG4_062",
+    "job_name": "BRN02-F05 PLA",
+    "tag": "01571",
+    "SCID": "062",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "08/01/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F36_BRN02-F05_SEG9_009",
     "job_name": "BRN02-F05 PLA",
     "tag": "08671",
