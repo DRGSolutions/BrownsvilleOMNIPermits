@@ -4,23 +4,28 @@ import { hashColor } from './data.js';
 const km = m => m/1000;
 const bboxIntersects = (a,b) => !(b[0]>a[2] || b[2]<a[0] || b[3]<a[1] || b[1]>a[3]);
 
-function ensurePanes(map){
-  // Create once; safe to call multiple times
+// singletons created once per map
+let SVG_GLOW = null, SVG_EDGE = null;
+
+function ensurePanesAndRenderers(map){
+  // panes: above tiles, below markers
   if (!map.getPane('jobGlow')) {
-    const glow = map.createPane('jobGlow');
-    glow.style.zIndex = 420;          // above tiles
-    glow.style.pointerEvents = 'none';
+    const glow = map.createPane('jobGlow'); glow.style.zIndex = 420; glow.style.pointerEvents = 'none';
   }
   if (!map.getPane('jobEdge')) {
-    const edge = map.createPane('jobEdge');
-    edge.style.zIndex = 430;          // above glow, below markers/clusters (Leaflet default marker pane ~600)
-    edge.style.pointerEvents = 'none';
+    const edge = map.createPane('jobEdge'); edge.style.zIndex = 430; edge.style.pointerEvents = 'none';
   }
   if (!map.getPane('jobLabel')) {
-    const lbl = map.createPane('jobLabel');
-    lbl.style.zIndex = 440;
-    lbl.style.pointerEvents = 'none';
+    const lbl = map.createPane('jobLabel'); lbl.style.zIndex = 440; lbl.style.pointerEvents = 'none';
   }
+
+  // force **SVG** renderers so pane ordering is respected even with preferCanvas:true
+  if (!SVG_GLOW) SVG_GLOW = L.svg({ pane:'jobGlow' });
+  if (!SVG_EDGE) SVG_EDGE = L.svg({ pane:'jobEdge' });
+
+  // attach once
+  if (!SVG_GLOW._map) SVG_GLOW.addTo(map);
+  if (!SVG_EDGE._map) SVG_EDGE.addTo(map);
 }
 
 // median nearest-neighbor spacing (meters) → robust scale for hulls
@@ -80,7 +85,7 @@ function splitClusters(pts, scaleM){
 
 // ---------- public API ----------
 export function buildJobAreas(map, poles){
-  ensurePanes(map);
+  ensurePanesAndRenderers(map);
 
   // group by job
   const byJob = new Map();
@@ -117,7 +122,7 @@ export function buildJobAreas(map, poles){
     if (base) carved.push({ job: raw[i].job, feature: base });
   }
 
-  // step 3: render (glow + edge + label) on dedicated panes
+  // step 3: render (glow + edge + label) using the **SVG renderers**
   const layers = [];
   for (const { job, feature } of carved){
     const col = hashColor(job);
@@ -125,11 +130,13 @@ export function buildJobAreas(map, poles){
 
     const glow = L.geoJSON(feature, {
       pane: 'jobGlow',
+      renderer: SVG_GLOW,
       style: { color: col, weight: 10, opacity: 0.22, fillColor: col, fillOpacity: 0.12 }
     }).addTo(map);
 
     const edge = L.geoJSON(feature, {
       pane: 'jobEdge',
+      renderer: SVG_EDGE,
       style: { color: col, weight: 2.25, opacity: 0.98, fillColor: col, fillOpacity: 0.24 }
     }).addTo(map);
 
