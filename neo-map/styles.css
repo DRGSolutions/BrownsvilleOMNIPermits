@@ -80,7 +80,7 @@ select,input{border:1px solid var(--border);background:#0f1219;color:var(--fg);p
 
 .obs{display:grid;gap:8px}
 .obs .note{background:#0f1219;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
-canvas{max-width:100%}
+#report canvas{max-width:100%}
 
 /* Optional: stronger job labels on map */
 .job-label div{padding:2px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(10,14,22,.92)}
