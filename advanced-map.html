@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Advanced Pole & Permit Map</title>
+
+<!-- Leaflet + MarkerCluster + Turf (CDNs) -->
+<link  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet" />
+<link  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" rel="stylesheet" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+<style>
+  :root{
+    /* Match your existing chip/status colors */
+    --bg:#0b0c10; --panel:#0f1219; --muted:#9aa3b2; --fg:#f3f4f6; --border:#1f2430;
+    --chip-pending:#fb923c;      /* orange  */  /* Submitted - Pending */
+    --chip-approved:#34d399;     /* green   */  /* Approved */
+    --chip-created:#facc15;      /* yellow  */  /* Created - NOT Submitted */
+    --chip-na-cannot:#a78bfa;    /* purple  */  /* Not Approved - Cannot Attach */
+    --chip-na-other:#ef4444;     /* red     */  /* Not Approved - PLA/MRE/Other */
+    --chip-none:#94a3b8;         /* slate   */  /* NONE (no permits) */
+    --glass: rgba(20,24,33,.75);
+    --accent:#60a5fa;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  #map{position:fixed;inset:0}
+
+  /* Floating panels */
+  .panel{
+    position:fixed; z-index:900; border:1px solid var(--border);
+    background:var(--glass); backdrop-filter: blur(8px);
+    box-shadow:0 10px 30px rgba(0,0,0,.35); border-radius:16px;
+  }
+  .panel h3{margin:0 0 8px 0; font-size:14px; letter-spacing:.4px}
+  .muted{color:var(--muted)}
+  .btn{
+    appearance:none; cursor:pointer; user-select:none;
+    border:1px solid var(--border); background:#161922; color:var(--fg);
+    padding:8px 12px; border-radius:10px; font-weight:600
+  }
+  .btn:hover{background:#1a1f2b}
+  .btn-ghost{background:transparent}
+  .btn-accent{border-color:#20304a;background:#112033}
+  .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .field{display:flex; flex-direction:column; gap:4px}
+  select,input{border:1px solid var(--border); background:#0f1219; color:var(--fg);
+    padding:8px 10px; border-radius:10px}
+
+  /* Filter Builder (top-left) */
+  #filters{
+    top:16px; left:16px; width:420px; padding:14px;
+  }
+  #filters .rule{display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:8px; margin-top:8px}
+  #filters .rule .remove{padding:6px 10px}
+  #filters .bar{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+  #filters .chip{display:inline-flex; align-items:center; gap:8px; font-size:11px; border:1px solid var(--border);
+    border-radius:999px; padding:3px 8px; background:#0f1219}
+  #filters small{color:var(--muted)}
+
+  /* Legend (bottom-left) */
+  #legend{
+    left:16px; bottom:16px; width:340px; padding:12px;
+  }
+  #legend .item{display:flex; align-items:center; gap:10px; margin:6px 0}
+  #legend .swatch{width:16px; height:16px; border:1px solid #000; border-radius:4px}
+  #legend svg{width:22px; height:22px; filter: drop-shadow(0 1px 0 rgba(0,0,0,.4));}
+
+  /* Job Areas toggle (top-right) */
+  #tools{
+    top:16px; right:16px; width:280px; padding:12px; display:flex; flex-direction:column; gap:10px;
+  }
+
+  /* Popups look nicer */
+  .leaflet-popup-content-wrapper{background:#0f1219;color:var(--fg);border-radius:12px;border:1px solid var(--border)}
+  .leaflet-popup-tip{background:#0f1219}
+  .popup-title{font-weight:800;margin-bottom:4px}
+  .popup-sub{color:var(--muted); font-size:12px; margin-bottom:8px}
+  .chip{display:inline-block;font-size:11px;border:1px solid #283244;border-radius:999px;padding:2px 8px;margin-left:6px}
+  .chip.pending{background:var(--chip-pending);color:#111;border-color:#a45312}
+  .chip.approved{background:var(--chip-approved);color:#0b261a;border-color:#1c7a57}
+  .chip.created{background:var(--chip-created);color:#211f06;border-color:#8a7b15}
+  .chip.na_other{background:var(--chip-na-other);color:#fff}
+  .chip.na_cannot{background:var(--chip-na-cannot);color:#18132b}
+
+  /* Marker SVG wrapper */
+  .shape-icon{transform: translate3d(0,0,0)}
+  .shape-icon svg{display:block}
+
+  /* Mini toast (loading/errors) */
+  #toast{
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:22px; z-index:950; background:#0f1219; border:1px solid var(--border);
+    color:var(--fg); padding:8px 12px; border-radius:10px; display:none;
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<!-- FILTERS (Top-Left) -->
+<div id="filters" class="panel">
+  <div class="bar">
+    <h3>Advanced Filters</h3>
+    <div class="row">
+      <label class="chip">Match
+        <select id="logic">
+          <option value="AND">All (AND)</option>
+          <option value="OR">Any (OR)</option>
+        </select>
+      </label>
+      <button id="btnClear" class="btn btn-ghost" title="Reset filters">Reset</button>
+    </div>
+  </div>
+  <!-- Quick presets -->
+  <div class="row" style="margin-bottom:6px;">
+    <div class="field">
+      <small>Owner</small>
+      <select id="qOwner">
+        <option value="">All</option>
+        <option>BPUB</option>
+        <option>AEP</option>
+        <option>MVEC</option>
+      </select>
+    </div>
+    <div class="field">
+      <small>Permit Status</small>
+      <select id="qStatus">
+        <option value="">All</option>
+        <option>NONE</option>
+        <option>Created - NOT Submitted</option>
+        <option>Submitted - Pending</option>
+        <option>Approved</option>
+        <option>Not Approved - Cannot Attach</option>
+        <option>Not Approved - PLA Issues</option>
+        <option>Not Approved - MRE Issues</option>
+        <option>Not Approved - Other Issues</option>
+      </select>
+    </div>
+    <div class="field" style="flex:1;">
+      <small>Search</small>
+      <input id="qSearch" placeholder="Job, Tag, SCID, MR…"/>
+    </div>
+  </div>
+
+  <div id="rules"></div>
+  <div class="row" style="margin-top:10px">
+    <button id="btnAddRule" class="btn">Add Condition</button>
+    <button id="btnApply"   class="btn btn-accent">Apply</button>
+  </div>
+</div>
+
+<!-- LEGEND (Bottom-Left) -->
+<div id="legend" class="panel">
+  <h3>Legend</h3>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div>
+      <div class="muted" style="margin-bottom:6px;">Utility → Shape</div>
+      <div class="item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+        <div>BPUB (circle)</div>
+      </div>
+      <div class="item">
+        <svg viewBox="0 0 24 24"><polygon points="12,4 20,20 4,20" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+        <div>AEP (triangle)</div>
+      </div>
+      <div class="item">
+        <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="2" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+        <div>MVEC (rectangle)</div>
+      </div>
+    </div>
+    <div>
+      <div class="muted" style="margin-bottom:6px;">Permit Status → Color</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-approved)"></span>Approved</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-pending)"></span>Submitted - Pending</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-created)"></span>Created - NOT Submitted</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-na-cannot)"></span>Not Approved - Cannot Attach</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-na-other)"></span>Not Approved - Other/PLA/MRE</div>
+      <div class="item"><span class="swatch" style="background:var(--chip-none)"></span>NONE (no permits)</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLS (Top-Right) -->
+<div id="tools" class="panel">
+  <h3>Map Tools</h3>
+  <div class="row"><button id="btnFit" class="btn">Fit to Poles</button><button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button></div>
+  <small class="muted">Click a shape to view full pole + related permits. Areas outline *clusters of poles by job* with soft boundaries and centered labels.</small>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* -------------------------- UTILS & STATE -------------------------- */
+const STATE = {
+  poles: [],
+  permits: [],
+  byKey: new Map(),
+  markers: [],
+  cluster: null,
+  jobAreas: [],
+  areasVisible: true,
+  allBounds: null
+};
+
+const TOAST = document.getElementById('toast');
+function toast(msg, ms=1800){ TOAST.textContent = msg; TOAST.style.display='block'; setTimeout(()=>TOAST.style.display='none', ms); }
+
+const poleKey = (p) => `${p.job_name}::${p.tag}::${p.SCID}`;
+function buildPermitIndex(permits){
+  const m = new Map();
+  for(const r of (permits||[])){
+    const key = `${r.job_name}::${r.tag}::${r.SCID}`;
+    if(!m.has(key)) m.set(key, []);
+    m.get(key).push(r);
+  }
+  for(const arr of m.values()){
+    arr.sort((a,b)=> String(a.permit_id).localeCompare(String(b.permit_id)));
+  }
+  return m;
+}
+
+/* status → chip class and color variable name (mirrors your app) */
+function statusClass(status){
+  const s = String(status||'').trim();
+  if (s === 'Submitted - Pending') return 'pending';
+  else if (s === 'Approved') return 'approved';
+  else if (s === 'Created - NOT Submitted') return 'created';
+  else if (s === 'Not Approved - Cannot Attach') return 'na_cannot';
+  else if (s.startsWith('Not Approved -')) return 'na_other';
+  else return ''; // NONE handled separately
+}
+
+/* status → CSS var color */
+function statusColor(status){
+  const s = String(status||'').trim();
+  if (s === 'Submitted - Pending') return getComputedStyle(document.documentElement).getPropertyValue('--chip-pending') || '#fb923c';
+  if (s === 'Approved')            return getComputedStyle(document.documentElement).getPropertyValue('--chip-approved') || '#34d399';
+  if (s === 'Created - NOT Submitted') return getComputedStyle(document.documentElement).getPropertyValue('--chip-created') || '#facc15';
+  if (s === 'Not Approved - Cannot Attach') return getComputedStyle(document.documentElement).getPropertyValue('--chip-na-cannot') || '#a78bfa';
+  if (s.startsWith('Not Approved -')) return getComputedStyle(document.documentElement).getPropertyValue('--chip-na-other') || '#ef4444';
+  if (s === 'NONE') return getComputedStyle(document.documentElement).getPropertyValue('--chip-none') || '#94a3b8';
+  return getComputedStyle(document.documentElement).getPropertyValue('--chip-none') || '#94a3b8';
+}
+
+function statusChipHTML(status){
+  const s = String(status||'').trim();
+  let cls = statusClass(s);
+  let extra = '';
+  if (s === 'NONE') { cls = ''; extra = 'style="background:#94a3b8;color:#0b0c10"'; }
+  return `<span class="chip ${cls}" ${extra}>${s || '—'}</span>`;
+}
+
+/* Determine a single color for a pole from its related permits */
+function dominantStatusFor(permits){
+  if(!permits || permits.length===0) return 'NONE';
+  const ss = permits.map(r => String(r.permit_status||'').trim());
+
+  // Severity order (worst → best)
+  const pri = [
+    'Not Approved - Cannot Attach',
+    'Not Approved - PLA Issues',
+    'Not Approved - MRE Issues',
+    'Not Approved - Other Issues',
+    'Submitted - Pending',
+    'Created - NOT Submitted',
+    'Approved'
+  ];
+  for (const p of pri){
+    if (p.includes('Not Approved -')){
+      if (ss.some(s => s.startsWith('Not Approved -'))) return ss.find(s=>s.startsWith('Not Approved -'));
+    } else {
+      if (ss.includes(p)) return p;
+    }
+  }
+  return ss[0] || 'NONE';
+}
+
+/* hash color for job area edges/fills */
+function colorFromString(s){
+  let h=0; for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i))>>>0;
+  const hue = h % 360;
+  return `hsl(${hue} 70% 50%)`;
+}
+
+/* -------------------------- MAP INIT -------------------------- */
+const map = L.map('map', { zoomControl: false, preferCanvas: true });
+L.control.zoom({ position:'bottomright' }).addTo(map);
+const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO'
+}).addTo(map);
+STATE.cluster = L.markerClusterGroup({ disableClusteringAtZoom: 18, spiderfyOnMaxZoom: true });
+map.addLayer(STATE.cluster);
+
+/* -------------------------- MARKERS (SVG shapes) -------------------------- */
+function markerSVG(owner, fill, size=28){
+  const stroke = '#fff', sw=2;
+  const half = size/2;
+  if (owner === 'AEP'){ // triangle
+    return `<svg viewBox="0 0 ${size} ${size}">
+      <polygon points="${half},${sw} ${size-sw},${size-sw} ${sw},${size-sw}"
+        fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+    </svg>`;
+  } else if (owner === 'MVEC'){ // rectangle
+    const w=size-8, h=size-14, x=(size-w)/2, y=(size-h)/2, rx=4;
+    return `<svg viewBox="0 0 ${size} ${size}">
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}"
+        stroke="${stroke}" stroke-width="${sw}"/>
+    </svg>`;
+  } else { // BPUB (default circle)
+    return `<svg viewBox="0 0 ${size} ${size}">
+      <circle cx="${half}" cy="${half}" r="${half-4}" fill="${fill}"
+        stroke="${stroke}" stroke-width="${sw}"/>
+    </svg>`;
+  }
+}
+
+function shapeIcon(owner, color){
+  return L.divIcon({
+    className: 'shape-icon',
+    html: markerSVG(owner, color),
+    iconSize: [28,28],
+    iconAnchor: [14,14],
+    popupAnchor: [0,-12]
+  });
+}
+
+/* -------------------------- JOB AREAS -------------------------- */
+function buildJobAreas(){
+  // clear existing
+  for (const a of STATE.jobAreas) map.removeLayer(a.layer);
+  STATE.jobAreas = [];
+
+  const byJob = new Map();
+  for (const p of STATE.poles){
+    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+    const job = String(p.job_name||'').trim();
+    if (!job) continue;
+    if (!byJob.has(job)) byJob.set(job, []);
+    byJob.get(job).push([p.lon, p.lat]); // GeoJSON is [lon,lat]
+  }
+
+  byJob.forEach((pts, job)=>{
+    if (pts.length < 3) return;
+
+    const fc = turf.featureCollection(pts.map(c => turf.point(c)));
+    let poly = turf.concave(fc, { maxEdge: 1.5, units: 'kilometers' });
+    if (!poly) poly = turf.convex(fc);
+    if (!poly) return;
+
+    // Soften / smooth boundary
+    let buffered = turf.buffer(poly, 0.06, { units:'kilometers' }); // ~60m pad
+    let simplified = turf.simplify(buffered, { tolerance: 0.0001, highQuality: true });
+
+    const col = colorFromString(job);
+    const layer = L.geoJSON(simplified, {
+      style: {
+        color: col,
+        weight: 1.5,
+        opacity: 0.7,
+        fillColor: col,
+        fillOpacity: 0.10  /* lightly opaque so map remains readable */
+      }
+    }).addTo(map);
+
+    // Center label
+    const center = turf.centerOfMass(simplified).geometry.coordinates;
+    const label = L.marker([center[1], center[0]], {
+      interactive:false,
+      icon: L.divIcon({
+        className: 'job-label',
+        html: `<div style="font-weight:800; letter-spacing:.3px; font-size:14px; color:#dbeafe; text-shadow:0 2px 6px rgba(0,0,0,.6)">${job}</div>`,
+        iconSize:[0,0]
+      })
+    }).addTo(map);
+
+    STATE.jobAreas.push({ job, layer, label });
+  });
+
+  if (!STATE.areasVisible){
+    for (const a of STATE.jobAreas){ map.removeLayer(a.layer); map.removeLayer(a.label); }
+  }
+}
+
+/* -------------------------- POPUP HTML -------------------------- */
+function popupHTML(p, rel){
+  const title = `${p.job_name || ''}`;
+  const sub = `<b>Owner:</b> ${p.owner||'—'} · <b>Tag:</b> ${p.tag||'—'} · <b>SCID:</b> ${p.SCID||'—'}`
+  const spec = `<b>Spec:</b> ${p.pole_spec||'—'} → ${p.proposed_spec||'—'} · <b>MR:</b> ${p.mr_level||'—'}`
+  const coords = (typeof p.lat==='number' && typeof p.lon==='number') ? `(${p.lat.toFixed(6)}, ${p.lon.toFixed(6)})` : '—';
+  const permits = (rel||[]).length
+    ? rel.map(r => {
+        const safeNotes = r.notes ? String(r.notes).replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
+        return `<div style="border:1px solid var(--border);background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0;">
+          <div class="row" style="justify-content:space-between">
+            <div class="small">
+              <code>${r.permit_id || ''}</code>
+              ${statusChipHTML(r.permit_status)}
+              ${r.submitted_by ? ` · by ${String(r.submitted_by).replace(/&/g,'&amp;').replace(/</g,'&lt;')}` : ''}
+              ${r.submitted_at ? ` · ${r.submitted_at}` : ''}
+            </div>
+          </div>
+          ${safeNotes ? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap;"><b>Notes:</b> ${safeNotes}</div>` : ''}
+        </div>`;
+      }).join('')
+    : `<div class="small"><span class="chip" style="background:var(--chip-none);color:#0b0c10">NONE</span> <span class="muted">No permits yet for this pole.</span></div>`;
+
+  return `
+    <div class="popup">
+      <div class="popup-title">${title}</div>
+      <div class="popup-sub">${sub}</div>
+      <div class="small muted" style="margin-bottom:6px">${spec} · <b>GPS:</b> ${coords}</div>
+      <div class="small muted" style="margin-bottom:4px">Permits</div>
+      ${permits}
+    </div>
+  `;
+}
+
+/* -------------------------- DATA LOADING -------------------------- */
+async function tryFetch(paths){
+  for (const p of paths){
+    try{
+      const r = await fetch(p);
+      if (r.ok) return await r.json();
+    }catch(e){}
+  }
+  throw new Error('Not found in paths: '+paths.join(', '));
+}
+
+async function loadData(){
+  toast('Loading poles & permits…');
+  const polesPaths   = ['poles.json','./poles.json','../poles.json','data/poles.json','./data/poles.json'];
+  const permitsPaths = ['permits.json','./permits.json','../permits.json','data/permits.json','./data/permits.json'];
+  const [poles, permits] = await Promise.all([ tryFetch(polesPaths), tryFetch(permitsPaths) ]);
+  STATE.poles = (poles||[]).filter(p => typeof p.lat==='number' && typeof p.lon==='number');
+  STATE.permits = permits||[];
+  STATE.byKey = buildPermitIndex(STATE.permits);
+  toast(`Loaded ${STATE.poles.length} poles, ${STATE.permits.length} permits`);
+}
+
+/* -------------------------- RENDER MARKERS -------------------------- */
+function buildMarkers(filtered = null){
+  const poles = filtered || STATE.poles;
+
+  // clear existing markers
+  STATE.cluster.clearLayers();
+  STATE.markers = [];
+  STATE.allBounds = null;
+
+  for(const p of poles){
+    const rel = STATE.byKey.get(poleKey(p)) || [];
+    const dominant = dominantStatusFor(rel);
+    const color = statusColor(dominant);
+    const icon = shapeIcon(p.owner, color);
+    const m = L.marker([p.lat, p.lon], { icon });
+
+    m.bindPopup(popupHTML(p, rel), { maxWidth: 420, minWidth: 320, autoPanPaddingTopLeft:[360,110] });
+    STATE.cluster.addLayer(m);
+    STATE.markers.push(m);
+
+    if (!STATE.allBounds) STATE.allBounds = L.latLngBounds(m.getLatLng(), m.getLatLng());
+    else STATE.allBounds.extend(m.getLatLng());
+  }
+
+  if (STATE.allBounds) map.fitBounds(STATE.allBounds.pad(0.15));
+}
+
+/* -------------------------- FILTER ENGINE -------------------------- */
+const FIELD_DEF = [
+  { key:'owner',      label:'Owner',         type:'enum',   options:['BPUB','AEP','MVEC'] },
+  { key:'job_name',   label:'Job Name',      type:'text' },
+  { key:'tag',        label:'Tag',           type:'text' },
+  { key:'SCID',       label:'SCID',          type:'text' },
+  { key:'mr_level',   label:'MR Level',      type:'text' },
+  { key:'permit_any', label:'Permit Status (any)', type:'enum', options:[
+      'NONE','Created - NOT Submitted','Submitted - Pending','Approved',
+      'Not Approved - Cannot Attach','Not Approved - PLA Issues','Not Approved - MRE Issues','Not Approved - Other Issues'
+    ]},
+];
+
+const OPS = [
+  {key:'eq', label:'='}, {key:'neq', label:'≠'}, {key:'contains', label:'contains'},
+  {key:'starts', label:'starts with'}, {key:'ends', label:'ends with'}
+];
+
+function ruleRow(){
+  const row = document.createElement('div'); row.className='rule';
+  row.innerHTML = `
+    <select class="f-field">
+      ${FIELD_DEF.map(f => `<option value="${f.key}">${f.label}</option>`).join('')}
+    </select>
+    <select class="f-op">
+      ${OPS.map(o => `<option value="${o.key}">${o.label}</option>`).join('')}
+    </select>
+    <span class="f-value-wrap">
+      <input class="f-value" placeholder="value"/>
+    </span>
+    <button class="btn remove" title="Remove">✕</button>
+  `;
+  const fieldSel = row.querySelector('.f-field');
+  const wrap = row.querySelector('.f-value-wrap');
+
+  function refreshValue(){
+    const def = FIELD_DEF.find(f => f.key===fieldSel.value);
+    wrap.innerHTML = def?.type === 'enum'
+      ? `<select class="f-value">${def.options.map(x=>`<option>${x}</option>`).join('')}</select>`
+      : `<input class="f-value" placeholder="value"/>`;
+  }
+  fieldSel.addEventListener('change', refreshValue);
+  row.querySelector('.remove').addEventListener('click', ()=> row.remove());
+  refreshValue();
+  return row;
+}
+
+function readRules(){
+  const logic = (document.getElementById('logic').value || 'AND').toUpperCase();
+  const rules = [];
+  for (const el of document.querySelectorAll('#rules .rule')){
+    const field = el.querySelector('.f-field').value;
+    const op    = el.querySelector('.f-op').value;
+    const valEl = el.querySelector('.f-value');
+    const value = valEl?.value || '';
+    rules.push({field, op, value});
+  }
+  // quick filters
+  const qOwner = document.getElementById('qOwner').value;
+  const qStatus= document.getElementById('qStatus').value;
+  const qSearch= (document.getElementById('qSearch').value || '').trim().toLowerCase();
+  return { logic, rules, q: { owner:qOwner, status:qStatus, search:qSearch } };
+}
+
+function matchRule(p, r, related){
+  const v = (key)=>{
+    if (r.field === 'permit_any'){
+      // value applies to any related permit status
+      const statuses = related.map(x => x.permit_status || '');
+      if (r.value === 'NONE') return statuses.length===0 ? 'NONE' : '';
+      return statuses.find(s => {
+        if (r.op==='eq')  return s===r.value;
+        if (r.op==='neq') return s!==r.value;
+        if (r.op==='contains') return s.toLowerCase().includes(r.value.toLowerCase());
+        if (r.op==='starts')   return s.toLowerCase().startsWith(r.value.toLowerCase());
+        if (r.op==='ends')     return s.toLowerCase().endsWith(r.value.toLowerCase());
+        return false;
+      }) ? 'hit' : '';
+    } else {
+      return (p[r.field] ?? '').toString();
+    }
+  };
+  const val = v(r.field);
+
+  if (r.field === 'permit_any'){
+    // value produced is 'NONE' | 'hit' | ''
+    if (r.value === 'NONE'){
+      if (r.op==='eq')  return val==='NONE';
+      if (r.op==='neq') return val!=='NONE';
+      return false;
+    } else {
+      // for any other status, 'hit' means match
+      if (r.op==='eq' || r.op==='contains' || r.op==='starts' || r.op==='ends') return val==='hit';
+      if (r.op==='neq') return val!== 'hit';
+      return false;
+    }
+  }
+
+  const target = val.toLowerCase();
+  const cmp    = (r.value||'').toLowerCase();
+  if (r.op==='eq')      return target === cmp;
+  if (r.op==='neq')     return target !== cmp;
+  if (r.op==='contains')return target.includes(cmp);
+  if (r.op==='starts')  return target.startsWith(cmp);
+  if (r.op==='ends')    return target.endsWith(cmp);
+  return true;
+}
+
+function applyFilters(){
+  const spec = readRules();
+  const byKey = STATE.byKey;
+  let result = STATE.poles.filter(p => {
+    // quick filters
+    if (spec.q.owner && p.owner !== spec.q.owner) return false;
+    if (spec.q.status){
+      const rel = byKey.get(poleKey(p)) || [];
+      if (spec.q.status === 'NONE'){
+        if (rel.length !== 0) return false;
+      } else {
+        if (!rel.some(r => r.permit_status === spec.q.status)) return false;
+      }
+    }
+    if (spec.q.search){
+      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
+      if (!hay.includes(spec.q.search)) return false;
+    }
+
+    // advanced rules
+    if (spec.rules.length){
+      const rel = byKey.get(poleKey(p)) || [];
+      const hits = spec.rules.map(r => matchRule(p, r, rel));
+      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
+    }
+    return true;
+  });
+
+  buildMarkers(result);
+  if (STATE.areasVisible){
+    // Rebuild job areas only for currently visible poles (so it feels contextual)
+    const prev = STATE.poles;
+    STATE.poles = result;
+    buildJobAreas();
+    STATE.poles = prev; // restore full set for next pass
+  }
+}
+
+/* -------------------------- WIRING -------------------------- */
+document.getElementById('btnAddRule').addEventListener('click', ()=> {
+  document.getElementById('rules').appendChild(ruleRow());
+});
+document.getElementById('btnApply').addEventListener('click', applyFilters);
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  document.getElementById('qOwner').value='';
+  document.getElementById('qStatus').value='';
+  document.getElementById('qSearch').value='';
+  document.getElementById('rules').innerHTML='';
+  buildMarkers(); // reset
+  if (STATE.areasVisible){ buildJobAreas(); }
+});
+document.getElementById('qOwner').addEventListener('change', applyFilters);
+document.getElementById('qStatus').addEventListener('change', applyFilters);
+document.getElementById('qSearch').addEventListener('input', ()=>{
+  // debounce-lite
+  clearTimeout(window.__qT); window.__qT = setTimeout(applyFilters, 220);
+});
+document.getElementById('btnFit').addEventListener('click', ()=>{
+  if (STATE.allBounds) map.fitBounds(STATE.allBounds.pad(0.15));
+});
+document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
+  STATE.areasVisible = !STATE.areasVisible;
+  if (STATE.areasVisible){
+    buildJobAreas();
+  } else {
+    for (const a of STATE.jobAreas){ map.removeLayer(a.layer); map.removeLayer(a.label); }
+  }
+  toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
+});
+
+/* -------------------------- BOOT -------------------------- */
+(async function(){
+  try{
+    await loadData();
+    buildMarkers();
+    buildJobAreas();
+  }catch(e){
+    console.error(e);
+    toast('Error loading data. Place advanced-map.html next to poles.json & permits.json', 5000);
+  }
+})();
+</script>
+</body>
+</html>
