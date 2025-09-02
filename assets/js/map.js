@@ -82,10 +82,39 @@
     return map;
   }
 
-  // ---- Map ----
+  // ---- Map & markers ----
   let map, pointsLayer, drawn, selectedSet=new Set(), pmap;
+  let jobPolesCache=[], permitsCache=[];
+  let recomputeSelection = () => {};
 
-  function setupMap(jobPoles, permits){
+  function buildPoints(){
+    if (!map) return;
+    if (pointsLayer) { map.removeLayer(pointsLayer); }
+    pointsLayer = L.layerGroup().addTo(map);
+    pmap = idxByPole(permitsCache);
+
+    const bounds=[];
+    for(const p of jobPolesCache){
+      const lat=+p.lat, lon=+p.lon; if(!Number.isFinite(lat)||!Number.isFinite(lon)) continue;
+      const rel  = pmap.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      const stat = latestStatusFor(rel);
+      const color= statusColor(stat);
+
+      const m = L.circleMarker([lat,lon], { radius:4, weight:1, color:'#2a3242', fillColor:color, fillOpacity:1 });
+      const tip = `<div class="id">SCID ${p.SCID} · Tag ${p.tag}</div><div class="status">${stat}</div>`;
+      m.bindTooltip(tip, { permanent:true, direction:'top', className:'pole-tag', opacity:1 });
+      m._pole=p;
+      pointsLayer.addLayer(m);
+      bounds.push([lat,lon]);
+    }
+    if (bounds.length) map.fitBounds(bounds,{padding:[40,40]});
+    setTimeout(()=>map.invalidateSize(),50); // prevent hiccup under panel
+
+    // After rebuilding, re-apply selection visuals
+    recomputeSelection();
+  }
+
+  function setupMap(){
     map = L.map('map', { preferCanvas:true, zoomControl:false, updateWhenZooming:false, updateWhenIdle:true });
     L.control.zoom({ position:'bottomright' }).addTo(map);
 
@@ -93,9 +122,7 @@
       maxZoom: 20, maxNativeZoom:19, keepBuffer:6, crossOrigin:true, attribution:'&copy; OpenStreetMap'
     }).addTo(map);
 
-    pointsLayer = L.layerGroup().addTo(map);
     drawn = new L.FeatureGroup(); map.addLayer(drawn);
-
     const drawCtl = new L.Control.Draw({
       position:'topright',
       draw:{
@@ -107,26 +134,6 @@
     });
     map.addControl(drawCtl);
 
-    pmap = idxByPole(permits);
-
-    const bounds=[];
-    for(const p of jobPoles){
-      const lat=+p.lat, lon=+p.lon; if(!Number.isFinite(lat)||!Number.isFinite(lon)) continue;
-      const rel  = pmap.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
-      const stat = latestStatusFor(rel);
-      const color= statusColor(stat);
-
-      const m = L.circleMarker([lat,lon], { radius:4, weight:1, color:'#2a3242', fillColor:color, fillOpacity:1 });
-      const tip = `<div class="id">SCID ${p.SCID} · Tag ${p.tag}</div><div class="status">${stat}</div>`;
-      m.bindTooltip(tip, { permanent:true, direction:'top', className:'pole-tag', opacity:1 });
-
-      m._pole=p;
-      pointsLayer.addLayer(m);
-      bounds.push([lat,lon]);
-    }
-    if(bounds.length) map.fitBounds(bounds,{padding:[40,40]});
-    setTimeout(()=>map.invalidateSize(),50); // prevent tile hiccup under panel
-
     function setSelected(marker,on){
       const tt = marker.getTooltip && marker.getTooltip();
       const el = tt && tt.getElement && tt.getElement();
@@ -134,10 +141,10 @@
       marker.setStyle({ radius: on?6:4, weight:on?2:1, color:on? '#2563eb':'#2a3242' });
     }
 
-    function recomputeSelection(){
+    recomputeSelection = function(){
       selectedSet.clear();
       const polys = drawn.toGeoJSON().features.filter(f=>f.geometry && f.geometry.type==='Polygon');
-      const markers = Object.values(pointsLayer._layers||{});
+      const markers = Object.values(pointsLayer? pointsLayer._layers : {});
       for(const m of markers){
         const {lat,lng} = m.getLatLng();
         const pt = turf.point([lng,lat]);
@@ -147,7 +154,7 @@
         setSelected(m, inside);
       }
       $('#selInfo').textContent = `Selected poles: ${selectedSet.size}`;
-    }
+    };
 
     map.on(L.Draw.Event.CREATED,(e)=>{ drawn.addLayer(e.layer); recomputeSelection(); });
     map.on(L.Draw.Event.EDITED, ()=>recomputeSelection());
@@ -195,9 +202,16 @@
       const data = await callApi({ actorName:'Website User', reason:`Map ${mode} (${changes.length})`, changes });
       msg(`<span style="color:#34d399">Submitted ${changes.length} change(s).</span> `+
           (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:''));
+
+      // 🔔 Trigger the same watcher/graphics:
+      // 1) in THIS tab (map) – to show overlay + reload data here
+      window.dispatchEvent(new CustomEvent('watch:start'));
+      // 2) in the MAIN tab – to show overlay + reload data there
       if (window.opener && !window.opener.closed) {
         try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {}
       }
+      // 3) Fallback broadcast (if opener is unavailable)
+      try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
     } catch(e){
       console.error(e);
       msg(`<span style="color:#ef4444">${e.message}</span>`);
@@ -219,12 +233,30 @@
 
     if (!JOB){ $('#msg').innerHTML='<span style="color:#ef4444">No Job specified. Open this via “Advanced Map Selection”.</span>'; return; }
 
+    // Load data, then map
     try{
       const {poles, permits} = await loadData();
-      const jobPoles = (poles||[]).filter(p => String(p.job_name)===String(JOB));
-      setupMap(jobPoles, permits||[]);
+      jobPolesCache = (poles||[]).filter(p => String(p.job_name)===String(JOB));
+      permitsCache  = permits || [];
+      setupMap();
+      buildPoints();
     }catch(e){
       $('#msg').innerHTML = `<span style="color:#ef4444">Load error: ${e.message}</span>`;
+    }
+  });
+
+  // When the watcher finishes a refresh (in this tab), rebuild markers
+  window.addEventListener('data:loaded', () => {
+    if (!window.STATE) return;
+    permitsCache  = window.STATE.permits || [];
+    jobPolesCache = (window.STATE.poles || []).filter(p => String(p.job_name)===String(JOB));
+    buildPoints();
+  });
+
+  // If main tab broadcasts via localStorage, start watching here too
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'permits:watch-start' && e.newValue) {
+      try { window.dispatchEvent(new CustomEvent('watch:start')); } catch {}
     }
   });
 })();
