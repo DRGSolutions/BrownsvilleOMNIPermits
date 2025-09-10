@@ -35080,7 +35080,7 @@
   },
   {
     "job_name": "BRN02-F01 PLA",
-    "tag": "NT3",
+    "tag": "NT",
     "SCID": "102",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
@@ -35542,7 +35542,7 @@
   },
   {
     "job_name": "BRN02-F01 PLA",
-    "tag": "NT4",
+    "tag": "NT",
     "SCID": "122",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
@@ -35553,7 +35553,7 @@
   },
   {
     "job_name": "BRN02-F01 PLA",
-    "tag": "NT5",
+    "tag": "NT2",
     "SCID": "123",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
@@ -56169,7 +56169,7 @@
     "job_name": "BRN02-F44 PLA",
     "tag": "NT",
     "SCID": "005",
-    "owner": "AEP",
+    "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
     "lat": 25.92550133223597,
@@ -81140,7 +81140,7 @@
     "tag": "07257",
     "SCID": "014",
     "owner": "BPUB",
-    "pole_spec": "45-3 SOUTHERN PINE",
+    "pole_spec": "80-H2 Douglas Fir",
     "proposed_spec": null,
     "lat": 25.933066474064574,
     "lon": -97.47819720955225,
@@ -81262,7 +81262,7 @@
     "SCID": "010",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
-    "proposed_spec": "50-3 SOUTHERN PINE",
+    "proposed_spec": null,
     "lat": 25.932943819904402,
     "lon": -97.47634266498441,
     "mr_level": "Complex Power MR"
@@ -82891,7 +82891,7 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.928412895034572,
+    "lat": 25.928410750772947,
     "lon": -97.47970725279099,
     "mr_level": "No MR"
   },
@@ -82968,7 +82968,7 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": "45-4 RED PINE",
-    "lat": 25.928369336952446,
+    "lat": 25.928368800886826,
     "lon": -97.47960614801535,
     "mr_level": "Complex Power MR"
   },
@@ -83034,7 +83034,7 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.931148690002612,
+    "lat": 25.93114876538275,
     "lon": -97.48086953641035,
     "mr_level": "No MR"
   },
@@ -83056,8 +83056,8 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.930325883977925,
-    "lon": -97.47623301504247,
+    "lat": 25.930324275863015,
+    "lon": -97.4762359952838,
     "mr_level": "Comm MR"
   },
   {
@@ -83067,8 +83067,8 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.930071234211024,
-    "lon": -97.47636346947837,
+    "lat": 25.9300685540137,
+    "lon": -97.47635870110452,
     "mr_level": "Comm MR"
   },
   {
@@ -83078,8 +83078,8 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.929806423998485,
-    "lon": -97.47650434275786,
+    "lat": 25.929802403684267,
+    "lon": -97.47649480601015,
     "mr_level": "No MR"
   },
   {
@@ -83166,8 +83166,8 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.93212693988729,
-    "lon": -97.47534976289623,
+    "lat": 25.932126939868894,
+    "lon": -97.47534618667211,
     "mr_level": "No MR"
   },
   {
@@ -83188,8 +83188,8 @@
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.931532820391325,
-    "lon": -97.4756374883619,
+    "lat": 25.931536304613687,
+    "lon": -97.47564583304172,
     "mr_level": "Comm MR"
   },
   {
@@ -84789,7 +84789,7 @@
   },
   {
     "job_name": "BRN01-F303 PLA",
-    "tag": "NT2",
+    "tag": "NT",
     "SCID": "024",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -84899,7 +84899,7 @@
   },
   {
     "job_name": "BRN01-F303 PLA",
-    "tag": "NT3",
+    "tag": "NT",
     "SCID": "040",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -84981,8 +84981,8 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.931080341415434,
-    "lon": -97.4984679560723,
+    "lat": 25.931077326207763,
+    "lon": -97.49847205387344,
     "mr_level": "Comm MR"
   },
   {
@@ -85064,7 +85064,7 @@
   },
   {
     "job_name": "BRN01-F303 PLA",
-    "tag": "NT1",
+    "tag": "NT",
     "SCID": "022",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -85181,7 +85181,7 @@
     "proposed_spec": null,
     "lat": 25.92553539299999,
     "lon": -97.50214154920901,
-    "mr_level": "Complex Power MR"
+    "mr_level": "Simple Power MR"
   },
   {
     "job_name": "BRN01-F303 PLA",
@@ -85329,7 +85329,7 @@
   {
     "job_name": "BRN01-F303 PLA",
     "tag": "62420",
-    "SCID": "065",
+    "SCID": "016.1",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -85361,17 +85361,6 @@
   },
   {
     "job_name": "BRN01-F303 PLA",
-    "tag": null,
-    "SCID": "076",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.928841891374812,
-    "lon": -97.49994492497983,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F303 PLA",
     "tag": "18103",
     "SCID": "062",
     "owner": "BPUB",
@@ -85399,20 +85388,9 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.92855593959224,
-    "lon": -97.50166807319226,
+    "lat": 25.928564650386473,
+    "lon": -97.50166956335386,
     "mr_level": "No MR"
-  },
-  {
-    "job_name": "BRN01-F303 PLA",
-    "tag": null,
-    "SCID": "066",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.92541564071674,
-    "lon": -97.50209984723422,
-    "mr_level": null
   },
   {
     "job_name": "BRN01-F300 PLA",
@@ -85531,7 +85509,7 @@
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.92546051669923,
+    "lat": 25.925458372457477,
     "lon": -97.5084990551616,
     "mr_level": "Comm MR"
   },
@@ -85542,8 +85520,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.925820745943454,
-    "lon": -97.51157436752342,
+    "lat": 25.92581967381669,
+    "lon": -97.51157466553528,
     "mr_level": "No MR"
   },
   {
@@ -85597,7 +85575,7 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.9334507986532,
+    "lat": 25.93345079865318,
     "lon": -97.51166435723613,
     "mr_level": "No MR"
   },
@@ -85630,8 +85608,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.929482667187884,
-    "lon": -97.51113691445875,
+    "lat": 25.929483421000008,
+    "lon": -97.51114546399998,
     "mr_level": "No MR"
   },
   {
@@ -85641,8 +85619,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.92976083534529,
-    "lon": -97.51110232826844,
+    "lat": 25.929750282000004,
+    "lon": -97.51111171599999,
     "mr_level": "No MR"
   },
   {
@@ -85652,8 +85630,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.929949177818163,
-    "lon": -97.51108010705175,
+    "lat": 25.929958826574765,
+    "lon": -97.51108983005943,
     "mr_level": "Comm MR"
   },
   {
@@ -85663,8 +85641,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.928990816658626,
-    "lon": -97.51119737876758,
+    "lat": 25.928991872000005,
+    "lon": -97.51120525775656,
     "mr_level": "No MR"
   },
   {
@@ -85694,7 +85672,7 @@
     "tag": "NT",
     "SCID": "005",
     "owner": "BPUB",
-    "pole_spec": "45-4 SOUTHERN PINE",
+    "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.926496978859674,
     "lon": -97.5130890713647,
@@ -85795,7 +85773,7 @@
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": "40-4 SOUTHERN PINE",
-    "lat": 25.926495798452677,
+    "lat": 25.926495798452656,
     "lon": -97.51243765047187,
     "mr_level": "Complex Power MR"
   },
@@ -85828,8 +85806,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.926152146987977,
-    "lon": -97.51312205552756,
+    "lat": 25.926157507579084,
+    "lon": -97.51312399267624,
     "mr_level": "No MR"
   },
   {
@@ -85872,7 +85850,7 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.928361919905544,
+    "lat": 25.928362991999993,
     "lon": -97.512224717,
     "mr_level": "No MR"
   },
@@ -85938,8 +85916,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.928666476473104,
-    "lon": -97.51123739758198,
+    "lat": 25.928666778000018,
+    "lon": -97.51124812641804,
     "mr_level": "Comm MR"
   },
   {
@@ -85950,7 +85928,7 @@
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.930356052999997,
-    "lon": -97.51103825944773,
+    "lon": -97.51103892999998,
     "mr_level": "Comm MR"
   },
   {
@@ -86026,8 +86004,8 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.92940132113889,
-    "lon": -97.51079377432023,
+    "lat": 25.92940207495152,
+    "lon": -97.51079561833893,
     "mr_level": "No MR"
   },
   {
@@ -86048,8 +86026,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.932676466526903,
-    "lon": -97.51040701485675,
+    "lat": 25.93267513985536,
+    "lon": -97.51040580786065,
     "mr_level": "Simple Power MR"
   },
   {
@@ -86158,7 +86136,7 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.933233055451417,
+    "lat": 25.933234261512386,
     "lon": -97.51274959127302,
     "mr_level": "No MR"
   },
@@ -86202,7 +86180,7 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.927946516003633,
+    "lat": 25.92794544390537,
     "lon": -97.51227527250145,
     "mr_level": "Comm MR"
   },
@@ -86213,8 +86191,8 @@
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.926221171271045,
-    "lon": -97.51311652407452,
+    "lat": 25.926216212723297,
+    "lon": -97.51312010036003,
     "mr_level": "No MR"
   },
   {
@@ -86296,7 +86274,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT3",
+    "tag": "NT",
     "SCID": "020",
     "owner": "AEP",
     "pole_spec": "45-3 SOUTHERN PINE",
@@ -86307,7 +86285,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT2",
+    "tag": "NT",
     "SCID": "019",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
@@ -86323,8 +86301,8 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": "50-3 SOUTHERN PINE",
-    "lat": 25.936520920191814,
-    "lon": -97.51700163223613,
+    "lat": 25.9365028297801,
+    "lon": -97.51700461247746,
     "mr_level": "Complex Power MR"
   },
   {
@@ -86368,7 +86346,7 @@
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
     "lat": 25.93918944229436,
-    "lon": -97.51811273495264,
+    "lon": -97.51810796676295,
     "mr_level": "Complex Power MR"
   },
   {
@@ -86400,13 +86378,13 @@
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.937074263753626,
-    "lon": -97.5172785126703,
+    "lat": 25.937088467999995,
+    "lon": -97.51728268499998,
     "mr_level": "Comm MR"
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT5",
+    "tag": "NT",
     "SCID": "022",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -86450,7 +86428,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "86351",
+    "tag": "8635",
     "SCID": "042",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -86461,7 +86439,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT4",
+    "tag": "NT",
     "SCID": "021",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -86582,7 +86560,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT1",
+    "tag": "NT",
     "SCID": "018",
     "owner": "BPUB",
     "pole_spec": "45-2 SOUTHERN PINE",
@@ -86708,8 +86686,8 @@
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": "40-4 SOUTHERN PINE",
-    "lat": 25.937072762938726,
-    "lon": -97.51708701791163,
+    "lat": 25.937076112999996,
+    "lon": -97.51708820999998,
     "mr_level": "Complex Power MR"
   },
   {
@@ -86824,7 +86802,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT2",
+    "tag": "NT",
     "SCID": "072",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -86854,6 +86832,17 @@
     "lat": 25.934416039975165,
     "lon": -97.51741685080802,
     "mr_level": "Simple Power MR"
+  },
+  {
+    "job_name": "BRN01-F302 PLA",
+    "tag": "53170",
+    "SCID": "060",
+    "owner": "BPUB",
+    "pole_spec": "45-3 SOUTHERN PINE",
+    "proposed_spec": null,
+    "lat": 25.936515522411753,
+    "lon": -97.5013448222524,
+    "mr_level": null
   },
   {
     "job_name": "BRN01-F302 PLA",
@@ -86895,8 +86884,8 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.936848472693548,
-    "lon": -97.50131985036695,
+    "lat": 25.936850482721233,
+    "lon": -97.50131910532708,
     "mr_level": "Comm MR"
   },
   {
@@ -87060,9 +87049,9 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": "50-3 SOUTHERN PINE",
-    "lat": 25.937278493959266,
-    "lon": -97.50127586259705,
-    "mr_level": "Complex Power MR"
+    "lat": 25.937282513999982,
+    "lon": -97.50128033299998,
+    "mr_level": "Simple Power MR"
   },
   {
     "job_name": "BRN01-F302 PLA",
@@ -87099,7 +87088,7 @@
   },
   {
     "job_name": "BRN01-F302 PLA",
-    "tag": "NT6",
+    "tag": "NT",
     "SCID": "074",
     "owner": "AEP",
     "pole_spec": "50-2 SOUTHERN PINE",
@@ -87107,28 +87096,6 @@
     "lat": 25.9384089372699,
     "lon": -97.51695030935652,
     "mr_level": "Simple Power MR"
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "076",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.937638246556382,
-    "lon": -97.50123787891324,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "081",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.937978420798334,
-    "lon": -97.50233712079319,
-    "mr_level": null
   },
   {
     "job_name": "BRN01-F302 PLA",
@@ -87153,171 +87120,6 @@
     "mr_level": "Comm MR"
   },
   {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "077",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93786267225558,
-    "lon": -97.50120986061762,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "078",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93789547772515,
-    "lon": -97.50148450521328,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "079",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.9379268340663,
-    "lon": -97.50175943163731,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "080",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93795095432304,
-    "lon": -97.50204106358387,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "082",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93800976847362,
-    "lon": -97.50259638834329,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "083",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93803040468313,
-    "lon": -97.50287876532973,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "084",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93809879377798,
-    "lon": -97.50307751002074,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "085",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938310903895626,
-    "lon": -97.50304553167061,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "086",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938602645160362,
-    "lon": -97.50301546855061,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "087",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938778618283713,
-    "lon": -97.5029958061119,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "088",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.939106430034442,
-    "lon": -97.50295244367825,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "089",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.93875307124549,
-    "lon": -97.50276871236073,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "090",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938673339038132,
-    "lon": -97.50210549937816,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "091",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938665566987257,
-    "lon": -97.50190180055012,
-    "mr_level": null
-  },
-  {
-    "job_name": "BRN01-F302 PLA",
-    "tag": null,
-    "SCID": "092",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938587243631126,
-    "lon": -97.50135276722955,
-    "mr_level": null
-  },
-  {
     "job_name": "BRN01-F301 PLA",
     "tag": "51235",
     "SCID": "065",
@@ -87325,7 +87127,7 @@
     "pole_spec": "50-4 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.92999865723535,
-    "lon": -97.51552869221136,
+    "lon": -97.51553018237296,
     "mr_level": "No MR"
   },
   {
@@ -87335,7 +87137,7 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.930301017545094,
+    "lat": 25.930301017545073,
     "lon": -97.51395112050717,
     "mr_level": "Comm MR"
   },
@@ -87654,8 +87456,8 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
-    "lat": 25.928093827488862,
-    "lon": -97.51599084665675,
+    "lat": 25.928092621375225,
+    "lon": -97.51598682334323,
     "mr_level": "Complex Power MR"
   },
   {
@@ -87665,7 +87467,7 @@
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
-    "lat": 25.928074962601777,
+    "lat": 25.92807556565866,
     "lon": -97.51575807202971,
     "mr_level": "Complex Power MR"
   },
@@ -87809,7 +87611,7 @@
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.928253827720123,
-    "lon": -97.51761285452545,
+    "lon": -97.517613391,
     "mr_level": "No MR"
   },
   {
@@ -87831,7 +87633,7 @@
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.928218091550757,
-    "lon": -97.51729990897807,
+    "lon": -97.51729964076127,
     "mr_level": "No MR"
   },
   {
@@ -87984,7 +87786,7 @@
     "owner": "BPUB",
     "pole_spec": "35-3 SOUTHERN PINE",
     "proposed_spec": "40-3 SOUTHERN PINE",
-    "lat": 25.929159607040717,
+    "lat": 25.92916021009205,
     "lon": -97.51879725963224,
     "mr_level": "Complex Power MR"
   },
