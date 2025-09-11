@@ -870,6 +870,176 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_068",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12070 Tag 81629",
+    "SCID": "068",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_069",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12067 Tag 81628",
+    "SCID": "069",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_070",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12069 Tag NT",
+    "SCID": "070",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_071",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12131 Tag NA",
+    "SCID": "071",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_072",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12132 Tag NT",
+    "SCID": "072",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_073",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12133 Tag 01395",
+    "SCID": "073",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_074",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12107 Tag 01390",
+    "SCID": "074",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_075",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12106 Tag 97886",
+    "SCID": "075",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_106",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12066 Tag 30794",
+    "SCID": "106",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_107",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12065 Tag 30795",
+    "SCID": "107",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_108",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12063 Tag 30796",
+    "SCID": "108",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_109",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12064 Tag NT",
+    "SCID": "109",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_110",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12126 Tag 72082",
+    "SCID": "110",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_111",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12127 Tag 01441",
+    "SCID": "111",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_112",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12128 Tag 72281",
+    "SCID": "112",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_113",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12129 Tag NT",
+    "SCID": "113",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F35_BRN02-F01_SEG6_114",
+    "job_name": "BRN02-F01 PLA",
+    "tag": "GPCAN 12130 Tag NT",
+    "SCID": "114",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/11/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F36_BRN02-F05_SEG1_016",
     "job_name": "BRN02-F05 PLA",
     "tag": "81286",
