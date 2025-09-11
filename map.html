@@ -140,10 +140,18 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (groups by permit prefix; toggle ON by default) === -->
+<!-- === Permit Areas overlay (smart concave polygons; toggle ON by default) === -->
 <script>
 (function(){
   'use strict';
+
+  // ---------- Tunables (adjust if needed) ----------
+  const CLUSTER_EPS_METERS   = 140; // DBSCAN distance to split far-apart runs (80–180 is typical)
+  const DBSCAN_MIN_POINTS    = 2;   // min points for a cluster (2 keeps pairs)
+  const MAX_EDGE_METERS      = 120; // concave hull "tightness" (smaller = tighter; 80–150 works well)
+  const BUFFER_METERS        = 25;  // outward buffer so the polygon isn't too tight
+  const SIMPLIFY_TOL_METERS  = 3;   // tiny simplify to smooth jaggies
+  const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.9, fillOpacity:0.08, dashArray:'6,4' };
 
   // ---------- Helpers ----------
   const degPerMeterLat = 1 / 111320;
@@ -151,33 +159,27 @@
     const m = 111320 * Math.cos((lat||0) * Math.PI/180);
     return m > 0 ? 1 / m : 1 / 111320;
   };
+  const degTol = SIMPLIFY_TOL_METERS * degPerMeterLat;
   const getJob = () => new URLSearchParams(location.search).get('job') || '';
 
-  // Ensure we only ever return a real Leaflet map instance
   function isLeafletMap(m){
     return !!(m && typeof m.addControl === 'function' && typeof m.addLayer === 'function' &&
               typeof m.getCenter === 'function' && m._leaflet_id != null);
   }
   function mapInstance(){
-    // Prefer the instance captured by the tiny L.map wrapper
     if (isLeafletMap(window.__leaflet_map__)) return window.__leaflet_map__;
-    // Fallback: scan globals for something that looks like a Leaflet map
-    for (const k of Object.keys(window)){
-      try { const v = window[k]; if (isLeafletMap(v)) return v; } catch(_) {}
-    }
+    for (const k of Object.keys(window)){ try{ const v = window[k]; if (isLeafletMap(v)) return v; }catch(_){} }
     return null;
   }
 
-  // generic getters (tolerant to different field names)
   const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
   const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
 
-  // extract permit id string from various shapes
   function readPermitId(r){
     return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
   }
 
-  // remove ALL trailing "_<digits>" segments so "..._028_12345" -> "...", e.g. "..._SEG4"
+  // Trim ALL trailing "_<digits>" segments so "..._028_12345" -> "...", e.g., "..._SEG4"
   function toPrefix(id){
     if (!id || typeof id !== 'string') return null;
     let s = id.trim();
@@ -185,13 +187,9 @@
     return s;
   }
 
-  // try fetch with several local paths if STATE not present
   async function smartFetch(paths){
     for (const p of paths) {
-      try {
-        const r = await fetch(p, { cache: 'no-store' });
-        if (r.ok) return r.json();
-      } catch(_) {}
+      try { const r = await fetch(p, { cache: 'no-store' }); if (r.ok) return r.json(); } catch(_) {}
     }
     return null;
   }
@@ -201,7 +199,6 @@
     const poles   = Array.isArray(S.poles)   ? S.poles   : [];
     const permits = Array.isArray(S.permits) ? S.permits : [];
 
-    // index permits by (job_name, tag, SCID)
     const byPole = new Map();
     for (const r of permits){
       const k = `${r.job_name}::${r.tag}::${r.SCID}`;
@@ -217,19 +214,17 @@
 
       const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
       for (const r of related){
-        const id = readPermitId(r);
-        const prefix = toPrefix(String(id||""));
+        const id = readPermitId(r); const prefix = toPrefix(String(id||""));
         if (prefix) pts.push({ lat, lng, prefix });
       }
     }
     return pts;
   }
 
-  // fallback loader if STATE missing/empty
   async function buildPointsFromFiles(job){
     const basePaths = ["data", "./data", "."];
-    const polePaths    = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
-    const permitPaths  = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
+    const polePaths   = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
+    const permitPaths = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
 
     const [poles, permits] = await Promise.all([ smartFetch(polePaths), smartFetch(permitPaths) ]);
 
@@ -242,17 +237,14 @@
         byPole.get(k).push(r);
       }
     }
-
     if (Array.isArray(poles)) {
       for (const p of poles){
         if (job && String(p.job_name) !== String(job)) continue;
         const lat = +getLat(p), lng = +getLng(p);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-
         const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
         for (const r of related){
-          const id = readPermitId(r);
-          const prefix = toPrefix(String(id||""));
+          const id = readPermitId(r); const prefix = toPrefix(String(id||""));
           if (prefix) pts.push({ lat, lng, prefix });
         }
       }
@@ -269,60 +261,82 @@
     }
 
     const layer = L.layerGroup();
+
     groups.forEach((pts, prefix) => {
-      if (pts.length < 2) return; // avoid singletons
+      if (pts.length < 2) return;
 
-      let minLat=+Infinity, maxLat=-Infinity, minLng=+Infinity, maxLng=-Infinity, latSum=0;
-      for (const p of pts){
-        if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
-        if (p.lat < minLat) minLat = p.lat;
-        if (p.lat > maxLat) maxLat = p.lat;
-        if (p.lng < minLng) minLng = p.lng;
-        if (p.lng > maxLng) maxLng = p.lng;
-        latSum += p.lat;
+      // 1) cluster by distance so far-apart runs don't fuse
+      const fc = turf.featureCollection(pts.map(p => turf.point([p.lng, p.lat], p)));
+      const clustered = turf.clustersDbscan(fc, CLUSTER_EPS_METERS, { units:'meters', minPoints: DBSCAN_MIN_POINTS });
+
+      const clusters = new Map();
+      for (const f of clustered.features){
+        const state = f.properties.dbscan;           // 'core' | 'edge' | 'noise'
+        const cid   = f.properties.cluster;          // number for non-noise
+        if (state === 'noise' || cid === undefined || cid === null) continue;
+        if (!clusters.has(cid)) clusters.set(cid, []);
+        clusters.get(cid).push(f);
       }
-      if (!isFinite(minLat) || !isFinite(maxLng)) return;
 
-      const centerLat = latSum / pts.length;
-      const padM = 60; // meters padding
-      const dLat = padM * degPerMeterLat;
-      const dLng = padM * degPerMeterLngAt(centerLat);
+      // if DBSCAN found nothing (all noise), just treat all points as one cluster
+      if (clusters.size === 0) clusters.set(0, fc.features);
 
-      const sw = [minLat - dLat, minLng - dLng];
-      const ne = [maxLat + dLat, maxLng + dLng];
+      // 2) For each cluster, build a concave hull (fallback: convex)
+      clusters.forEach((feats) => {
+        if (!feats || feats.length < 2) return;
+        const subFC = turf.featureCollection(feats);
 
-      const rect = L.rectangle([sw, ne], {
-        color: '#7b61ff',
-        weight: 2,
-        opacity: 0.9,
-        fillOpacity: 0.07,
-        dashArray: '6,4',
-        interactive: false
+        let poly   = (feats.length >= 3) ? turf.concave(subFC, { maxEdge: MAX_EDGE_METERS, units:'meters' }) : null;
+        if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
+
+        if (!poly) {
+          // final fallback: tiny padded rectangle around min/max
+          let minLat=+Infinity,maxLat=-Infinity,minLng=+Infinity,maxLng=-Infinity, latSum=0;
+          for (const f of feats){
+            const [lng,lat] = f.geometry.coordinates;
+            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+            if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
+            latSum += lat;
+          }
+          const centerLat = latSum / feats.length;
+          const dLat = 20 * degPerMeterLat;
+          const dLng = 20 * degPerMeterLngAt(centerLat);
+          const sw = [minLng - dLng, minLat - dLat];
+          const ne = [maxLng + dLng, maxLat + dLat];
+          poly = turf.bboxPolygon([sw[0], sw[1], ne[0], ne[1]]);
+        }
+
+        // 3) buffer + simplify for a nicer outline
+        try { poly = turf.buffer(poly, BUFFER_METERS, { units:'meters' }); } catch(_) {}
+        try { poly = turf.simplify(poly, { tolerance: degTol, highQuality:false }); } catch(_) {}
+
+        // 4) draw it
+        const gj = L.geoJSON(poly, { style: POLY_STYLE, interactive:false });
+        layer.addLayer(gj);
+
+        // 5) center label (high-contrast, always legible)
+        const center = turf.centerOfMass(poly).geometry.coordinates;
+        const labelHTML = `<div class="permit-area-label" style="background:#111827;color:#fff;border:1px solid rgba(255,255,255,.25);box-shadow:0 2px 6px rgba(0,0,0,.35);padding:4px 6px;border-radius:6px;font-weight:700">${prefix}</div>`;
+        const label = L.marker([center[1], center[0]], {
+          icon: L.divIcon({ className:'', html: labelHTML, iconAnchor:[0,0] }),
+          interactive:false, keyboard:false
+        });
+        layer.addLayer(label);
       });
-
-      const center = L.latLng((sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2);
-      const label  = L.marker(center, {
-        icon: L.divIcon({ className: 'permit-area-label', html: prefix, iconAnchor: [0,0] }),
-        interactive: false, keyboard: false
-      });
-
-      layer.addLayer(rect);
-      layer.addLayer(label);
     });
 
     return layer;
   }
 
-  // Leaflet control to toggle the layer (TOP-LEFT)
   const PermitAreasControl = L.Control.extend({
     onAdd: function(){
       const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
       div.innerHTML = `
-        <label title="Show rectangles around poles that share the same permit prefix">
+        <label title="Show polygons around poles that share the same permit prefix">
           <input type="checkbox" id="permitAreasToggle" checked />
           Permit Areas
         </label>
-        <small>Groups by prefix (trims all trailing "_###").</small>
+        <small>Smart concave polygons by prefix</small>
       `;
       return div;
     }
@@ -368,21 +382,19 @@
     const ctrl = new PermitAreasControl({ position: 'topleft' });
     map.addControl(ctrl);
 
-    // Wait until the checkbox exists in DOM, then wire it and render
     const waitToggle = () => {
       if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
       else setTimeout(waitToggle, 100);
     };
     waitToggle();
 
-    // Hot-swap refresh hooks (watcher/map code should dispatch one of these)
+    // Hot-swap refresh hooks
     window.addEventListener('data:loaded',   rebuild);
     window.addEventListener('poles:loaded',  rebuild);
     window.addEventListener('permits:loaded',rebuild);
     window.addEventListener('state:updated', rebuild);
 
-    // Optional public hook for console/manual refresh
-    window.refreshPermitAreas = rebuild;
+    window.refreshPermitAreas = rebuild; // manual hook if needed
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
