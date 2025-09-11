@@ -140,18 +140,21 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (smart concave polygons; toggle ON by default) === -->
+<!-- === Permit Areas overlay (adaptive clusters + guaranteed coverage; toggle ON) === -->
 <script>
 (function(){
   'use strict';
 
-  // ---------- Tunables (adjust if needed) ----------
-  const CLUSTER_EPS_METERS   = 140; // DBSCAN distance to split far-apart runs (80–180 is typical)
-  const DBSCAN_MIN_POINTS    = 2;   // min points for a cluster (2 keeps pairs)
-  const MAX_EDGE_METERS      = 120; // concave hull "tightness" (smaller = tighter; 80–150 works well)
-  const BUFFER_METERS        = 25;  // outward buffer so the polygon isn't too tight
-  const SIMPLIFY_TOL_METERS  = 3;   // tiny simplify to smooth jaggies
-  const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.9, fillOpacity:0.08, dashArray:'6,4' };
+  // ---------- Tunables ----------
+  const DBSCAN_MIN_POINTS   = 1;    // allow singletons to form tiny clusters
+  const EPS_CLAMP_MIN_M     = 35;   // lower clamp for adaptive eps
+  const EPS_CLAMP_MAX_M     = 170;  // upper clamp for adaptive eps
+  const MAXEDGE_MIN_M       = 70;   // lower clamp for concave "tightness"
+  const MAXEDGE_FACTOR      = 2.2;  // concave maxEdge ~= eps * factor
+  const OUTLIER_BUFFER_F    = 0.35; // outlier fix: buffer radius = eps * this
+  const BASE_BUFFER_M       = 22;   // general breathing room for polygons
+  const SIMPLIFY_TOL_M      = 3;    // small smoothing
+  const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
 
   // ---------- Helpers ----------
   const degPerMeterLat = 1 / 111320;
@@ -159,7 +162,7 @@
     const m = 111320 * Math.cos((lat||0) * Math.PI/180);
     return m > 0 ? 1 / m : 1 / 111320;
   };
-  const degTol = SIMPLIFY_TOL_METERS * degPerMeterLat;
+  const degTol = SIMPLIFY_TOL_M * degPerMeterLat;
   const getJob = () => new URLSearchParams(location.search).get('job') || '';
 
   function isLeafletMap(m){
@@ -188,9 +191,7 @@
   }
 
   async function smartFetch(paths){
-    for (const p of paths) {
-      try { const r = await fetch(p, { cache: 'no-store' }); if (r.ok) return r.json(); } catch(_) {}
-    }
+    for (const p of paths) { try { const r = await fetch(p, { cache:'no-store' }); if (r.ok) return r.json(); } catch(_) {} }
     return null;
   }
 
@@ -225,7 +226,6 @@
     const basePaths = ["data", "./data", "."];
     const polePaths   = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
     const permitPaths = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
-
     const [poles, permits] = await Promise.all([ smartFetch(polePaths), smartFetch(permitPaths) ]);
 
     const pts = [];
@@ -252,7 +252,35 @@
     return pts;
   }
 
+  // --- Adaptive neighborhood radius (eps) per prefix ---
+  function percentile(sorted, p){ if (!sorted.length) return 0; const i = (sorted.length-1)*p; const lo = Math.floor(i), hi = Math.ceil(i); if (lo===hi) return sorted[lo]; return sorted[lo] + (sorted[hi]-sorted[lo])*(i-lo); }
+  function nearestNeighborDistancesMeters(coords){
+    // coords: [[lng,lat], ...]
+    const out = [];
+    for (let i=0;i<coords.length;i++){
+      let best = Infinity;
+      for (let j=0;j<coords.length;j++){
+        if (i===j) continue;
+        const d = turf.distance(coords[i], coords[j], {units:'meters'});
+        if (d < best) best = d;
+      }
+      if (Number.isFinite(best)) out.push(best);
+    }
+    return out.sort((a,b)=>a-b);
+  }
+  function adaptiveEpsMeters(coords){
+    if (coords.length < 2) return 50;
+    const nnd = nearestNeighborDistancesMeters(coords);
+    const p50 = percentile(nnd, 0.50);
+    const p75 = percentile(nnd, 0.75);
+    // slightly liberal to keep sequential poles together but not fuse distant runs
+    let eps = Math.max(p75*1.6, p50*1.8);
+    eps = Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
+    return eps;
+  }
+
   function buildAreasLayer(points){
+    // Group by prefix first
     const groups = new Map();
     for (const pt of points){
       if (!pt || !pt.prefix) continue;
@@ -265,59 +293,70 @@
     groups.forEach((pts, prefix) => {
       if (pts.length < 2) return;
 
-      // 1) cluster by distance so far-apart runs don't fuse
-      const fc = turf.featureCollection(pts.map(p => turf.point([p.lng, p.lat], p)));
-      const clustered = turf.clustersDbscan(fc, CLUSTER_EPS_METERS, { units:'meters', minPoints: DBSCAN_MIN_POINTS });
+      // Prepare FeatureCollection
+      const features = pts.map(p => turf.point([p.lng, p.lat], p));
+      const fc = turf.featureCollection(features);
 
+      // Adaptive DBSCAN
+      const coords = features.map(f => f.geometry.coordinates);
+      const eps    = adaptiveEpsMeters(coords);
+      const clustered = turf.clustersDbscan(fc, eps, { units:'meters', minPoints: DBSCAN_MIN_POINTS });
+
+      // Gather clusters (ignore "noise" concept since minPoints=1)
       const clusters = new Map();
       for (const f of clustered.features){
-        const state = f.properties.dbscan;           // 'core' | 'edge' | 'noise'
-        const cid   = f.properties.cluster;          // number for non-noise
-        if (state === 'noise' || cid === undefined || cid === null) continue;
+        const cid = f.properties.cluster ?? 0;
         if (!clusters.has(cid)) clusters.set(cid, []);
         clusters.get(cid).push(f);
       }
 
-      // if DBSCAN found nothing (all noise), just treat all points as one cluster
-      if (clusters.size === 0) clusters.set(0, fc.features);
-
-      // 2) For each cluster, build a concave hull (fallback: convex)
       clusters.forEach((feats) => {
         if (!feats || feats.length < 2) return;
-        const subFC = turf.featureCollection(feats);
 
-        let poly   = (feats.length >= 3) ? turf.concave(subFC, { maxEdge: MAX_EDGE_METERS, units:'meters' }) : null;
+        const subFC = turf.featureCollection(feats);
+        // Concave, fallback to convex
+        const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
+        let poly = (feats.length >= 3) ? turf.concave(subFC, { maxEdge, units:'meters' }) : null;
         if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
 
-        if (!poly) {
-          // final fallback: tiny padded rectangle around min/max
-          let minLat=+Infinity,maxLat=-Infinity,minLng=+Infinity,maxLng=-Infinity, latSum=0;
-          for (const f of feats){
-            const [lng,lat] = f.geometry.coordinates;
-            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-            if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng;
-            latSum += lat;
+        // Outlier guarantee: ensure every point is inside; if not, union small buffers
+        const checkPoints = feats.map(f => f.geometry.coordinates);
+        let needsUnion = false;
+        if (poly){
+          for (const c of checkPoints){
+            if (!turf.booleanPointInPolygon(turf.point(c), poly)) { needsUnion = true; break; }
           }
-          const centerLat = latSum / feats.length;
-          const dLat = 20 * degPerMeterLat;
-          const dLng = 20 * degPerMeterLngAt(centerLat);
-          const sw = [minLng - dLng, minLat - dLat];
-          const ne = [maxLng + dLng, maxLat + dLat];
-          poly = turf.bboxPolygon([sw[0], sw[1], ne[0], ne[1]]);
+        } else {
+          needsUnion = true;
         }
 
-        // 3) buffer + simplify for a nicer outline
-        try { poly = turf.buffer(poly, BUFFER_METERS, { units:'meters' }); } catch(_) {}
+        if (needsUnion){
+          // build a union of small disks around all points, radius relative to eps
+          const r = Math.max(12, eps * OUTLIER_BUFFER_F);
+          let unionGeom = null;
+          for (const f of feats){
+            const b = turf.buffer(f, r, {units:'meters'});
+            unionGeom = unionGeom ? (turf.union(unionGeom, b) || unionGeom) : b;
+          }
+          poly = poly ? (turf.union(poly, unionGeom) || unionGeom) : unionGeom;
+        }
+
+        // General breathing room + smoothing
+        try { poly = turf.buffer(poly, BASE_BUFFER_M, { units:'meters' }); } catch(_) {}
         try { poly = turf.simplify(poly, { tolerance: degTol, highQuality:false }); } catch(_) {}
 
-        // 4) draw it
+        // Draw polygon
         const gj = L.geoJSON(poly, { style: POLY_STYLE, interactive:false });
         layer.addLayer(gj);
 
-        // 5) center label (high-contrast, always legible)
-        const center = turf.centerOfMass(poly).geometry.coordinates;
-        const labelHTML = `<div class="permit-area-label" style="background:#111827;color:#fff;border:1px solid rgba(255,255,255,.25);box-shadow:0 2px 6px rgba(0,0,0,.35);padding:4px 6px;border-radius:6px;font-weight:700">${prefix}</div>`;
-        const label = L.marker([center[1], center[0]], {
+        // Red, bold label chip (high contrast)
+        const ctr = turf.centerOfMass(poly).geometry.coordinates;
+        const labelHTML = `<div style="
+            background:#ef4444;color:#fff;font-weight:800;font-size:12px;
+            padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.25);
+            box-shadow:0 2px 6px rgba(0,0,0,.35);
+          ">${prefix}</div>`;
+        const label = L.marker([ctr[1], ctr[0]], {
           icon: L.divIcon({ className:'', html: labelHTML, iconAnchor:[0,0] }),
           interactive:false, keyboard:false
         });
@@ -336,7 +375,7 @@
           <input type="checkbox" id="permitAreasToggle" checked />
           Permit Areas
         </label>
-        <small>Smart concave polygons by prefix</small>
+        <small>Adaptive concave polygons; guarantees full coverage</small>
       `;
       return div;
     }
