@@ -140,62 +140,110 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-  <!-- === Permit Areas overlay (groups by permit prefix; toggle ON by default) === -->
-  <script>
-  (function(){
-    // ---------- Helpers ----------
-    const degPerMeterLat = 1 / 111320;
-    const degPerMeterLngAt = (lat) => {
-      const m = 111320 * Math.cos((lat||0) * Math.PI/180);
-      return m > 0 ? 1 / m : 1 / 111320;
-    };
-    const getJob = () => new URLSearchParams(location.search).get('job') || '';
+<!-- === Permit Areas overlay (groups by permit prefix; toggle ON by default) === -->
+<script>
+(function(){
+  'use strict';
 
-    function mapInstance(){
-      return window.__leaflet_map__ || window.map || window.MAP || null;
+  // ---------- Helpers ----------
+  const degPerMeterLat = 1 / 111320;
+  const degPerMeterLngAt = (lat) => {
+    const m = 111320 * Math.cos((lat||0) * Math.PI/180);
+    return m > 0 ? 1 / m : 1 / 111320;
+  };
+  const getJob = () => new URLSearchParams(location.search).get('job') || '';
+
+  // Ensure we only ever return a real Leaflet map instance
+  function isLeafletMap(m){
+    return !!(m && typeof m.addControl === 'function' && typeof m.addLayer === 'function' &&
+              typeof m.getCenter === 'function' && m._leaflet_id != null);
+  }
+  function mapInstance(){
+    // Prefer the instance captured by the tiny L.map wrapper
+    if (isLeafletMap(window.__leaflet_map__)) return window.__leaflet_map__;
+    // Fallback: scan globals for something that looks like a Leaflet map
+    for (const k of Object.keys(window)){
+      try { const v = window[k]; if (isLeafletMap(v)) return v; } catch(_) {}
+    }
+    return null;
+  }
+
+  // generic getters (tolerant to different field names)
+  const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
+  const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
+
+  // extract permit id string from various shapes
+  function readPermitId(r){
+    return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
+  }
+
+  // remove ALL trailing "_<digits>" segments so "..._028_12345" -> "...", e.g. "..._SEG4"
+  function toPrefix(id){
+    if (!id || typeof id !== 'string') return null;
+    let s = id.trim();
+    while (/_\d+$/.test(s)) s = s.replace(/_\d+$/, '');
+    return s;
+  }
+
+  // try fetch with several local paths if STATE not present
+  async function smartFetch(paths){
+    for (const p of paths) {
+      try {
+        const r = await fetch(p, { cache: 'no-store' });
+        if (r.ok) return r.json();
+      } catch(_) {}
+    }
+    return null;
+  }
+
+  function buildPointsFromSTATE(job){
+    const S = window.STATE || {};
+    const poles   = Array.isArray(S.poles)   ? S.poles   : [];
+    const permits = Array.isArray(S.permits) ? S.permits : [];
+
+    // index permits by (job_name, tag, SCID)
+    const byPole = new Map();
+    for (const r of permits){
+      const k = `${r.job_name}::${r.tag}::${r.SCID}`;
+      if (!byPole.has(k)) byPole.set(k, []);
+      byPole.get(k).push(r);
     }
 
-    // generic getters (tolerant to different field names)
-    const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
-    const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
+    const pts = [];
+    for (const p of poles){
+      if (job && String(p.job_name) !== String(job)) continue;
+      const lat = +getLat(p), lng = +getLng(p);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
 
-    // extract permit id string from various shapes
-    function readPermitId(r){
-      return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
-    }
-
-    // remove trailing "_<digits>" after the LAST underscore
-    function toPrefix(id){
-      if (!id || typeof id !== 'string') return null;
-      const m = id.match(/^(.*)_\d+$/);
-      return (m && m[1]) ? m[1] : id;
-    }
-
-    // try fetch with several local paths if STATE not present
-    async function smartFetch(paths){
-      for (const p of paths) {
-        try {
-          const r = await fetch(p, { cache: 'no-store' });
-          if (r.ok) return r.json();
-        } catch(_) {}
+      const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      for (const r of related){
+        const id = readPermitId(r);
+        const prefix = toPrefix(String(id||""));
+        if (prefix) pts.push({ lat, lng, prefix });
       }
-      return null;
     }
+    return pts;
+  }
 
-    function buildPointsFromSTATE(job){
-      const S = window.STATE || {};
-      const poles   = Array.isArray(S.poles)   ? S.poles   : [];
-      const permits = Array.isArray(S.permits) ? S.permits : [];
+  // fallback loader if STATE missing/empty
+  async function buildPointsFromFiles(job){
+    const basePaths = ["data", "./data", "."];
+    const polePaths    = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
+    const permitPaths  = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
 
-      // index permits by (job_name, tag, SCID)
-      const byPole = new Map();
+    const [poles, permits] = await Promise.all([ smartFetch(polePaths), smartFetch(permitPaths) ]);
+
+    const pts = [];
+    const byPole = new Map();
+    if (Array.isArray(permits)) {
       for (const r of permits){
         const k = `${r.job_name}::${r.tag}::${r.SCID}`;
         if (!byPole.has(k)) byPole.set(k, []);
         byPole.get(k).push(r);
       }
+    }
 
-      const pts = [];
+    if (Array.isArray(poles)) {
       for (const p of poles){
         if (job && String(p.job_name) !== String(job)) continue;
         const lat = +getLat(p), lng = +getLng(p);
@@ -208,177 +256,136 @@
           if (prefix) pts.push({ lat, lng, prefix });
         }
       }
-      return pts;
+    }
+    return pts;
+  }
+
+  function buildAreasLayer(points){
+    const groups = new Map();
+    for (const pt of points){
+      if (!pt || !pt.prefix) continue;
+      if (!groups.has(pt.prefix)) groups.set(pt.prefix, []);
+      groups.get(pt.prefix).push(pt);
     }
 
-    // fallback loader if STATE missing/empty
-    async function buildPointsFromFiles(job){
-      const basePaths = ["data", "./data", "."];
-      const polePaths    = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
-      const permitPaths  = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
+    const layer = L.layerGroup();
+    groups.forEach((pts, prefix) => {
+      if (pts.length < 2) return; // avoid singletons
 
-      const [poles, permits] = await Promise.all([
-        smartFetch(polePaths), smartFetch(permitPaths)
-      ]);
-
-      const pts = [];
-      const byPole = new Map();
-      if (Array.isArray(permits)) {
-        for (const r of permits){
-          const k = `${r.job_name}::${r.tag}::${r.SCID}`;
-          if (!byPole.has(k)) byPole.set(k, []);
-          byPole.get(k).push(r);
-        }
+      let minLat=+Infinity, maxLat=-Infinity, minLng=+Infinity, maxLng=-Infinity, latSum=0;
+      for (const p of pts){
+        if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
+        if (p.lat < minLat) minLat = p.lat;
+        if (p.lat > maxLat) maxLat = p.lat;
+        if (p.lng < minLng) minLng = p.lng;
+        if (p.lng > maxLng) maxLng = p.lng;
+        latSum += p.lat;
       }
+      if (!isFinite(minLat) || !isFinite(maxLng)) return;
 
-      if (Array.isArray(poles)) {
-        for (const p of poles){
-          if (job && String(p.job_name) !== String(job)) continue;
-          const lat = +getLat(p), lng = +getLng(p);
-          if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      const centerLat = latSum / pts.length;
+      const padM = 60; // meters padding
+      const dLat = padM * degPerMeterLat;
+      const dLng = padM * degPerMeterLngAt(centerLat);
 
-          const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
-          for (const r of related){
-            const id = readPermitId(r);
-            const prefix = toPrefix(String(id||""));
-            if (prefix) pts.push({ lat, lng, prefix });
-          }
-        }
-      }
-      return pts;
-    }
+      const sw = [minLat - dLat, minLng - dLng];
+      const ne = [maxLat + dLat, maxLng + dLng];
 
-    function buildAreasLayer(points){
-      const groups = new Map();
-      for (const pt of points){
-        if (!pt || !pt.prefix) continue;
-        if (!groups.has(pt.prefix)) groups.set(pt.prefix, []);
-        groups.get(pt.prefix).push(pt);
-      }
-
-      const layer = L.layerGroup();
-      groups.forEach((pts, prefix) => {
-        if (pts.length < 2) return; // avoid singletons
-
-        let minLat=+Infinity, maxLat=-Infinity, minLng=+Infinity, maxLng=-Infinity, latSum=0;
-        for (const p of pts){
-          if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
-          if (p.lat < minLat) minLat = p.lat;
-          if (p.lat > maxLat) maxLat = p.lat;
-          if (p.lng < minLng) minLng = p.lng;
-          if (p.lng > maxLng) maxLng = p.lng;
-          latSum += p.lat;
-        }
-        if (!isFinite(minLat) || !isFinite(maxLng)) return;
-
-        const centerLat = latSum / pts.length;
-        const padM = 60; // meters padding
-        const dLat = padM * degPerMeterLat;
-        const dLng = padM * degPerMeterLngAt(centerLat);
-
-        const sw = [minLat - dLat, minLng - dLng];
-        const ne = [maxLat + dLat, maxLng + dLng];
-
-        const rect = L.rectangle([sw, ne], {
-          color: '#7b61ff',
-          weight: 2,
-          opacity: 0.9,
-          fillOpacity: 0.07,
-          dashArray: '6,4',
-          interactive: false
-        });
-
-        const center = L.latLng((sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2);
-        const label  = L.marker(center, {
-          icon: L.divIcon({ className: 'permit-area-label', html: prefix, iconAnchor: [0,0] }),
-          interactive: false, keyboard: false
-        });
-
-        layer.addLayer(rect);
-        layer.addLayer(label);
+      const rect = L.rectangle([sw, ne], {
+        color: '#7b61ff',
+        weight: 2,
+        opacity: 0.9,
+        fillOpacity: 0.07,
+        dashArray: '6,4',
+        interactive: false
       });
 
-      return layer;
-    }
+      const center = L.latLng((sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2);
+      const label  = L.marker(center, {
+        icon: L.divIcon({ className: 'permit-area-label', html: prefix, iconAnchor: [0,0] }),
+        interactive: false, keyboard: false
+      });
 
-    // Leaflet control to toggle the layer (TOP-LEFT, per your ask)
-    const PermitAreasControl = L.Control.extend({
-      onAdd: function(){
-        const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
-        div.innerHTML = `
-          <label title="Show rectangles around poles that share the same permit prefix">
-            <input type="checkbox" id="permitAreasToggle" checked />
-            Permit Areas
-          </label>
-          <small>Groups by <i>permit prefix</i> (trims last "_###").</small>
-        `;
-        return div;
-      }
+      layer.addLayer(rect);
+      layer.addLayer(label);
     });
 
-    async function gatherPoints(){
-      // Prefer STATE if present, else file fallback
-      const S = window.STATE || {};
-      const hasSTATE = Array.isArray(S.poles) && Array.isArray(S.permits) && (S.poles.length || S.permits.length);
-      return hasSTATE ? buildPointsFromSTATE(getJob()) : buildPointsFromFiles(getJob());
+    return layer;
+  }
+
+  // Leaflet control to toggle the layer (TOP-LEFT)
+  const PermitAreasControl = L.Control.extend({
+    onAdd: function(){
+      const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
+      div.innerHTML = `
+        <label title="Show rectangles around poles that share the same permit prefix">
+          <input type="checkbox" id="permitAreasToggle" checked />
+          Permit Areas
+        </label>
+        <small>Groups by prefix (trims all trailing "_###").</small>
+      `;
+      return div;
+    }
+  });
+
+  async function gatherPoints(){
+    const S = window.STATE || {};
+    const hasSTATE = Array.isArray(S.poles) && Array.isArray(S.permits) && (S.poles.length || S.permits.length);
+    return hasSTATE ? buildPointsFromSTATE(getJob()) : buildPointsFromFiles(getJob());
+  }
+
+  function wireToggle(map){
+    const t = document.getElementById('permitAreasToggle');
+    if (!t) return;
+    t.addEventListener('change', ()=>{
+      const layer = window.__permitAreasLayer;
+      if (!layer) return;
+      if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); }
+      else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+    });
+  }
+
+  async function rebuild(){
+    const map = mapInstance();
+    if (!isLeafletMap(map) || !window.L) return;
+
+    if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) {
+      map.removeLayer(window.__permitAreasLayer);
     }
 
-    function wireToggle(map){
-      const t = document.getElementById('permitAreasToggle');
-      if (!t) return;
-      t.addEventListener('change', ()=>{
-        const layer = window.__permitAreasLayer;
-        if (!layer) return;
-        if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); }
-        else { if (map.hasLayer(layer)) map.removeLayer(layer); }
-      });
-    }
+    const points = await gatherPoints();
+    const layer  = buildAreasLayer(points);
+    window.__permitAreasLayer = layer;
 
-    async function rebuild(){
-      const map = mapInstance();
-      if (!map || !window.L) return;
+    const toggle = document.getElementById('permitAreasToggle');
+    if (!toggle || toggle.checked) { if (layer) layer.addTo(map); }
+  }
 
-      // remove old
-      if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) {
-        map.removeLayer(window.__permitAreasLayer);
-      }
+  function boot(){
+    const map = mapInstance();
+    if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
 
-      const points = await gatherPoints();
-      const layer  = buildAreasLayer(points);
-      window.__permitAreasLayer = layer;
+    const ctrl = new PermitAreasControl({ position: 'topleft' });
+    map.addControl(ctrl);
 
-      const toggle = document.getElementById('permitAreasToggle');
-      if (!toggle || toggle.checked) { if (layer) layer.addTo(map); }
-    }
+    // Wait until the checkbox exists in DOM, then wire it and render
+    const waitToggle = () => {
+      if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
+      else setTimeout(waitToggle, 100);
+    };
+    waitToggle();
 
-    function boot(){
-      const map = mapInstance();
-      if (!map || !window.L) { setTimeout(boot, 200); return; }
+    // Hot-swap refresh hooks (watcher/map code should dispatch one of these)
+    window.addEventListener('data:loaded',   rebuild);
+    window.addEventListener('poles:loaded',  rebuild);
+    window.addEventListener('permits:loaded',rebuild);
+    window.addEventListener('state:updated', rebuild);
 
-      // Add the control (TOP-LEFT)
-      const ctrl = new PermitAreasControl({ position: 'topleft' });
-      map.addControl(ctrl);
+    // Optional public hook for console/manual refresh
+    window.refreshPermitAreas = rebuild;
+  }
 
-      // Wait until the checkbox exists in DOM, then wire it
-      const waitToggle = () => {
-        if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
-        else setTimeout(waitToggle, 100);
-      };
-      waitToggle();
-
-      // Hot-swap refresh hooks (watcher/map code should dispatch one of these)
-      window.addEventListener('data:loaded',   rebuild);
-      window.addEventListener('poles:loaded',  rebuild);
-      window.addEventListener('permits:loaded',rebuild);
-      window.addEventListener('state:updated', rebuild);
-
-      // Optional public hook for console/manual refresh
-      window.refreshPermitAreas = rebuild;
-    }
-
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-    else boot();
-  })();
-  </script>
-</body>
-</html>
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
