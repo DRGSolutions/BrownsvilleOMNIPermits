@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Map Selection</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <style>
+    :root{ --bg:#0b0c10;--panel:#121318;--muted:#9aa3b2;--fg:#f3f4f6;--border:#1f2430; }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    #map{position:absolute;inset:0}
+    .panel{
+      position:absolute;top:12px;left:12px;z-index:1000;background:var(--panel);
+      border:1px solid var(--border);border-radius:12px;padding:12px;min-width:360px;max-width:440px;
+      box-shadow:0 8px 28px rgba(0,0,0,.35);overflow:hidden;box-sizing:border-box
+    }
+    .panel *{box-sizing:border-box}
+    .panel .hdr{font-size:12px;color:var(--muted);margin-bottom:6px}
+    label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
+    input,select,button{
+      width:100%;max-width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+      background:#0f1219;color:var(--fg);appearance:none
+    }
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+    .col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    .btn{cursor:pointer;font-weight:600}.btn:hover{background:#1a1f2b}
+    .btn-accent{border-color:#1f3b2f;background:#0f2b22}
+    .small{font-size:12px}.muted{color:var(--muted)}
+    #msg{min-height:18px}
+    .leaflet-top.leaflet-right{margin-right:12px;margin-top:12px}
+
+    /* white tag by default; blue when selected */
+    .leaflet-tooltip.pole-tag{
+      background:#fff;border:1px solid #e5e7eb;color:#111827;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
+      border-radius:8px;padding:4px 6px;font-size:10px;line-height:1.15
+    }
+    .pole-tag .id{font-weight:700}
+    .pole-tag .status{color:#374151}
+    .leaflet-tooltip.pole-tag.selected{ background:#2563eb;border-color:#2563eb;color:#fff; }
+    .leaflet-tooltip.pole-tag.selected .status{color:#e5efff}
+    .leaflet-tooltip.pole-tag.selected .id{color:#fff}
+
+    .hint{font-size:11px;color:var(--muted);margin-top:6px}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="panel">
+    <div class="hdr" id="jobName">Job: —</div>
+    <div class="small muted" id="selInfo" style="margin-bottom:8px">Selected poles: 0</div>
+
+    <div class="row">
+      <div class="col-12">
+        <label>Mode</label>
+        <select id="mode">
+          <option value="assign">Assign new permits (only poles with no permits)</option>
+          <option value="modify">Modify existing permits (status only)</option>
+        </select>
+      </div>
+
+      <div class="col-12 assign-only">
+        <label>Base Permit ID (we append “_SCID”)</label>
+        <input id="baseId" placeholder="e.g., BTX02-F36_BRN02-F05_SEG2"/>
+      </div>
+
+      <div class="col-6">
+        <label>Permit Status</label>
+        <select id="status">
+          <option>Created - NOT Submitted</option>
+          <option>Submitted - Pending</option>
+          <option>Approved</option>
+          <option>Not Approved - Cannot Attach</option>
+          <option>Not Approved - PLA Issues</option>
+          <option>Not Approved - MRE Issues</option>
+          <option>Not Approved - Other Issues</option>
+        </select>
+      </div>
+      <div class="col-6 assign-only">
+        <label>Submitted By</label>
+        <input id="by" placeholder="Name"/>
+      </div>
+      <div class="col-6 assign-only">
+        <label>Submitted At</label>
+        <input id="date" type="date"/>
+      </div>
+
+      <div class="col-6"><label>&nbsp;</label><button id="btnClear" type="button">Clear Selection</button></div>
+      <div class="col-6"><label>&nbsp;</label><button id="btnApply" class="btn btn-accent" type="button">Apply to Selected Poles</button></div>
+
+      <div class="col-12"><div id="msg" class="small muted" style="margin-top:2px"></div></div>
+      <div class="col-12"><div class="hint">Use the polygon/rectangle tools (top-right) to draw one or more areas. Selected labels turn <b style="color:#2563eb">blue</b>.</div></div>
+    </div>
+  </div>
+
+  <!-- libs -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+  <!-- shared config + map logic + watcher graphics -->
+  <script src="assets/js/config.js?v=api2"></script>
+  <script src="assets/js/map.js"></script>
+  <script src="assets/js/watch.js"></script>
+</body>
+</html>
