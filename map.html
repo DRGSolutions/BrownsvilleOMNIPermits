@@ -140,22 +140,25 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (adaptive DBSCAN + concave hull + MST corridor); toggle ON === -->
+<!-- === Permit Areas overlay (tight, non-overlapping polygons + black blinking pill) === -->
 <script>
 (function(){
   'use strict';
 
-  /* ================= Tunables (adjust if you ever need) ================= */
+  /* ================= Tunables ================= */
   const DBSCAN_MIN_POINTS   = 1;    // allow singletons
-  const EPS_CLAMP_MIN_M     = 35;   // min adaptive neighborhood
-  const EPS_CLAMP_MAX_M     = 170;  // max adaptive neighborhood
-  const MAXEDGE_MIN_M       = 70;   // concave min tightness
-  const MAXEDGE_FACTOR      = 2.2;  // concave maxEdge ~= eps * factor
-  const MST_LINE_BUF_F      = 0.55; // MST corridor width = eps * this
-  const POINT_BUF_F         = 0.45; // buffer around each pole = eps * this
-  const BASE_BUFFER_M       = 18;   // gentle breathing room at the end
+  const EPS_CLAMP_MIN_M     = 30;   // min adaptive neighborhood
+  const EPS_CLAMP_MAX_M     = 160;  // max adaptive neighborhood
+  const MAXEDGE_MIN_M       = 60;   // concave minimum tightness
+  const MAXEDGE_FACTOR      = 1.9;  // concave maxEdge ~= eps * factor (smaller = tighter)
+  const MST_LINE_BUF_F      = 0.35; // MST corridor half-width = eps * this
+  const POINT_BUF_F         = 0.33; // point buffer radius = eps * this
+  const BASE_BUFFER_M       = 10;   // gentle breathing room
   const SIMPLIFY_TOL_M      = 3;    // smoothing
-  const MORPH_CLOSE_M       = 3;    // small close (out then in)
+  const MORPH_CLOSE_M       = 2;    // tiny close (out then in)
+  const VOR_MARGIN_M        = 600;  // Voronoi bbox margin
+  const RESCUE_BUF_F        = 0.35; // rescue radius for clipped-away points = eps * this
+
   const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
 
   /* ================= Helpers ================= */
@@ -215,7 +218,7 @@
     return pts;
   }
 
-  // --- Adaptive eps from nearest-neighbor stats ---
+  // Adaptive eps from nearest-neighbor stats
   function percentile(sorted,p){ if(!sorted.length) return 0; const i=(sorted.length-1)*p; const lo=Math.floor(i), hi=Math.ceil(i); return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(i-lo); }
   function nearestNeighborMeters(coords){
     const out=[]; for(let i=0;i<coords.length;i++){ let best=Infinity;
@@ -228,11 +231,11 @@
     if (coords.length<2) return 50;
     const nnd = nearestNeighborMeters(coords);
     const p50=percentile(nnd,0.50), p75=percentile(nnd,0.75);
-    let eps = Math.max(p75*1.6, p50*1.8);
+    let eps = Math.max(p75*1.5, p50*1.7);
     return Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
   }
 
-  // --- Minimum Spanning Tree (Prim) on coordinates [[lng,lat],...] (meters) ---
+  // Minimum Spanning Tree (Prim) on coordinates [[lng,lat],...] (meters)
   function mstEdges(coords){
     const n = coords.length; if (n<=1) return [];
     const inMST=new Array(n).fill(false), dist=new Array(n).fill(Infinity), parent=new Array(n).fill(-1);
@@ -250,79 +253,168 @@
     return edges;
   }
 
+  // Inject pill CSS (black pill, red bold text, blink)
+  function ensurePillCSS(){
+    if (document.getElementById('permit-pill-css')) return;
+    const s = document.createElement('style'); s.id='permit-pill-css';
+    s.textContent = `
+      .permit-pill{background:#000;color:#e11d48;border:1px solid rgba(255,255,255,.28);
+        padding:4px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.35);font-weight:800;white-space:nowrap;}
+      @keyframes permitBlink{0%{opacity:.60} 50%{opacity:1} 100%{opacity:.60}}
+      .permit-blink{animation:permitBlink 1.2s ease-in-out infinite;}
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Build tight polygon for one cluster (no global overlap handling yet)
+  function clusterPolygon(feats){
+    const coords = feats.map(f=>f.geometry.coordinates);
+    const eps = adaptiveEpsMeters(coords);
+    const subFC = turf.featureCollection(feats);
+    const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
+
+    // concave (fallback convex)
+    let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
+    if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
+
+    // MST corridor (hugs linear runs)
+    const edges = mstEdges(coords);
+    let corridor = null;
+    const lineW = Math.max(5, eps * MST_LINE_BUF_F);
+    for (const e of edges){
+      const ls = turf.lineString(e);
+      const b  = turf.buffer(ls, lineW, {units:'meters'});
+      corridor = corridor ? (turf.union(corridor, b) || corridor) : b;
+    }
+
+    // small point buffers (end caps & sparse segments)
+    let pbuf = null;
+    const rPoint = Math.max(5, eps * POINT_BUF_F);
+    for (const f of feats){
+      const b = turf.buffer(f, rPoint, {units:'meters'});
+      pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
+    }
+
+    // union + polish
+    let merged = null;
+    for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
+    if (!merged) return { geom:null, eps };
+
+    try { merged = turf.buffer(merged, MORPH_CLOSE_M, {units:'meters'}); merged = turf.buffer(merged, -MORPH_CLOSE_M, {units:'meters'}); } catch(_){}
+    try { merged = turf.buffer(merged, BASE_BUFFER_M, {units:'meters'}); } catch(_){}
+    try { merged = turf.simplify(merged, {tolerance: degTol, highQuality:false}); } catch(_){}
+
+    return { geom: merged, eps };
+  }
+
   function buildAreasLayer(points){
     // 1) group by prefix
-    const groups = new Map();
-    for (const pt of points){ if(!pt||!pt.prefix) continue; if(!groups.has(pt.prefix)) groups.set(pt.prefix, []); groups.get(pt.prefix).push(pt); }
+    const byPrefix = new Map();
+    for (const pt of points){
+      if (!pt || !pt.prefix) continue;
+      if (!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []);
+      byPrefix.get(pt.prefix).push(pt);
+    }
 
-    const layer = L.layerGroup();
-
-    groups.forEach((pts, prefix) => {
+    // 2) DBSCAN per prefix → clusters → initial polygons
+    const clusters = [];
+    byPrefix.forEach((pts, prefix) => {
       if (pts.length < 1) return;
-
-      const feats = pts.map(p=>turf.point([p.lng,p.lat],p));
+      const feats = pts.map(p=>turf.point([p.lng,p.lat], p));
       const fc = turf.featureCollection(feats);
       const coords = feats.map(f=>f.geometry.coordinates);
       const eps = adaptiveEpsMeters(coords);
 
-      // 2) adaptive DBSCAN → clusters
       const clustered = turf.clustersDbscan(fc, eps, {units:'meters', minPoints: DBSCAN_MIN_POINTS});
-      const clusters = new Map();
-      for (const f of clustered.features){ const cid = f.properties.cluster ?? 0; if(!clusters.has(cid)) clusters.set(cid, []); clusters.get(cid).push(f); }
+      const groupMap = new Map();
+      for (const f of clustered.features){ const cid = f.properties.cluster ?? 0; if(!groupMap.has(cid)) groupMap.set(cid, []); groupMap.get(cid).push(f); }
 
-      // 3) for each cluster, build concave hull + MST corridor + point buffers (union)
-      clusters.forEach((feats) => {
-        if (!feats || feats.length === 0) return;
-
-        const subFC = turf.featureCollection(feats);
-        const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
-
-        // 3a) concave (fallback convex)
-        let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
-        if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
-
-        // 3b) MST corridor buffer to hug linear street runs
-        const c = feats.map(f=>f.geometry.coordinates);
-        const edges = mstEdges(c);
-        let corridor = null;
-        const lineWidth = Math.max(6, eps * MST_LINE_BUF_F);
-        for (const e of edges){
-          const ls = turf.lineString(e);
-          const buf = turf.buffer(ls, lineWidth, {units:'meters'});
-          corridor = corridor ? (turf.union(corridor, buf) || corridor) : buf;
-        }
-
-        // 3c) point buffers (end caps & sparse segments)
-        let pbuf = null;
-        const rPoint = Math.max(6, eps * POINT_BUF_F);
-        for (const f of feats){
-          const b = turf.buffer(f, rPoint, {units:'meters'});
-          pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
-        }
-
-        // Union everything we have
-        let merged = null;
-        for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
-        if (!merged) return;
-
-        // 3d) morphological close (small gaps), base buffer, simplify
-        try { merged = turf.buffer(merged, MORPH_CLOSE_M, {units:'meters'}); merged = turf.buffer(merged, -MORPH_CLOSE_M, {units:'meters'}); } catch(_){}
-        try { merged = turf.buffer(merged, BASE_BUFFER_M, {units:'meters'}); } catch(_){}
-        try { merged = turf.simplify(merged, {tolerance: degTol, highQuality:false}); } catch(_){}
-
-        // Draw polygon
-        const gj = L.geoJSON(merged, { style: POLY_STYLE, interactive:false });
-        layer.addLayer(gj);
-
-        // 4) Label: original white pill, but **red, bold text** and no wrapping
-        const ctr = turf.centerOfMass(merged).geometry.coordinates;
-        const labelHTML = `<div class="permit-area-label" style="color:#e11d48;font-weight:800;white-space:nowrap;">${prefix}</div>`;
-        const label = L.marker([ctr[1], ctr[0]], {
-          icon: L.divIcon({ className:'', html: labelHTML, iconAnchor:[0,0] }),
-          interactive:false, keyboard:false
-        });
-        layer.addLayer(label);
+      let idx = 0;
+      groupMap.forEach((feats, cid) => {
+        const { geom, eps:ceps } = clusterPolygon(feats);
+        if (!geom) return;
+        const centroid = turf.centerOfMass(geom).geometry.coordinates;
+        clusters.push({ id:`${prefix}__${idx++}`, prefix, feats, eps:ceps, initial: geom, center: centroid });
       });
+    });
+
+    if (!clusters.length) return L.layerGroup();
+
+    // 3) Global Voronoi from cluster centroids (prevents overlaps by design)
+    const seedFC = turf.featureCollection(clusters.map(c => turf.point(c.center, { sid:c.id })));
+    let bboxPoly = turf.buffer(seedFC, VOR_MARGIN_M, {units:'meters'});
+    const bbox = turf.bbox(bboxPoly);  // [minX,minY,maxX,maxY]
+    const vor  = turf.voronoi(seedFC, { bbox });
+
+    // Map sid -> cell that contains its seed
+    const cellsById = new Map();
+    if (vor && Array.isArray(vor.features)) {
+      for (const c of clusters){
+        const seed = turf.point(c.center);
+        for (const cell of vor.features){
+          if (!cell) continue;
+          try { if (turf.booleanPointInPolygon(seed, cell)) { cellsById.set(c.id, cell); break; } } catch(_) {}
+        }
+      }
+    }
+
+    // 4) Clip initial polygons by their Voronoi cell (non-overlapping),
+    //    then rescue any of this cluster's points that were clipped
+    const finalById = new Map();
+    for (const c of clusters){
+      const cell = cellsById.get(c.id);
+      let clipped = null;
+      try { clipped = cell ? turf.intersect(c.initial, cell) : c.initial; } catch(_) { clipped = c.initial; }
+
+      // rescue: ensure all feats are inside; add small buffers around missing points
+      const rescueR = Math.max(6, c.eps * RESCUE_BUF_F);
+      for (const f of c.feats){
+        try {
+          if (!turf.booleanPointInPolygon(f, clipped)) {
+            const rb = turf.buffer(f, rescueR, {units:'meters'});
+            clipped = clipped ? (turf.union(clipped, rb) || clipped) : rb;
+          }
+        } catch(_) {}
+      }
+
+      finalById.set(c.id, clipped);
+    }
+
+    // 5) Enforce non-overlap strictly: subtract newer shapes from prior ones
+    //    (order by area desc so larger areas keep dominance)
+    const ordered = [...clusters].sort((a,b)=>{
+      const ab = turf.area(finalById.get(a.id)||a.initial);
+      const bb = turf.area(finalById.get(b.id)||b.initial);
+      return bb - ab;
+    });
+
+    const resolved = new Map();
+    for (let i=0;i<ordered.length;i++){
+      const ci = ordered[i]; let gi = finalById.get(ci.id); if (!gi) continue;
+      // subtract all already-kept polygons to eliminate overlaps
+      for (let j=0;j<i;j++){
+        const cj = ordered[j]; const gj = resolved.get(cj.id); if (!gj) continue;
+        try { const diff = turf.difference(gi, gj); gi = diff || gi; } catch(_) {}
+      }
+      resolved.set(ci.id, gi);
+    }
+
+    // 6) Render
+    const layer = L.layerGroup();
+    resolved.forEach((geom, id) => {
+      if (!geom) return;
+      const poly = L.geoJSON(geom, { style: POLY_STYLE, interactive:false });
+      layer.addLayer(poly);
+
+      // label (black pill, blinking; red bold text)
+      const ctr = turf.centerOfMass(geom).geometry.coordinates;
+      const prefix = id.split('__')[0];
+      const html = `<div class="permit-pill permit-blink"><span class="txt">${prefix}</span></div>`;
+      const lbl = L.marker([ctr[1], ctr[0]], {
+        icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }),
+        interactive:false, keyboard:false
+      });
+      layer.addLayer(lbl);
     });
 
     return layer;
@@ -337,7 +429,7 @@
           <input type="checkbox" id="permitAreasToggle" checked />
           Permit Areas
         </label>
-        <small>Adaptive concave + MST corridor (full coverage)</small>
+        <small>Tight, non-overlapping polygons (concave + MST + Voronoi)</small>
       `;
       return div;
     }
@@ -371,11 +463,16 @@
   }
 
   function boot(){
+    ensurePillCSS();
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
     const ctrl = new PermitAreasControl({ position: 'topleft' });
     map.addControl(ctrl);
-    const waitToggle = () => { if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); } else setTimeout(waitToggle, 100); };
+
+    const waitToggle = () => {
+      if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
+      else setTimeout(waitToggle, 100);
+    };
     waitToggle();
 
     // Hot-swap refresh hooks
@@ -384,7 +481,7 @@
     window.addEventListener('permits:loaded',rebuild);
     window.addEventListener('state:updated', rebuild);
 
-    window.refreshPermitAreas = rebuild;
+    window.refreshPermitAreas = rebuild; // manual hook if needed
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
