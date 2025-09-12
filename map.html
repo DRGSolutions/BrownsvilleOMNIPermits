@@ -283,7 +283,7 @@
         padding:2px 6px;border-radius:6px;font:700 10px/1.1 system-ui, -apple-system, Segoe UI, Roboto, Arial;white-space:nowrap}
 
       /* Hide your existing full pole labels when cycling */
-      #map.labels-scid .leaflet-tooltip.pole-tag,
+      #map.labels-scid .leaflet-tooltip.pole-tag:not(.scid-only){ display:none !important; }
       #map.labels-none .leaflet-tooltip.pole-tag{ display:none !important; }
     `;
     document.head.appendChild(s);
@@ -404,26 +404,34 @@
 
   /* ================= SCID-only labels overlay (for cycling) ================= */
   async function gatherPoles(){
-    const S = window.STATE || {};
     const job = getJob();
+    const S = window.STATE || {};
     if (Array.isArray(S.poles) && S.poles.length){
       return S.poles.filter(p => !job || String(p.job_name) === String(job));
     }
     const base = ["data","./data","."];
     const polesP = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
-    return await smartFetch(polesP) || [];
+    const all = await smartFetch(polesP) || [];
+    return all.filter(p => !job || String(p.job_name) === String(job));
   }
 
   function buildScidLayer(poles){
     const g = L.layerGroup();
     for (const p of poles){
-      const lat = +getLat(p), lng = +getLng(p); if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-      const scid = (p.SCID != null) ? String(p.SCID) : null; if (!scid) continue;
-      const mk = L.marker([lat,lng], {
-        icon: L.divIcon({ className:'scid-chip', html:`SCID ${scid}`, iconAnchor:[0,0] }),
-        interactive:false, keyboard:false
-      });
-      g.addLayer(mk);
+      const lat = +getLat(p), lng = +getLng(p);
+      const scid = (p && p.SCID != null) ? String(p.SCID) : null;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || !scid) continue;
+
+      const tt = L.tooltip({
+        permanent: true,
+        direction: 'right',
+        offset: [8, 0],
+        className: 'pole-tag scid-only'  // <- same style as your normal labels, but marked scid-only
+      })
+      .setContent(`SCID ${scid}`)
+      .setLatLng([lat, lng]);
+
+      g.addLayer(tt);
     }
     return g;
   }
