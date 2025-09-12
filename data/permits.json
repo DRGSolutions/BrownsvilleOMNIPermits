@@ -2667,7 +2667,7 @@
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/12/2025",
-    "notes": ""
+    "notes": "TESTING"
   },
   {
     "permit_id": "TEST_2_123_002",
@@ -2677,7 +2677,7 @@
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/12/2025",
-    "notes": ""
+    "notes": "TESTING"
   },
   {
     "permit_id": "TEST_2_123_003",
@@ -2687,7 +2687,7 @@
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/12/2025",
-    "notes": ""
+    "notes": "TESTING"
   },
   {
     "permit_id": "TEST_2_123_004",
@@ -2697,6 +2697,6 @@
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/12/2025",
-    "notes": ""
+    "notes": "TESTING"
   }
 ]
