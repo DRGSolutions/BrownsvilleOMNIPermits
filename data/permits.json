@@ -2658,15 +2658,5 @@
     "submitted_by": "ZK",
     "submitted_at": "08/01/2025",
     "notes": ""
-  },
-  {
-    "permit_id": "test2_004",
-    "job_name": "BRN01-F161",
-    "tag": "52874",
-    "SCID": "004",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "09/12/2025",
-    "notes": ""
   }
 ]
