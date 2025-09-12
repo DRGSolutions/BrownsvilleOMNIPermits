@@ -140,7 +140,7 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (tight, non-overlapping polygons + black blinking pill) === -->
+<!-- === Permit Areas overlay (Voronoi-constrained, gap-separated; black blinking pill, red bold text) === -->
 <script>
 (function(){
   'use strict';
@@ -153,11 +153,13 @@
   const MAXEDGE_FACTOR      = 1.9;  // concave maxEdge ~= eps * factor (smaller = tighter)
   const MST_LINE_BUF_F      = 0.35; // MST corridor half-width = eps * this
   const POINT_BUF_F         = 0.33; // point buffer radius = eps * this
-  const BASE_BUFFER_M       = 10;   // gentle breathing room
+  const BASE_BUFFER_M       = 10;   // gentle breathing room on cluster shape
   const SIMPLIFY_TOL_M      = 3;    // smoothing
   const MORPH_CLOSE_M       = 2;    // tiny close (out then in)
-  const VOR_MARGIN_M        = 600;  // Voronoi bbox margin
-  const RESCUE_BUF_F        = 0.35; // rescue radius for clipped-away points = eps * this
+
+  const VOR_MARGIN_M        = 600;  // Voronoi bbox padding
+  const CLEAR_GAP_M         = 7;    // << minimum empty gap between any two permit areas
+  const RECOVER_F           = 0.45; // recovery disk radius = CLEAR_GAP_M * this (must be < 1)
 
   const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
 
@@ -183,7 +185,11 @@
   }
   // Trim ALL trailing "_<digits>" segments → shared prefix (…_SEG4)
   function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
-  async function smartFetch(paths){ for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} } return null; }
+
+  async function smartFetch(paths){
+    for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} }
+    return null;
+  }
 
   function buildPointsFromSTATE(job){
     const S = window.STATE || {};
@@ -206,6 +212,7 @@
     const polesP   = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
     const permitsP = base.map(p=>`${p}/permits.json`).concat(["permits.json","./permits.json"]);
     const [poles,permits] = await Promise.all([smartFetch(polesP),smartFetch(permitsP)]);
+
     const byPole = new Map();
     if (Array.isArray(permits)) for (const r of permits){ const k=`${r.job_name}::${r.tag}::${r.SCID}`; if(!byPole.has(k)) byPole.set(k,[]); byPole.get(k).push(r); }
     const pts=[];
@@ -253,31 +260,30 @@
     return edges;
   }
 
-  // Inject pill CSS (black pill, red bold text, blink)
+  // Black pill (blinking) with red bold text
   function ensurePillCSS(){
     if (document.getElementById('permit-pill-css')) return;
     const s = document.createElement('style'); s.id='permit-pill-css';
     s.textContent = `
       .permit-pill{background:#000;color:#e11d48;border:1px solid rgba(255,255,255,.28);
-        padding:4px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.35);font-weight:800;white-space:nowrap;}
+        padding:4px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.35);
+        font-weight:800;white-space:nowrap;}
       @keyframes permitBlink{0%{opacity:.60} 50%{opacity:1} 100%{opacity:.60}}
       .permit-blink{animation:permitBlink 1.2s ease-in-out infinite;}
     `;
     document.head.appendChild(s);
   }
 
-  // Build tight polygon for one cluster (no global overlap handling yet)
+  // Tight cluster polygon (concave + MST corridor + point disks)
   function clusterPolygon(feats){
     const coords = feats.map(f=>f.geometry.coordinates);
     const eps = adaptiveEpsMeters(coords);
     const subFC = turf.featureCollection(feats);
     const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
 
-    // concave (fallback convex)
     let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
     if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
 
-    // MST corridor (hugs linear runs)
     const edges = mstEdges(coords);
     let corridor = null;
     const lineW = Math.max(5, eps * MST_LINE_BUF_F);
@@ -287,7 +293,6 @@
       corridor = corridor ? (turf.union(corridor, b) || corridor) : b;
     }
 
-    // small point buffers (end caps & sparse segments)
     let pbuf = null;
     const rPoint = Math.max(5, eps * POINT_BUF_F);
     for (const f of feats){
@@ -295,7 +300,6 @@
       pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
     }
 
-    // union + polish
     let merged = null;
     for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
     if (!merged) return { geom:null, eps };
@@ -307,114 +311,108 @@
     return { geom: merged, eps };
   }
 
-  function buildAreasLayer(points){
-    // 1) group by prefix
-    const byPrefix = new Map();
-    for (const pt of points){
-      if (!pt || !pt.prefix) continue;
-      if (!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []);
-      byPrefix.get(pt.prefix).push(pt);
+  // Voronoi: build per-pole cell map (keyed by rounded coordinate)
+  const coordKey = (lng,lat) => `${lng.toFixed(6)},${lat.toFixed(6)}`;
+  function buildVoronoiMap(allPoints){
+    const feats = allPoints.map(p => turf.point([p.lng, p.lat], { key: coordKey(p.lng,p.lat) }));
+    if (!feats.length) return new Map();
+    const fc = turf.featureCollection(feats);
+    let bboxPoly = turf.buffer(fc, VOR_MARGIN_M, {units:'meters'});
+    const bbox = turf.bbox(bboxPoly);
+    const vor  = turf.voronoi(fc, { bbox });
+    const map = new Map();
+    if (vor && Array.isArray(vor.features)){
+      for (const cell of vor.features){
+        if (!cell) continue;
+        // assign to whichever point it contains
+        for (const f of feats){
+          const k = f.properties.key;
+          if (map.has(k)) continue;
+          try { if (turf.booleanPointInPolygon(f, cell)) { map.set(k, cell); } } catch(_){}
+        }
+      }
     }
+    return map;
+  }
 
-    // 2) DBSCAN per prefix → clusters → initial polygons
-    const clusters = [];
+  function buildAreasLayer(points){
+    // Group by prefix
+    const byPrefix = new Map();
+    for (const pt of points){ if(!pt||!pt.prefix) continue; if(!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []); byPrefix.get(pt.prefix).push(pt); }
+
+    if (!byPrefix.size) return L.layerGroup();
+
+    // Build Voronoi map from ALL points (across all prefixes)
+    const vorMap = buildVoronoiMap(points);
+
+    const layer = L.layerGroup();
+
+    // For each prefix: cluster → cluster polygon → clip to union of OWN cells → shrink gap → recover points (safe)
     byPrefix.forEach((pts, prefix) => {
-      if (pts.length < 1) return;
       const feats = pts.map(p=>turf.point([p.lng,p.lat], p));
       const fc = turf.featureCollection(feats);
       const coords = feats.map(f=>f.geometry.coordinates);
       const eps = adaptiveEpsMeters(coords);
 
+      // DBSCAN to split distant runs
       const clustered = turf.clustersDbscan(fc, eps, {units:'meters', minPoints: DBSCAN_MIN_POINTS});
-      const groupMap = new Map();
-      for (const f of clustered.features){ const cid = f.properties.cluster ?? 0; if(!groupMap.has(cid)) groupMap.set(cid, []); groupMap.get(cid).push(f); }
+      const groups = new Map();
+      for (const f of clustered.features){ const cid = f.properties.cluster ?? 0; if(!groups.has(cid)) groups.set(cid, []); groups.get(cid).push(f); }
 
-      let idx = 0;
-      groupMap.forEach((feats, cid) => {
-        const { geom, eps:ceps } = clusterPolygon(feats);
-        if (!geom) return;
-        const centroid = turf.centerOfMass(geom).geometry.coordinates;
-        clusters.push({ id:`${prefix}__${idx++}`, prefix, feats, eps:ceps, initial: geom, center: centroid });
-      });
-    });
+      groups.forEach((feats) => {
+        if (!feats || !feats.length) return;
 
-    if (!clusters.length) return L.layerGroup();
-
-    // 3) Global Voronoi from cluster centroids (prevents overlaps by design)
-    const seedFC = turf.featureCollection(clusters.map(c => turf.point(c.center, { sid:c.id })));
-    let bboxPoly = turf.buffer(seedFC, VOR_MARGIN_M, {units:'meters'});
-    const bbox = turf.bbox(bboxPoly);  // [minX,minY,maxX,maxY]
-    const vor  = turf.voronoi(seedFC, { bbox });
-
-    // Map sid -> cell that contains its seed
-    const cellsById = new Map();
-    if (vor && Array.isArray(vor.features)) {
-      for (const c of clusters){
-        const seed = turf.point(c.center);
-        for (const cell of vor.features){
+        // union of this cluster's Voronoi cells
+        let ownCells = null;
+        for (const f of feats){
+          const [lng,lat] = f.geometry.coordinates;
+          const cell = vorMap.get(coordKey(lng,lat));
           if (!cell) continue;
-          try { if (turf.booleanPointInPolygon(seed, cell)) { cellsById.set(c.id, cell); break; } } catch(_) {}
+          ownCells = ownCells ? (turf.union(ownCells, cell) || ownCells) : cell;
         }
-      }
-    }
+        if (!ownCells) return;
 
-    // 4) Clip initial polygons by their Voronoi cell (non-overlapping),
-    //    then rescue any of this cluster's points that were clipped
-    const finalById = new Map();
-    for (const c of clusters){
-      const cell = cellsById.get(c.id);
-      let clipped = null;
-      try { clipped = cell ? turf.intersect(c.initial, cell) : c.initial; } catch(_) { clipped = c.initial; }
+        // initial tight cluster polygon
+        const { geom:clusterGeom, eps:ceps } = clusterPolygon(feats);
+        if (!clusterGeom) return;
 
-      // rescue: ensure all feats are inside; add small buffers around missing points
-      const rescueR = Math.max(6, c.eps * RESCUE_BUF_F);
-      for (const f of c.feats){
-        try {
-          if (!turf.booleanPointInPolygon(f, clipped)) {
-            const rb = turf.buffer(f, rescueR, {units:'meters'});
-            clipped = clipped ? (turf.union(clipped, rb) || clipped) : rb;
-          }
-        } catch(_) {}
-      }
+        // constrain to own cells
+        let constrained = null;
+        try { constrained = turf.intersect(clusterGeom, ownCells) || ownCells; } catch(_){ constrained = ownCells; }
 
-      finalById.set(c.id, clipped);
-    }
+        // in-cell polish (close) and simplify, keeping within cells
+        try { constrained = turf.buffer(constrained, MORPH_CLOSE_M, {units:'meters'}); constrained = turf.intersect(constrained, ownCells) || constrained; constrained = turf.buffer(constrained, -MORPH_CLOSE_M, {units:'meters'}); constrained = turf.intersect(constrained, ownCells) || constrained; } catch(_){}
+        try { constrained = turf.simplify(constrained, {tolerance: degTol, highQuality:false}); } catch(_){}
 
-    // 5) Enforce non-overlap strictly: subtract newer shapes from prior ones
-    //    (order by area desc so larger areas keep dominance)
-    const ordered = [...clusters].sort((a,b)=>{
-      const ab = turf.area(finalById.get(a.id)||a.initial);
-      const bb = turf.area(finalById.get(b.id)||b.initial);
-      return bb - ab;
-    });
+        // global non-touch rule: erode by CLEAR_GAP_M (still within own cells)
+        let safe = constrained;
+        try { safe = turf.buffer(constrained, -CLEAR_GAP_M, {units:'meters'}); safe = turf.intersect(safe, ownCells) || safe; } catch(_){}
 
-    const resolved = new Map();
-    for (let i=0;i<ordered.length;i++){
-      const ci = ordered[i]; let gi = finalById.get(ci.id); if (!gi) continue;
-      // subtract all already-kept polygons to eliminate overlaps
-      for (let j=0;j<i;j++){
-        const cj = ordered[j]; const gj = resolved.get(cj.id); if (!gj) continue;
-        try { const diff = turf.difference(gi, gj); gi = diff || gi; } catch(_) {}
-      }
-      resolved.set(ci.id, gi);
-    }
+        // recovery: ensure each pole remains inside (recover disks clipped to eroded cells)
+        const recoverR = Math.max(2, CLEAR_GAP_M * RECOVER_F);
+        for (const f of feats){
+          try{
+            if (!turf.booleanPointInPolygon(f, safe)) {
+              const disk = turf.buffer(f, recoverR, {units:'meters'});
+              // keep disk within eroded ownCells to maintain the gap from neighbors
+              const erodedCells = turf.buffer(ownCells, -CLEAR_GAP_M, {units:'meters'});
+              const clippedDisk = turf.intersect(disk, erodedCells) || null;
+              if (clippedDisk) safe = turf.union(safe, clippedDisk) || safe;
+              // if erodedCells is too thin here, skip recovery to preserve gap
+            }
+          }catch(_){}
+        }
 
-    // 6) Render
-    const layer = L.layerGroup();
-    resolved.forEach((geom, id) => {
-      if (!geom) return;
-      const poly = L.geoJSON(geom, { style: POLY_STYLE, interactive:false });
-      layer.addLayer(poly);
+        // draw final
+        const gj = L.geoJSON(safe, { style: POLY_STYLE, interactive:false });
+        layer.addLayer(gj);
 
-      // label (black pill, blinking; red bold text)
-      const ctr = turf.centerOfMass(geom).geometry.coordinates;
-      const prefix = id.split('__')[0];
-      const html = `<div class="permit-pill permit-blink"><span class="txt">${prefix}</span></div>`;
-      const lbl = L.marker([ctr[1], ctr[0]], {
-        icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }),
-        interactive:false, keyboard:false
+        // label (black pill + blink; red bold text)
+        const ctr = turf.centerOfMass(safe).geometry.coordinates;
+        const html = `<div class="permit-pill permit-blink"><span class="txt">${prefix}</span></div>`;
+        const lbl  = L.marker([ctr[1], ctr[0]], { icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }), interactive:false, keyboard:false });
+        layer.addLayer(lbl);
       });
-      layer.addLayer(lbl);
     });
 
     return layer;
@@ -429,7 +427,7 @@
           <input type="checkbox" id="permitAreasToggle" checked />
           Permit Areas
         </label>
-        <small>Tight, non-overlapping polygons (concave + MST + Voronoi)</small>
+        <small>Voronoi-constrained (no-touch) polygons</small>
       `;
       return div;
     }
