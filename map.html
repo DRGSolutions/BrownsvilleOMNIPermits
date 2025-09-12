@@ -698,15 +698,51 @@
     }
 
     /* ---- selection ---- */
+    // REPLACE your current getSelectedSCIDs() with this version
     function getSelectedSCIDs(){
-      const els = Array.from(document.querySelectorAll('.leaflet-tooltip.pole-tag.selected'));
-      const ids = new Set();
-      for (const el of els){
-        const m = (el.textContent || '').match(/SCID\s+(\d+)/i);
-        if (m) ids.add(normSCID(m[1]));
+      // 0) Normalizer already shared from the first script
+      const ns = (v) => normSCID(v);
+
+      // 1) Prefer selection from global state, if your map.js exposes it
+      const W = window;
+      const candidates = [
+        W.SELECTED_SCIDS,
+        W.SELECTION_SCIDS,
+        W.SELECTION?.scids,
+        W.SELECTION?.ids,
+        W.STATE?.selectedScids,
+        W.STATE?.selection?.scids,
+        W.STATE?.selected?.scids
+      ].filter(Boolean);
+
+      for (const arr of candidates){
+        if (Array.isArray(arr) && arr.length){
+          return [...new Set(arr.map(ns))];
+        }
       }
+
+      // 2) DOM: labels explicitly marked as selected
+      let ids = new Set();
+      document.querySelectorAll('.leaflet-tooltip.pole-tag.selected').forEach(el=>{
+        const m = (el.textContent || '').match(/SCID\s+(\d+)/i);
+        if (m) ids.add(ns(m[1]));
+      });
+      if (ids.size) return [...ids];
+
+      // 3) DOM fallback: compute style (blue-ish bg) OR has 'selected' anyway
+      document.querySelectorAll('.leaflet-tooltip.pole-tag').forEach(el=>{
+        const cs = window.getComputedStyle(el);
+        const bg = (cs.backgroundColor || '').replace(/\s+/g,'').toLowerCase();
+        // rgb(37,99,235) ~= #2563eb — allow a loose check
+        const looksSelected = bg.includes('37,99,235') || el.classList.contains('selected');
+        if (looksSelected){
+          const m = (el.textContent || '').match(/SCID\s+(\d+)/i);
+          if (m) ids.add(ns(m[1]));
+        }
+      });
       return [...ids];
     }
+
 
     /* ---- Mass-apply Notes (no SCID appending) ---- */
     function massApplyNotesToSelected(){
