@@ -140,28 +140,26 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (adaptive clusters + guaranteed coverage; toggle ON) === -->
+<!-- === Permit Areas overlay (adaptive DBSCAN + concave hull + MST corridor); toggle ON === -->
 <script>
 (function(){
   'use strict';
 
-  // ---------- Tunables ----------
-  const DBSCAN_MIN_POINTS   = 1;    // allow singletons to form tiny clusters
-  const EPS_CLAMP_MIN_M     = 35;   // lower clamp for adaptive eps
-  const EPS_CLAMP_MAX_M     = 170;  // upper clamp for adaptive eps
-  const MAXEDGE_MIN_M       = 70;   // lower clamp for concave "tightness"
+  /* ================= Tunables (adjust if you ever need) ================= */
+  const DBSCAN_MIN_POINTS   = 1;    // allow singletons
+  const EPS_CLAMP_MIN_M     = 35;   // min adaptive neighborhood
+  const EPS_CLAMP_MAX_M     = 170;  // max adaptive neighborhood
+  const MAXEDGE_MIN_M       = 70;   // concave min tightness
   const MAXEDGE_FACTOR      = 2.2;  // concave maxEdge ~= eps * factor
-  const OUTLIER_BUFFER_F    = 0.35; // outlier fix: buffer radius = eps * this
-  const BASE_BUFFER_M       = 22;   // general breathing room for polygons
-  const SIMPLIFY_TOL_M      = 3;    // small smoothing
+  const MST_LINE_BUF_F      = 0.55; // MST corridor width = eps * this
+  const POINT_BUF_F         = 0.45; // buffer around each pole = eps * this
+  const BASE_BUFFER_M       = 18;   // gentle breathing room at the end
+  const SIMPLIFY_TOL_M      = 3;    // smoothing
+  const MORPH_CLOSE_M       = 3;    // small close (out then in)
   const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
 
-  // ---------- Helpers ----------
+  /* ================= Helpers ================= */
   const degPerMeterLat = 1 / 111320;
-  const degPerMeterLngAt = (lat) => {
-    const m = 111320 * Math.cos((lat||0) * Math.PI/180);
-    return m > 0 ? 1 / m : 1 / 111320;
-  };
   const degTol = SIMPLIFY_TOL_M * degPerMeterLat;
   const getJob = () => new URLSearchParams(location.search).get('job') || '';
 
@@ -177,185 +175,148 @@
 
   const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
   const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
-
   function readPermitId(r){
     return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
   }
-
-  // Trim ALL trailing "_<digits>" segments so "..._028_12345" -> "...", e.g., "..._SEG4"
-  function toPrefix(id){
-    if (!id || typeof id !== 'string') return null;
-    let s = id.trim();
-    while (/_\d+$/.test(s)) s = s.replace(/_\d+$/, '');
-    return s;
-  }
-
-  async function smartFetch(paths){
-    for (const p of paths) { try { const r = await fetch(p, { cache:'no-store' }); if (r.ok) return r.json(); } catch(_) {} }
-    return null;
-  }
+  // Trim ALL trailing "_<digits>" segments → shared prefix (…_SEG4)
+  function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
+  async function smartFetch(paths){ for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} } return null; }
 
   function buildPointsFromSTATE(job){
     const S = window.STATE || {};
     const poles   = Array.isArray(S.poles)   ? S.poles   : [];
     const permits = Array.isArray(S.permits) ? S.permits : [];
-
     const byPole = new Map();
-    for (const r of permits){
-      const k = `${r.job_name}::${r.tag}::${r.SCID}`;
-      if (!byPole.has(k)) byPole.set(k, []);
-      byPole.get(k).push(r);
-    }
-
+    for (const r of permits){ const k=`${r.job_name}::${r.tag}::${r.SCID}`; if(!byPole.has(k)) byPole.set(k,[]); byPole.get(k).push(r); }
     const pts = [];
     for (const p of poles){
       if (job && String(p.job_name) !== String(job)) continue;
-      const lat = +getLat(p), lng = +getLng(p);
-      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-
-      const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
-      for (const r of related){
-        const id = readPermitId(r); const prefix = toPrefix(String(id||""));
-        if (prefix) pts.push({ lat, lng, prefix });
-      }
+      const lat=+getLat(p), lng=+getLng(p); if(!Number.isFinite(lat)||!Number.isFinite(lng)) continue;
+      const rel = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      for (const r of rel){ const id=readPermitId(r); const prefix=toPrefix(String(id||'')); if(prefix) pts.push({lat,lng,prefix}); }
     }
     return pts;
   }
 
   async function buildPointsFromFiles(job){
-    const basePaths = ["data", "./data", "."];
-    const polePaths   = basePaths.map(p => `${p}/poles.json`).concat(["poles.json","./poles.json"]);
-    const permitPaths = basePaths.map(p => `${p}/permits.json`).concat(["permits.json","./permits.json"]);
-    const [poles, permits] = await Promise.all([ smartFetch(polePaths), smartFetch(permitPaths) ]);
-
-    const pts = [];
+    const base = ["data","./data","."];
+    const polesP   = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
+    const permitsP = base.map(p=>`${p}/permits.json`).concat(["permits.json","./permits.json"]);
+    const [poles,permits] = await Promise.all([smartFetch(polesP),smartFetch(permitsP)]);
     const byPole = new Map();
-    if (Array.isArray(permits)) {
-      for (const r of permits){
-        const k = `${r.job_name}::${r.tag}::${r.SCID}`;
-        if (!byPole.has(k)) byPole.set(k, []);
-        byPole.get(k).push(r);
-      }
-    }
-    if (Array.isArray(poles)) {
-      for (const p of poles){
-        if (job && String(p.job_name) !== String(job)) continue;
-        const lat = +getLat(p), lng = +getLng(p);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-        const related = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
-        for (const r of related){
-          const id = readPermitId(r); const prefix = toPrefix(String(id||""));
-          if (prefix) pts.push({ lat, lng, prefix });
-        }
-      }
+    if (Array.isArray(permits)) for (const r of permits){ const k=`${r.job_name}::${r.tag}::${r.SCID}`; if(!byPole.has(k)) byPole.set(k,[]); byPole.get(k).push(r); }
+    const pts=[];
+    if (Array.isArray(poles)) for (const p of poles){
+      if (job && String(p.job_name) !== String(job)) continue;
+      const lat=+getLat(p), lng=+getLng(p); if(!Number.isFinite(lat)||!Number.isFinite(lng)) continue;
+      const rel = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      for (const r of rel){ const id=readPermitId(r); const prefix=toPrefix(String(id||'')); if(prefix) pts.push({lat,lng,prefix}); }
     }
     return pts;
   }
 
-  // --- Adaptive neighborhood radius (eps) per prefix ---
-  function percentile(sorted, p){ if (!sorted.length) return 0; const i = (sorted.length-1)*p; const lo = Math.floor(i), hi = Math.ceil(i); if (lo===hi) return sorted[lo]; return sorted[lo] + (sorted[hi]-sorted[lo])*(i-lo); }
-  function nearestNeighborDistancesMeters(coords){
-    // coords: [[lng,lat], ...]
-    const out = [];
-    for (let i=0;i<coords.length;i++){
-      let best = Infinity;
-      for (let j=0;j<coords.length;j++){
-        if (i===j) continue;
-        const d = turf.distance(coords[i], coords[j], {units:'meters'});
-        if (d < best) best = d;
-      }
-      if (Number.isFinite(best)) out.push(best);
+  // --- Adaptive eps from nearest-neighbor stats ---
+  function percentile(sorted,p){ if(!sorted.length) return 0; const i=(sorted.length-1)*p; const lo=Math.floor(i), hi=Math.ceil(i); return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(i-lo); }
+  function nearestNeighborMeters(coords){
+    const out=[]; for(let i=0;i<coords.length;i++){ let best=Infinity;
+      for(let j=0;j<coords.length;j++){ if(i===j) continue; const d=turf.distance(coords[i],coords[j],{units:'meters'}); if(d<best) best=d; }
+      if(Number.isFinite(best)) out.push(best);
     }
     return out.sort((a,b)=>a-b);
   }
   function adaptiveEpsMeters(coords){
-    if (coords.length < 2) return 50;
-    const nnd = nearestNeighborDistancesMeters(coords);
-    const p50 = percentile(nnd, 0.50);
-    const p75 = percentile(nnd, 0.75);
-    // slightly liberal to keep sequential poles together but not fuse distant runs
+    if (coords.length<2) return 50;
+    const nnd = nearestNeighborMeters(coords);
+    const p50=percentile(nnd,0.50), p75=percentile(nnd,0.75);
     let eps = Math.max(p75*1.6, p50*1.8);
-    eps = Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
-    return eps;
+    return Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
+  }
+
+  // --- Minimum Spanning Tree (Prim) on coordinates [[lng,lat],...] (meters) ---
+  function mstEdges(coords){
+    const n = coords.length; if (n<=1) return [];
+    const inMST=new Array(n).fill(false), dist=new Array(n).fill(Infinity), parent=new Array(n).fill(-1);
+    dist[0]=0;
+    for(let k=0;k<n;k++){
+      let u=-1, best=Infinity; for(let i=0;i<n;i++){ if(!inMST[i] && dist[i]<best){ best=dist[i]; u=i; } }
+      if(u===-1) break; inMST[u]=true;
+      for(let v=0; v<n; v++){
+        if(inMST[v]) continue;
+        const d=turf.distance(coords[u], coords[v], {units:'meters'});
+        if(d<dist[v]){ dist[v]=d; parent[v]=u; }
+      }
+    }
+    const edges=[]; for(let v=1; v<n; v++){ if(parent[v]!==-1) edges.push([coords[v], coords[parent[v]]]); }
+    return edges;
   }
 
   function buildAreasLayer(points){
-    // Group by prefix first
+    // 1) group by prefix
     const groups = new Map();
-    for (const pt of points){
-      if (!pt || !pt.prefix) continue;
-      if (!groups.has(pt.prefix)) groups.set(pt.prefix, []);
-      groups.get(pt.prefix).push(pt);
-    }
+    for (const pt of points){ if(!pt||!pt.prefix) continue; if(!groups.has(pt.prefix)) groups.set(pt.prefix, []); groups.get(pt.prefix).push(pt); }
 
     const layer = L.layerGroup();
 
     groups.forEach((pts, prefix) => {
-      if (pts.length < 2) return;
+      if (pts.length < 1) return;
 
-      // Prepare FeatureCollection
-      const features = pts.map(p => turf.point([p.lng, p.lat], p));
-      const fc = turf.featureCollection(features);
+      const feats = pts.map(p=>turf.point([p.lng,p.lat],p));
+      const fc = turf.featureCollection(feats);
+      const coords = feats.map(f=>f.geometry.coordinates);
+      const eps = adaptiveEpsMeters(coords);
 
-      // Adaptive DBSCAN
-      const coords = features.map(f => f.geometry.coordinates);
-      const eps    = adaptiveEpsMeters(coords);
-      const clustered = turf.clustersDbscan(fc, eps, { units:'meters', minPoints: DBSCAN_MIN_POINTS });
-
-      // Gather clusters (ignore "noise" concept since minPoints=1)
+      // 2) adaptive DBSCAN → clusters
+      const clustered = turf.clustersDbscan(fc, eps, {units:'meters', minPoints: DBSCAN_MIN_POINTS});
       const clusters = new Map();
-      for (const f of clustered.features){
-        const cid = f.properties.cluster ?? 0;
-        if (!clusters.has(cid)) clusters.set(cid, []);
-        clusters.get(cid).push(f);
-      }
+      for (const f of clustered.features){ const cid = f.properties.cluster ?? 0; if(!clusters.has(cid)) clusters.set(cid, []); clusters.get(cid).push(f); }
 
+      // 3) for each cluster, build concave hull + MST corridor + point buffers (union)
       clusters.forEach((feats) => {
-        if (!feats || feats.length < 2) return;
+        if (!feats || feats.length === 0) return;
 
         const subFC = turf.featureCollection(feats);
-        // Concave, fallback to convex
         const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
-        let poly = (feats.length >= 3) ? turf.concave(subFC, { maxEdge, units:'meters' }) : null;
+
+        // 3a) concave (fallback convex)
+        let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
         if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
 
-        // Outlier guarantee: ensure every point is inside; if not, union small buffers
-        const checkPoints = feats.map(f => f.geometry.coordinates);
-        let needsUnion = false;
-        if (poly){
-          for (const c of checkPoints){
-            if (!turf.booleanPointInPolygon(turf.point(c), poly)) { needsUnion = true; break; }
-          }
-        } else {
-          needsUnion = true;
+        // 3b) MST corridor buffer to hug linear street runs
+        const c = feats.map(f=>f.geometry.coordinates);
+        const edges = mstEdges(c);
+        let corridor = null;
+        const lineWidth = Math.max(6, eps * MST_LINE_BUF_F);
+        for (const e of edges){
+          const ls = turf.lineString(e);
+          const buf = turf.buffer(ls, lineWidth, {units:'meters'});
+          corridor = corridor ? (turf.union(corridor, buf) || corridor) : buf;
         }
 
-        if (needsUnion){
-          // build a union of small disks around all points, radius relative to eps
-          const r = Math.max(12, eps * OUTLIER_BUFFER_F);
-          let unionGeom = null;
-          for (const f of feats){
-            const b = turf.buffer(f, r, {units:'meters'});
-            unionGeom = unionGeom ? (turf.union(unionGeom, b) || unionGeom) : b;
-          }
-          poly = poly ? (turf.union(poly, unionGeom) || unionGeom) : unionGeom;
+        // 3c) point buffers (end caps & sparse segments)
+        let pbuf = null;
+        const rPoint = Math.max(6, eps * POINT_BUF_F);
+        for (const f of feats){
+          const b = turf.buffer(f, rPoint, {units:'meters'});
+          pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
         }
 
-        // General breathing room + smoothing
-        try { poly = turf.buffer(poly, BASE_BUFFER_M, { units:'meters' }); } catch(_) {}
-        try { poly = turf.simplify(poly, { tolerance: degTol, highQuality:false }); } catch(_) {}
+        // Union everything we have
+        let merged = null;
+        for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
+        if (!merged) return;
+
+        // 3d) morphological close (small gaps), base buffer, simplify
+        try { merged = turf.buffer(merged, MORPH_CLOSE_M, {units:'meters'}); merged = turf.buffer(merged, -MORPH_CLOSE_M, {units:'meters'}); } catch(_){}
+        try { merged = turf.buffer(merged, BASE_BUFFER_M, {units:'meters'}); } catch(_){}
+        try { merged = turf.simplify(merged, {tolerance: degTol, highQuality:false}); } catch(_){}
 
         // Draw polygon
-        const gj = L.geoJSON(poly, { style: POLY_STYLE, interactive:false });
+        const gj = L.geoJSON(merged, { style: POLY_STYLE, interactive:false });
         layer.addLayer(gj);
 
-        // Red, bold label chip (high contrast)
-        const ctr = turf.centerOfMass(poly).geometry.coordinates;
-        const labelHTML = `<div style="
-            background:#ef4444;color:#fff;font-weight:800;font-size:12px;
-            padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,.25);
-            box-shadow:0 2px 6px rgba(0,0,0,.35);
-          ">${prefix}</div>`;
+        // 4) Label: original white pill, but **red, bold text** and no wrapping
+        const ctr = turf.centerOfMass(merged).geometry.coordinates;
+        const labelHTML = `<div class="permit-area-label" style="color:#e11d48;font-weight:800;white-space:nowrap;">${prefix}</div>`;
         const label = L.marker([ctr[1], ctr[0]], {
           icon: L.divIcon({ className:'', html: labelHTML, iconAnchor:[0,0] }),
           interactive:false, keyboard:false
@@ -367,6 +328,7 @@
     return layer;
   }
 
+  // UI control
   const PermitAreasControl = L.Control.extend({
     onAdd: function(){
       const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
@@ -375,7 +337,7 @@
           <input type="checkbox" id="permitAreasToggle" checked />
           Permit Areas
         </label>
-        <small>Adaptive concave polygons; guarantees full coverage</small>
+        <small>Adaptive concave + MST corridor (full coverage)</small>
       `;
       return div;
     }
@@ -393,23 +355,17 @@
     t.addEventListener('change', ()=>{
       const layer = window.__permitAreasLayer;
       if (!layer) return;
-      if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); }
-      else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+      if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); } else { if (map.hasLayer(layer)) map.removeLayer(layer); }
     });
   }
 
   async function rebuild(){
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) return;
-
-    if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) {
-      map.removeLayer(window.__permitAreasLayer);
-    }
-
+    if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) map.removeLayer(window.__permitAreasLayer);
     const points = await gatherPoints();
     const layer  = buildAreasLayer(points);
     window.__permitAreasLayer = layer;
-
     const toggle = document.getElementById('permitAreasToggle');
     if (!toggle || toggle.checked) { if (layer) layer.addTo(map); }
   }
@@ -417,14 +373,9 @@
   function boot(){
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
-
     const ctrl = new PermitAreasControl({ position: 'topleft' });
     map.addControl(ctrl);
-
-    const waitToggle = () => {
-      if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
-      else setTimeout(waitToggle, 100);
-    };
+    const waitToggle = () => { if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); } else setTimeout(waitToggle, 100); };
     waitToggle();
 
     // Hot-swap refresh hooks
@@ -433,7 +384,7 @@
     window.addEventListener('permits:loaded',rebuild);
     window.addEventListener('state:updated', rebuild);
 
-    window.refreshPermitAreas = rebuild; // manual hook if needed
+    window.refreshPermitAreas = rebuild;
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
