@@ -91,13 +91,14 @@
         <input id="date" type="date"/>
       </div>
 
-      <!-- Notes (optional; used when Assign/Modify) -->
+      <!-- NEW: Notes field (optional; used when Assign/Modify) -->
       <div class="col-12">
         <label>Notes (optional — used on Assign/Modify)</label>
         <input id="notes" placeholder="Add or overwrite permit notes for selected poles"/>
       </div>
 
       <div class="col-6"><label>&nbsp;</label><button id="btnClear" type="button">Clear Selection</button></div>
+      <!-- NEW: Delete button to the right of Apply -->
       <div class="col-6" style="display:flex;gap:8px">
         <button id="btnApply" class="btn btn-accent" type="button" style="flex:1">Apply to Selected Poles</button>
         <button id="btnDelete" class="btn" type="button" style="flex:1;border-color:#7f1d1d;background:#1f2937;color:#fca5a5">Delete Selected Permits</button>
@@ -133,7 +134,7 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-  <!-- === Permit Areas overlay (precise, no-touch per prefix) + TOP-RIGHT pro toggle + Pole Labels cycler + NOTES IN LABELS === -->
+  <!-- === Permit Areas overlay (precise, no-touch per prefix) + TOP-RIGHT pro toggle + Pole Labels cycler === -->
   <script>
   (function(){
     'use strict';
@@ -172,8 +173,6 @@
     const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
     const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
     function readPermitId(r){ return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null; }
-    function readStatus(r){ return r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? ''; }
-    function readNotes(r){ return (r && (r.notes ?? r.Notes)) || ''; }
     function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
     async function smartFetch(paths){ for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} } return null; }
 
@@ -424,56 +423,6 @@
     }
 
     let labelMode = 'normal'; // normal → scid → none
-
-    // NEW: add Notes (if present) to each default pole label, below the status line
-    function augmentLabelsWithNotes(){
-      const job = getJob();
-      const st = window.STATE || {};
-      const permits = Array.isArray(st.permits) ? st.permits : [];
-
-      // index notes by (job, SCID, statusText)
-      const makeKey = (scid, status) => `${job}::${String(scid)}::${String(status || '').trim()}`;
-      const notesByKey = new Map();
-      for (const r of permits){
-        if (String(r?.job_name) !== String(job)) continue;
-        const status = (r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? '').toString().trim();
-        const note   = (r?.notes ?? r?.Notes ?? '').toString().trim();
-        if (!note) continue;
-        const scid = r?.SCID != null ? String(r.SCID) : '';
-        if (!scid) continue;
-        const k = makeKey(scid, status);
-        if (!notesByKey.has(k)) notesByKey.set(k, note); // first match wins
-      }
-
-      // walk existing default labels and append a line with notes (once)
-      const tips = document.querySelectorAll('.leaflet-tooltip.pole-tag:not(.scid-only)');
-      tips.forEach(tip => {
-        // parse SCID
-        const text = tip.textContent || '';
-        const m = text.match(/SCID\s+(\d+)/i);
-        if (!m) { return; }
-        const scid = m[1];
-
-        // status line: assume next non-empty line after header
-        const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
-        const statusLine = lines.length >= 2 ? lines[1] : '';
-
-        // remove any previous notes-line to avoid duplicates
-        const old = tip.querySelector('.notes-line');
-        if (old) old.remove();
-
-        const note = notesByKey.get(makeKey(scid, statusLine));
-        if (note){
-          const div = document.createElement('div');
-          div.className = 'notes-line';
-          // matches your default tooltip styling color scheme
-          div.style.cssText = 'margin-top:2px;color:#111827;';
-          div.textContent = note;
-          tip.appendChild(div);
-        }
-      });
-    }
-
     async function setLabelMode(mode){
       labelMode = mode;
       const mapDiv = document.getElementById('map');
@@ -482,42 +431,30 @@
       const map = mapInstance(); if (!isLeafletMap(map)) return;
 
       if (mode === 'scid') {
-        // Always rebuild to ensure current job filter is applied
-        if (window.__scidLabelsLayer && map.hasLayer(window.__scidLabelsLayer)) map.removeLayer(window.__scidLabelsLayer);
-        window.__scidLabelsLayer = null;
-        const poles = await gatherPoles();
-        window.__scidLabelsLayer = buildScidLayer(poles);
+        if (!window.__scidLabelsLayer) {
+          const poles = await gatherPoles();
+          window.__scidLabelsLayer = buildScidLayer(poles);
+        }
         if (!map.hasLayer(window.__scidLabelsLayer)) window.__scidLabelsLayer.addTo(map);
         mapDiv.classList.add('labels-scid');
       } else {
         if (window.__scidLabelsLayer && map.hasLayer(window.__scidLabelsLayer)) map.removeLayer(window.__scidLabelsLayer);
-        if (mode === 'none') {
-          mapDiv.classList.add('labels-none');
-        } else {
-          // normal
-          augmentLabelsWithNotes();
-        }
+        if (mode === 'none') mapDiv.classList.add('labels-none');
       }
 
       const btn = document.getElementById('labelCycleBtn');
       if (btn) btn.textContent = `Pole Labels: ${mode === 'normal' ? 'Normal' : mode === 'scid' ? 'SCID only' : 'None'}`;
     }
-
     function cycleLabelMode(){
       if (labelMode === 'normal') setLabelMode('scid');
       else if (labelMode === 'scid') setLabelMode('none');
       else setLabelMode('normal');
     }
-
     async function rebuildScidLayer(){
       const map = mapInstance(); if (!isLeafletMap(map)) return;
       if (window.__scidLabelsLayer && map.hasLayer(window.__scidLabelsLayer)) map.removeLayer(window.__scidLabelsLayer);
       window.__scidLabelsLayer = null;
-      if (labelMode === 'scid') {
-        const poles = await gatherPoles();
-        window.__scidLabelsLayer = buildScidLayer(poles);
-        if (!map.hasLayer(window.__scidLabelsLayer)) window.__scidLabelsLayer.addTo(map);
-      }
+      if (labelMode === 'scid') await setLabelMode('scid');
     }
 
     /* ================= Build + Toggle areas ================= */
@@ -585,164 +522,159 @@
         if (document.getElementById('permitAreasSwitch') && document.getElementById('labelCycleBtn')) {
           wireControl(map);
           rebuildAreas();
-          setLabelMode('normal'); // initial
-          // also augment after initial render (in case labels were built slightly later)
-          setTimeout(augmentLabelsWithNotes, 150);
+          setLabelMode('normal');
         } else setTimeout(wait, 100);
       };
       wait();
 
-      // Hot refresh
-      window.addEventListener('data:loaded',   ()=>{ rebuildAreas(); rebuildScidLayer(); augmentLabelsWithNotes(); });
-      window.addEventListener('poles:loaded',  ()=>{ rebuildAreas(); rebuildScidLayer(); augmentLabelsWithNotes(); });
-      window.addEventListener('permits:loaded',()=>{ rebuildAreas(); rebuildScidLayer(); augmentLabelsWithNotes(); });
-      window.addEventListener('state:updated', ()=>{ rebuildAreas(); rebuildScidLayer(); augmentLabelsWithNotes(); });
+      window.addEventListener('data:loaded',   ()=>{ rebuildAreas(); rebuildScidLayer(); });
+      window.addEventListener('poles:loaded',  ()=>{ rebuildAreas(); rebuildScidLayer(); });
+      window.addEventListener('permits:loaded',()=>{ rebuildAreas(); rebuildScidLayer(); });
+      window.addEventListener('state:updated', ()=>{ rebuildAreas(); rebuildScidLayer(); });
 
-      // Manual hooks
       window.refreshPermitAreas = rebuildAreas;
       window.refreshScidLabels  = rebuildScidLayer;
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
-    })();
-    </script>
 
-    <!-- === Add: mass Notes apply + Delete Selected Permits (status picker + confirm) === -->
-    <script>
-    (function(){
-      'use strict';
+  })();
+  </script>
 
-      const getJob = () => new URLSearchParams(location.search).get('job') || '';
-      const S = () => (window.STATE || {});
-      const readStatus = r => r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? '(no status)';
-      const setMsg = txt => { const el = document.getElementById('msg'); if (el) el.textContent = txt; };
+  <!-- === Add: mass Notes apply + Delete Selected Permits (status picker + confirm) === -->
+  <script>
+  (function(){
+    'use strict';
 
-      function getSelectedSCIDs(){
-        const els = Array.from(document.querySelectorAll('.leaflet-tooltip.pole-tag.selected'));
-        const ids = new Set();
-        for (const el of els){
-          const m = (el.textContent || '').match(/SCID\s+(\d+)/i);
-          if (m) ids.add(m[1]);
-        }
-        return [...ids];
+    const getJob = () => new URLSearchParams(location.search).get('job') || '';
+    const S = () => (window.STATE || {});
+    const readStatus = r => r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? '(no status)';
+    const setMsg = txt => { const el = document.getElementById('msg'); if (el) el.textContent = txt; };
+
+    function getSelectedSCIDs(){
+      const els = Array.from(document.querySelectorAll('.leaflet-tooltip.pole-tag.selected'));
+      const ids = new Set();
+      for (const el of els){
+        const m = (el.textContent || '').match(/SCID\s+(\d+)/i);
+        if (m) ids.add(m[1]);
       }
+      return [...ids];
+    }
 
-      // Mass-apply Notes on Assign/Modify (do NOT append SCID; overwrite only)
-      function massApplyNotesToSelected(){
-        const notes = (document.getElementById('notes')?.value || '').trim();
-        if (!notes) return; // empty → do nothing
+    function massApplyNotesToSelected(){
+      const notes = (document.getElementById('notes')?.value || '').trim();
+      if (!notes) return;
 
-        const job = getJob();
-        const scids = new Set(getSelectedSCIDs().map(String));
-        const st = S();
-        if (!Array.isArray(st.permits) || !scids.size) return;
+      const job = getJob();
+      const scids = new Set(getSelectedSCIDs().map(String));
+      const st = S(); if (!Array.isArray(st.permits) || !scids.size) return;
 
-        let changed = 0;
-        for (const r of st.permits){
-          if (String(r?.job_name) === String(job) && scids.has(String(r?.SCID))){
-            if ('notes' in r) { if (r.notes !== notes) { r.notes = notes; changed++; } }
-            else if ('Notes' in r) { if (r.Notes !== notes) { r.Notes = notes; changed++; } }
-            else { r.notes = notes; changed++; }
-          }
-        }
-        if (changed){
-          window.dispatchEvent(new Event('permits:loaded'));
-          window.dispatchEvent(new Event('state:updated'));
-          setMsg(`Notes updated on ${changed} permit${changed===1?'':'s'}.`);
+      let changed = 0;
+      for (const r of st.permits){
+        if (String(r?.job_name) === String(job) && scids.has(String(r?.SCID))){
+          if ('notes' in r) { if (r.notes !== notes) { r.notes = notes; changed++; } }
+          else if ('Notes' in r) { if (r.Notes !== notes) { r.Notes = notes; changed++; } }
+          else { r.notes = notes; changed++; }
         }
       }
-
-      function hookApplyForNotes(){
-        const btn = document.getElementById('btnApply');
-        if (!btn) return;
-        btn.addEventListener('click', () => {
-          massApplyNotesToSelected(); // now
-          const once = () => { massApplyNotesToSelected(); window.removeEventListener('state:updated', once); };
-          window.addEventListener('state:updated', once, { once:true }); // after your app refreshes
-        }, false);
+      if (changed){
+        window.dispatchEvent(new Event('permits:loaded'));
+        window.dispatchEvent(new Event('state:updated'));
+        setMsg(`Notes updated on ${changed} permit${changed===1?'':'s'}.`);
       }
+    }
 
-      // Delete flow: picker (by status) + confirm
-      function openDeleteStatusPicker(statusCounts, onConfirm){
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:5000;display:flex;align-items:center;justify-content:center';
-        const box = document.createElement('div');
-        box.style.cssText = 'background:#0f1219;color:#e5e7eb;border:1px solid #1f2430;border-radius:12px;min-width:340px;max-width:420px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px system-ui';
-        box.innerHTML = `
-          <div style="font-weight:700;margin-bottom:8px">Delete selected permits</div>
-          <div style="font-size:12px;color:#9aa3b2;margin-bottom:8px">Choose which <b>statuses</b> to delete from the selected poles.</div>
-          <div id="stList" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 12px 0;max-height:220px;overflow:auto"></div>
-          <div style="display:flex;gap:8px;justify-content:flex-end">
-            <button id="delCancel" style="padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer">Cancel</button>
-            <button id="delGo" style="padding:8px 10px;border-radius:8px;border:1px solid #7f1d1d;background:#1f2937;color:#fca5a5;cursor:pointer;font-weight:700">Delete</button>
-          </div>
-        `;
-        const list = box.querySelector('#stList');
-        Object.entries(statusCounts).forEach(([st, cnt])=>{
-          const id = 'st_' + Math.random().toString(36).slice(2);
-          const row = document.createElement('label');
-          row.style.cssText = 'display:flex;align-items:center;gap:8px';
-          row.innerHTML = `<input type="checkbox" id="${id}" checked/><span>${st}</span><span style="margin-left:auto;color:#9aa3b2">(${cnt})</span>`;
-          list.appendChild(row);
-          row.querySelector('input').dataset.status = st;
-        });
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
+    function hookApplyForNotes(){
+      const btn = document.getElementById('btnApply');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        massApplyNotesToSelected(); // now
+        const once = () => { massApplyNotesToSelected(); window.removeEventListener('state:updated', once); };
+        window.addEventListener('state:updated', once, { once:true });
+      }, false);
+    }
 
-        function close(){ overlay.remove(); }
+    function openDeleteStatusPicker(statusCounts, onConfirm){
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:5000;display:flex;align-items:center;justify-content:center';
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#0f1219;color:#e5e7eb;border:1px solid #1f2430;border-radius:12px;min-width:340px;max-width:420px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px system-ui';
+      box.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px">Delete selected permits</div>
+        <div style="font-size:12px;color:#9aa3b2;margin-bottom:8px">Choose which <b>statuses</b> to delete from the selected poles.</div>
+        <div id="stList" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 12px 0;max-height:220px;overflow:auto"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="delCancel" style="padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer">Cancel</button>
+          <button id="delGo" style="padding:8px 10px;border-radius:8px;border:1px solid #7f1d1d;background:#1f2937;color:#fca5a5;cursor:pointer;font-weight:700">Delete</button>
+        </div>
+      `;
+      const list = box.querySelector('#stList');
+      Object.entries(statusCounts).forEach(([st, cnt])=>{
+        const id = 'st_' + Math.random().toString(36).slice(2);
+        const row = document.createElement('label');
+        row.style.cssText = 'display:flex;align-items:center;gap:8px';
+        row.innerHTML = `<input type="checkbox" id="${id}" checked/><span>${st}</span><span style="margin-left:auto;color:#9aa3b2">(${cnt})</span>`;
+        list.appendChild(row);
+        row.querySelector('input').dataset.status = st;
+      });
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
 
-        box.querySelector('#delCancel').onclick = close;
-        box.querySelector('#delGo').onclick = () => {
-          const checks = Array.from(list.querySelectorAll('input[type=checkbox]')).filter(c => c.checked).map(c => c.dataset.status);
-          if (!checks.length) { close(); return; }
-          const total = Object.entries(statusCounts).filter(([s])=>checks.includes(s)).reduce((a, [,c])=>a+c, 0);
-          const ok = window.confirm(`Are you sure you want to delete ${total} permit${total===1?'':'s'} with status: ${checks.join(', ')}?`);
-          if (!ok) return;
-          close();
-          onConfirm(checks);
-        };
+      function close(){ overlay.remove(); }
+
+      box.querySelector('#delCancel').onclick = close;
+      box.querySelector('#delGo').onclick = () => {
+        const checks = Array.from(list.querySelectorAll('input[type=checkbox]')).filter(c => c.checked).map(c => c.dataset.status);
+        if (!checks.length) { close(); return; }
+        const total = Object.entries(statusCounts).filter(([s])=>checks.includes(s)).reduce((a, [,c])=>a+c, 0);
+        const ok = window.confirm(`Are you sure you want to delete ${total} permit${total===1?'':'s'} with status: ${checks.join(', ')}?`);
+        if (!ok) return;
+        close();
+        onConfirm(checks);
+      };
+    }
+
+    function deleteSelectedPermits(){
+      const job = getJob();
+      const st = S();
+      const scids = new Set(getSelectedSCIDs().map(String));
+      if (!Array.isArray(st.permits) || !scids.size){
+        setMsg('No poles selected with permits to delete.');
+        return;
       }
+      const candidates = st.permits.filter(r => String(r?.job_name)===String(job) && scids.has(String(r?.SCID)));
+      if (!candidates.length){ setMsg('Selected poles have no permits to delete.'); return; }
 
-      function deleteSelectedPermits(){
-        const job = getJob();
-        const st = S();
-        const scids = new Set(getSelectedSCIDs().map(String));
-        if (!Array.isArray(st.permits) || !scids.size){
-          setMsg('No poles selected with permits to delete.');
-          return;
-        }
-        const candidates = st.permits.filter(r => String(r?.job_name)===String(job) && scids.has(String(r?.SCID)));
-        if (!candidates.length){ setMsg('Selected poles have no permits to delete.'); return; }
-
-        const statusCounts = {};
-        for (const r of candidates){
-          const s = readStatus(r);
-          statusCounts[s] = (statusCounts[s]||0) + 1;
-        }
-        openDeleteStatusPicker(statusCounts, (chosenStatuses)=>{
-          const keep = st.permits.filter(r => !(String(r?.job_name)===String(job) && scids.has(String(r?.SCID)) && chosenStatuses.includes(readStatus(r))));
-          const removed = st.permits.length - keep.length;
-          if (!removed){ setMsg('Nothing deleted.'); return; }
-          window.STATE.permits = keep;
-          window.dispatchEvent(new Event('permits:loaded'));
-          window.dispatchEvent(new Event('state:updated'));
-          if (window.refreshPermitAreas) window.refreshPermitAreas();
-          if (window.refreshScidLabels)  window.refreshScidLabels();
-          setMsg(`Deleted ${removed} permit${removed===1?'':'s'} from ${scids.size} pole${scids.size===1?'':'s'}.`);
-        });
+      const statusCounts = {};
+      for (const r of candidates){
+        const s = readStatus(r);
+        statusCounts[s] = (statusCounts[s]||0) + 1;
       }
+      openDeleteStatusPicker(statusCounts, (chosenStatuses)=>{
+        const keep = st.permits.filter(r => !(String(r?.job_name)===String(job) && scids.has(String(r?.SCID)) && chosenStatuses.includes(readStatus(r))));
+        const removed = st.permits.length - keep.length;
+        if (!removed){ setMsg('Nothing deleted.'); return; }
+        window.STATE.permits = keep;
+        window.dispatchEvent(new Event('permits:loaded'));
+        window.dispatchEvent(new Event('state:updated'));
+        if (window.refreshPermitAreas) window.refreshPermitAreas();
+        if (window.refreshScidLabels)  window.refreshScidLabels();
+        setMsg(`Deleted ${removed} permit${removed===1?'':'s'} from ${scids.size} pole${scids.size===1?'':'s'}.`);
+      });
+    }
 
-      function init(){
-        const del = document.getElementById('btnDelete');
-        if (del) del.addEventListener('click', deleteSelectedPermits);
-        const apply = document.getElementById('btnApply');
-        if (apply) hookApplyForNotes();
-      }
+    function init(){
+      const del = document.getElementById('btnDelete');
+      if (del) del.addEventListener('click', deleteSelectedPermits);
+      const apply = document.getElementById('btnApply');
+      if (apply) hookApplyForNotes();
+    }
 
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-      else init();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
 
-    })();
-    </script>
-
+  })();
+  </script>
+</body>
+</html>
