@@ -2660,16 +2660,6 @@
     "notes": ""
   },
   {
-    "permit_id": "test_002",
-    "job_name": "BRN01-F161",
-    "tag": "52875",
-    "SCID": "002",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "09/12/2025",
-    "notes": ""
-  },
-  {
     "permit_id": "test_003",
     "job_name": "BRN01-F161",
     "tag": "52876",
