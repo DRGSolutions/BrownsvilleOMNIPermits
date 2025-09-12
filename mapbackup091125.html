@@ -140,12 +140,12 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (single, precise, no-touch per prefix) + TOP-RIGHT toggle === -->
+<!-- === Permit Areas overlay (precise, no-touch per prefix) + TOP-RIGHT pro toggle + Pole Labels cycler === -->
 <script>
 (function(){
   'use strict';
 
-  /* ================= Tunables ================= */
+  /* ================= Tunables (same behavior you approved) ================= */
   const EPS_CLAMP_MIN_M     = 30;
   const EPS_CLAMP_MAX_M     = 160;
   const MAXEDGE_MIN_M       = 60;
@@ -178,15 +178,9 @@
 
   const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
   const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
-  function readPermitId(r){
-    return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
-  }
+  function readPermitId(r){ return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null; }
   function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
-
-  async function smartFetch(paths){
-    for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} }
-    return null;
-  }
+  async function smartFetch(paths){ for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} } return null; }
 
   function buildPointsFromSTATE(job){
     const S = window.STATE || {};
@@ -203,7 +197,6 @@
     }
     return pts;
   }
-
   async function buildPointsFromFiles(job){
     const base = ["data","./data","."];
     const polesP   = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
@@ -221,6 +214,7 @@
     return pts;
   }
 
+  // Adaptive eps from nearest-neighbor stats
   function percentile(sorted,p){ if(!sorted.length) return 0; const i=(sorted.length-1)*p; const lo=Math.floor(i), hi=Math.ceil(i); return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(i-lo); }
   function nearestNeighborMeters(coords){
     const out=[]; for(let i=0;i<coords.length;i++){ let best=Infinity;
@@ -236,7 +230,7 @@
     let eps = Math.max(p75*1.5, p50*1.7);
     return Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
   }
-
+  // Minimum Spanning Tree (Prim)
   function mstEdges(coords){
     const n = coords.length; if (n<=1) return [];
     const inMST=new Array(n).fill(false), dist=new Array(n).fill(Infinity), parent=new Array(n).fill(-1);
@@ -254,28 +248,59 @@
     return edges;
   }
 
-  function ensurePillCSS(){
+  // Pill CSS (black pill + red bold text + blink) and control/labels CSS
+  function ensureUIStyles(){
     if (document.getElementById('permit-pill-css')) return;
     const s = document.createElement('style'); s.id='permit-pill-css';
     s.textContent = `
+      /* Black pill for area label */
       .permit-pill{background:#000;color:#e11d48;border:1px solid rgba(255,255,255,.28);
         padding:4px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.35);
         font-weight:800;white-space:nowrap;}
       @keyframes permitBlink{0%{opacity:.60} 50%{opacity:1} 100%{opacity:.60}}
       .permit-blink{animation:permitBlink 1.2s ease-in-out infinite;}
+
+      /* Professional control card */
+      .overlay-ctl{background:#fff;padding:10px 12px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.2);min-width:180px}
+      .overlay-ctl .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0}
+      .overlay-ctl .label{font:600 12px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial;color:#6b7280}
+      .overlay-ctl .small{font:500 11px/1.2 system-ui;color:#9ca3af}
+
+      /* Switch */
+      .switch{position:relative;display:inline-block;width:42px;height:24px}
+      .switch input{display:none}
+      .slider{position:absolute;inset:0;background:#e5e7eb;border-radius:9999px;transition:background .2s ease;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+      .slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+      .switch input:checked + .slider{background:#2563eb}
+      .switch input:checked + .slider:before{transform:translateX(18px)}
+
+      /* Button */
+      .ctl-btn{appearance:none;border:1px solid #e5e7eb;background:#f9fafb;border-radius:8px;padding:6px 10px;font:600 12px system-ui;color:#111827;cursor:pointer}
+      .ctl-btn:hover{background:#eef2ff;border-color:#c7d2fe}
+
+      /* SCID-only overlay chip */
+      .scid-chip{background:#111827;color:#f9fafb;border:1px solid rgba(255,255,255,.25);
+        padding:2px 6px;border-radius:6px;font:700 10px/1.1 system-ui, -apple-system, Segoe UI, Roboto, Arial;white-space:nowrap}
+
+      /* Hide your existing full pole labels when cycling */
+      #map.labels-scid .leaflet-tooltip.pole-tag:not(.scid-only){ display:none !important; }
+      #map.labels-none .leaflet-tooltip.pole-tag{ display:none !important; }
     `;
     document.head.appendChild(s);
   }
 
+  // Build ONE tight polygon for a whole prefix (no-touch via Voronoi later)
   function prefixPolygon(feats){
     const coords = feats.map(f=>f.geometry.coordinates);
     const eps = adaptiveEpsMeters(coords);
     const subFC = turf.featureCollection(feats);
     const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
 
+    // concave hull (fallback convex)
     let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
     if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
 
+    // MST corridor for linear runs
     const edges = mstEdges(coords);
     let corridor = null;
     const lineW = Math.max(5, eps * MST_LINE_BUF_F);
@@ -285,6 +310,7 @@
       corridor = corridor ? (turf.union(corridor, b) || corridor) : b;
     }
 
+    // per-point disks
     let pbuf = null;
     const rPoint = Math.max(5, eps * POINT_BUF_F);
     for (const f of feats){
@@ -292,6 +318,7 @@
       pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
     }
 
+    // union + polish
     let merged = null;
     for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
     if (!merged) return { geom:null, eps };
@@ -303,6 +330,7 @@
     return { geom: merged, eps };
   }
 
+  // Voronoi helpers
   const coordKey = (lng,lat) => `${lng.toFixed(6)},${lat.toFixed(6)}`;
   function buildVoronoiMap(allPoints){
     const feats = allPoints.map(p => turf.point([p.lng, p.lat], { key: coordKey(p.lng,p.lat) }));
@@ -324,6 +352,7 @@
     return map;
   }
 
+  // Build final areas layer (single, precise, non-touch per prefix)
   function buildAreasLayer(points){
     const byPrefix = new Map();
     for (const pt of points){ if(!pt||!pt.prefix) continue; if(!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []); byPrefix.get(pt.prefix).push(pt); }
@@ -337,20 +366,16 @@
       const { geom:rawGeom } = prefixPolygon(feats);
       if (!rawGeom) return;
 
+      // union of THIS prefix's Voronoi cells
       let ownCells = null;
-      for (const p of pts){
-        const cell = vorMap.get(coordKey(p.lng,p.lat));
-        if (!cell) continue;
-        ownCells = ownCells ? (turf.union(ownCells, cell) || ownCells) : cell;
-      }
+      for (const p of pts){ const cell = vorMap.get(coordKey(p.lng,p.lat)); if (!cell) continue; ownCells = ownCells ? (turf.union(ownCells, cell) || ownCells) : cell; }
       if (!ownCells) return;
 
-      let constrained = null;
-      try { constrained = turf.intersect(rawGeom, ownCells) || ownCells; } catch(_){ constrained = ownCells; }
+      // constrain and erode for gap
+      let constrained = null; try { constrained = turf.intersect(rawGeom, ownCells) || ownCells; } catch(_){ constrained = ownCells; }
+      let safe = constrained; try { safe = turf.buffer(constrained, -CLEAR_GAP_M, {units:'meters'}); safe = turf.intersect(safe, ownCells) || safe; } catch(_){}
 
-      let safe = constrained;
-      try { safe = turf.buffer(constrained, -CLEAR_GAP_M, {units:'meters'}); safe = turf.intersect(safe, ownCells) || safe; } catch(_){}
-
+      // recover poles inside *eroded* cells only
       const erodedCells = (() => { try { return turf.buffer(ownCells, -CLEAR_GAP_M, {units:'meters'}); } catch(_){ return ownCells; }})();
       const recoverR = Math.max(2, CLEAR_GAP_M * RECOVER_F);
       for (const p of pts){
@@ -367,6 +392,7 @@
       const gj = L.geoJSON(safe, { style: POLY_STYLE, interactive:false });
       layer.addLayer(gj);
 
+      // label inside polygon
       const pin = turf.pointOnFeature(safe).geometry.coordinates;
       const html = `<div class="permit-pill permit-blink"><span>${prefix}</span></div>`;
       const lbl  = L.marker([pin[1], pin[0]], { icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }), interactive:false, keyboard:false });
@@ -376,72 +402,167 @@
     return layer;
   }
 
-  // === TOP-RIGHT toggle control (default ON) ===
-  const PermitAreasControl = L.Control.extend({
-    onAdd: function(){
-      const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
-      div.innerHTML = `
-        <label title="Show polygons around poles that share the same permit prefix">
-          <input type="checkbox" id="permitAreasToggle" checked />
-          Permit Areas
-        </label>
-        <small>Single, precise, non-touch areas per prefix</small>
-      `;
-      return div;
+  /* ================= SCID-only labels overlay (for cycling) ================= */
+  async function gatherPoles(){
+    const job = getJob();
+    const S = window.STATE || {};
+    if (Array.isArray(S.poles) && S.poles.length){
+      return S.poles.filter(p => !job || String(p.job_name) === String(job));
     }
-  });
+    const base = ["data","./data","."];
+    const polesP = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
+    const all = await smartFetch(polesP) || [];
+    return all.filter(p => !job || String(p.job_name) === String(job));
+  }
 
+  function buildScidLayer(poles){
+    const g = L.layerGroup();
+    for (const p of poles){
+      const lat = +getLat(p), lng = +getLng(p);
+      const scid = (p && p.SCID != null) ? String(p.SCID) : null;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || !scid) continue;
+
+      const tt = L.tooltip({
+        permanent: true,
+        direction: 'right',
+        offset: [8, 0],
+        className: 'pole-tag scid-only'  // <- same style as your normal labels, but marked scid-only
+      })
+      .setContent(`SCID ${scid}`)
+      .setLatLng([lat, lng]);
+
+      g.addLayer(tt);
+    }
+    return g;
+  }
+
+  let labelMode = 'normal'; // normal → scid → none
+  async function setLabelMode(mode){
+    labelMode = mode;
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) return;
+    mapDiv.classList.remove('labels-scid','labels-none');
+    const map = mapInstance(); if (!isLeafletMap(map)) return;
+
+    // ensure layer exists if needed
+    if (mode === 'scid') {
+      if (!window.__scidLabelsLayer) {
+        const poles = await gatherPoles();
+        window.__scidLabelsLayer = buildScidLayer(poles);
+      }
+      if (!map.hasLayer(window.__scidLabelsLayer)) window.__scidLabelsLayer.addTo(map);
+      mapDiv.classList.add('labels-scid');
+    } else {
+      if (window.__scidLabelsLayer && map.hasLayer(window.__scidLabelsLayer)) map.removeLayer(window.__scidLabelsLayer);
+      if (mode === 'none') mapDiv.classList.add('labels-none');
+    }
+
+    // update button text
+    const btn = document.getElementById('labelCycleBtn');
+    if (btn) btn.textContent = `Pole Labels: ${mode === 'normal' ? 'Normal' : mode === 'scid' ? 'SCID only' : 'None'}`;
+  }
+  function cycleLabelMode(){
+    if (labelMode === 'normal') setLabelMode('scid');
+    else if (labelMode === 'scid') setLabelMode('none');
+    else setLabelMode('normal');
+  }
+  async function rebuildScidLayer(){
+    // rebuild from fresh data (e.g., after data:loaded)
+    const map = mapInstance(); if (!isLeafletMap(map)) return;
+    if (window.__scidLabelsLayer && map.hasLayer(window.__scidLabelsLayer)) map.removeLayer(window.__scidLabelsLayer);
+    window.__scidLabelsLayer = null;
+    if (labelMode === 'scid') await setLabelMode('scid');
+  }
+
+  /* ================= Build + Toggle areas ================= */
   async function gatherPoints(){
     const S = window.STATE || {};
     const hasSTATE = Array.isArray(S.poles) && Array.isArray(S.permits) && (S.poles.length || S.permits.length);
     if (hasSTATE) return buildPointsFromSTATE(getJob());
     return buildPointsFromFiles(getJob());
   }
-
-  function wireToggle(map){
-    const t = document.getElementById('permitAreasToggle');
-    if (!t) return;
-    t.addEventListener('change', ()=>{
-      const layer = window.__permitAreasLayer;
-      if (!layer) return;
-      if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); } else { if (map.hasLayer(layer)) map.removeLayer(layer); }
-    });
-  }
-
-  async function rebuild(){
+  async function rebuildAreas(){
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) return;
     if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) map.removeLayer(window.__permitAreasLayer);
-    ensurePillCSS();
     const points = await gatherPoints();
     const layer  = buildAreasLayer(points);
     window.__permitAreasLayer = layer;
-    const toggle = document.getElementById('permitAreasToggle');
-    if (!toggle || toggle.checked) { if (layer) layer.addTo(map); }
+    const toggle = document.getElementById('permitAreasSwitch');
+    const isOn = !toggle || toggle.checked;
+    if (isOn && layer) layer.addTo(map);
   }
 
-  function boot(){
+  /* ================= Control (top-right): Pro switch + labels cycler ================= */
+  const OverlayControl = L.Control.extend({
+    onAdd: function(){
+      const div = L.DomUtil.create('div', 'overlay-ctl');
+      div.innerHTML = `
+        <div class="row">
+          <span class="label">Permit Areas</span>
+          <label class="switch" title="Toggle permit areas">
+            <input type="checkbox" id="permitAreasSwitch" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="row">
+          <button id="labelCycleBtn" class="ctl-btn" title="Cycle pole labels: Normal → SCID only → None">Pole Labels: Normal</button>
+        </div>
+        <div class="small" style="margin-top:2px">Single, precise, non-touch areas per prefix</div>
+      `;
+      return div;
+    }
+  });
+
+  function wireControl(map){
+    // Areas switch
+    const sw = document.getElementById('permitAreasSwitch');
+    if (sw){
+      sw.addEventListener('change', ()=>{
+        const layer = window.__permitAreasLayer;
+        if (!layer) return;
+        if (sw.checked) { if (!map.hasLayer(layer)) layer.addTo(map); }
+        else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+      });
+    }
+    // Labels cycler
+    const btn = document.getElementById('labelCycleBtn');
+    if (btn) btn.addEventListener('click', cycleLabelMode);
+  }
+
+  /* ================= Boot + hot-swap ================= */
+  async function boot(){
+    ensureUIStyles();
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
-    // NOTE: position changed to TOP-RIGHT per your request
-    const ctrl = new PermitAreasControl({ position: 'topright' });
-    map.addControl(ctrl);
 
-    const waitToggle = () => {
-      if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
-      else setTimeout(waitToggle, 100);
+    // Control (top-right)
+    const ctl = new OverlayControl({ position: 'topright' });
+    map.addControl(ctl);
+
+    // Wire events once the DOM is ready
+    const wait = () => {
+      if (document.getElementById('permitAreasSwitch') && document.getElementById('labelCycleBtn')) {
+        wireControl(map);
+        rebuildAreas();
+        setLabelMode('normal'); // initial state
+      } else setTimeout(wait, 100);
     };
-    waitToggle();
+    wait();
 
-    window.addEventListener('data:loaded',   rebuild);
-    window.addEventListener('poles:loaded',  rebuild);
-    window.addEventListener('permits:loaded',rebuild);
-    window.addEventListener('state:updated', rebuild);
+    // Hot refresh
+    window.addEventListener('data:loaded',   ()=>{ rebuildAreas(); rebuildScidLayer(); });
+    window.addEventListener('poles:loaded',  ()=>{ rebuildAreas(); rebuildScidLayer(); });
+    window.addEventListener('permits:loaded',()=>{ rebuildAreas(); rebuildScidLayer(); });
+    window.addEventListener('state:updated', ()=>{ rebuildAreas(); rebuildScidLayer(); });
 
-    window.refreshPermitAreas = rebuild;
+    // Manual hooks if needed
+    window.refreshPermitAreas = rebuildAreas;
+    window.refreshScidLabels  = rebuildScidLayer;
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+
 })();
 </script>
