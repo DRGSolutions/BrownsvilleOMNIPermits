@@ -4,8 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Advanced Map Selection</title>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+
   <style>
     :root{ --bg:#0b0c10;--panel:#121318;--muted:#9aa3b2;--fg:#f3f4f6;--border:#1f2430; }
     html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -29,6 +32,7 @@
     .small{font-size:12px}.muted{color:var(--muted)}
     #msg{min-height:18px}
     .leaflet-top.leaflet-right{margin-right:12px;margin-top:12px}
+    .leaflet-top.leaflet-left{margin-left:12px;margin-top:12px}
 
     /* white tag by default; blue when selected */
     .leaflet-tooltip.pole-tag{
@@ -43,6 +47,22 @@
     .leaflet-tooltip.pole-tag.selected .id{color:#fff}
 
     .hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+    /* === Permit-areas label & control === */
+    .permit-area-label{
+      font: 600 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
+      padding: 4px 6px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      white-space: nowrap;
+    }
+    .leaflet-control.permit-areas-control{
+      background:#fff;padding:8px 10px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.2)
+    }
+    .leaflet-control.permit-areas-control label{display:flex;align-items:center;gap:8px;font-weight:600}
+    .leaflet-control.permit-areas-control small{display:block;font-weight:500;opacity:.7;margin-top:4px}
   </style>
 </head>
 <body>
@@ -100,9 +120,328 @@
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
   <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
-  <!-- shared config + map logic + watcher graphics -->
+  <!-- === Capture the Leaflet map instance ASAP (must run BEFORE your map.js creates the map) === -->
+  <script>
+  (function(){
+    if (window.L && !window.__L_MAP_WRAPPED__) {
+      window.__L_MAP_WRAPPED__ = true;
+      const _map = L.map;
+      L.map = function(){
+        const m = _map.apply(this, arguments);
+        window.__leaflet_map__ = m;  // always expose the instance
+        return m;
+      };
+    }
+  })();
+  </script>
+
+  <!-- shared config + map logic + watcher graphics (unchanged) -->
   <script src="assets/js/config.js?v=api2"></script>
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
-</body>
-</html>
+
+<!-- === Permit Areas overlay (single, precise, no-touch per prefix) + TOP-RIGHT toggle === -->
+<script>
+(function(){
+  'use strict';
+
+  /* ================= Tunables ================= */
+  const EPS_CLAMP_MIN_M     = 30;
+  const EPS_CLAMP_MAX_M     = 160;
+  const MAXEDGE_MIN_M       = 60;
+  const MAXEDGE_FACTOR      = 1.9;
+  const MST_LINE_BUF_F      = 0.35;
+  const POINT_BUF_F         = 0.33;
+  const BASE_BUFFER_M       = 10;
+  const SIMPLIFY_TOL_M      = 3;
+  const MORPH_CLOSE_M       = 2;
+  const VOR_MARGIN_M        = 600;
+  const CLEAR_GAP_M         = 8;
+  const RECOVER_F           = 0.45;
+
+  const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
+
+  /* ================= Helpers ================= */
+  const degPerMeterLat = 1 / 111320;
+  const degTol = SIMPLIFY_TOL_M * degPerMeterLat;
+  const getJob = () => new URLSearchParams(location.search).get('job') || '';
+
+  function isLeafletMap(m){
+    return !!(m && typeof m.addControl === 'function' && typeof m.addLayer === 'function' &&
+              typeof m.getCenter === 'function' && m._leaflet_id != null);
+  }
+  function mapInstance(){
+    if (isLeafletMap(window.__leaflet_map__)) return window.__leaflet_map__;
+    for (const k of Object.keys(window)){ try{ const v = window[k]; if (isLeafletMap(v)) return v; }catch(_){} }
+    return null;
+  }
+
+  const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
+  const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
+  function readPermitId(r){
+    return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
+  }
+  function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
+
+  async function smartFetch(paths){
+    for (const p of paths){ try{ const r=await fetch(p,{cache:'no-store'}); if(r.ok) return r.json(); }catch(_){} }
+    return null;
+  }
+
+  function buildPointsFromSTATE(job){
+    const S = window.STATE || {};
+    const poles   = Array.isArray(S.poles)   ? S.poles   : [];
+    const permits = Array.isArray(S.permits) ? S.permits : [];
+    const byPole = new Map();
+    for (const r of permits){ const k=`${r.job_name}::${r.tag}::${r.SCID}`; if(!byPole.has(k)) byPole.set(k,[]); byPole.get(k).push(r); }
+    const pts = [];
+    for (const p of poles){
+      if (job && String(p.job_name) !== String(job)) continue;
+      const lat=+getLat(p), lng=+getLng(p); if(!Number.isFinite(lat)||!Number.isFinite(lng)) continue;
+      const rel = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      for (const r of rel){ const id=readPermitId(r); const prefix=toPrefix(String(id||'')); if(prefix) pts.push({lat,lng,prefix}); }
+    }
+    return pts;
+  }
+
+  async function buildPointsFromFiles(job){
+    const base = ["data","./data","."];
+    const polesP   = base.map(p=>`${p}/poles.json`).concat(["poles.json","./poles.json"]);
+    const permitsP = base.map(p=>`${p}/permits.json`).concat(["permits.json","./permits.json"]);
+    const [poles,permits] = await Promise.all([smartFetch(polesP),smartFetch(permitsP)]);
+    const byPole = new Map();
+    if (Array.isArray(permits)) for (const r of permits){ const k=`${r.job_name}::${r.tag}::${r.SCID}`; if(!byPole.has(k)) byPole.set(k,[]); byPole.get(k).push(r); }
+    const pts=[];
+    if (Array.isArray(poles)) for (const p of poles){
+      if (job && String(p.job_name) !== String(job)) continue;
+      const lat=+getLat(p), lng=+getLng(p); if(!Number.isFinite(lat)||!Number.isFinite(lng)) continue;
+      const rel = byPole.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+      for (const r of rel){ const id=readPermitId(r); const prefix=toPrefix(String(id||'')); if(prefix) pts.push({lat,lng,prefix}); }
+    }
+    return pts;
+  }
+
+  function percentile(sorted,p){ if(!sorted.length) return 0; const i=(sorted.length-1)*p; const lo=Math.floor(i), hi=Math.ceil(i); return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(i-lo); }
+  function nearestNeighborMeters(coords){
+    const out=[]; for(let i=0;i<coords.length;i++){ let best=Infinity;
+      for(let j=0;j<coords.length;j++){ if(i===j) continue; const d=turf.distance(coords[i],coords[j],{units:'meters'}); if(d<best) best=d; }
+      if(Number.isFinite(best)) out.push(best);
+    }
+    return out.sort((a,b)=>a-b);
+  }
+  function adaptiveEpsMeters(coords){
+    if (coords.length<2) return 50;
+    const nnd = nearestNeighborMeters(coords);
+    const p50=percentile(nnd,0.50), p75=percentile(nnd,0.75);
+    let eps = Math.max(p75*1.5, p50*1.7);
+    return Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
+  }
+
+  function mstEdges(coords){
+    const n = coords.length; if (n<=1) return [];
+    const inMST=new Array(n).fill(false), dist=new Array(n).fill(Infinity), parent=new Array(n).fill(-1);
+    dist[0]=0;
+    for(let k=0;k<n;k++){
+      let u=-1, best=Infinity; for(let i=0;i<n;i++){ if(!inMST[i] && dist[i]<best){ best=dist[i]; u=i; } }
+      if(u===-1) break; inMST[u]=true;
+      for(let v=0; v<n; v++){
+        if(inMST[v]) continue;
+        const d=turf.distance(coords[u], coords[v], {units:'meters'});
+        if(d<dist[v]){ dist[v]=d; parent[v]=u; }
+      }
+    }
+    const edges=[]; for(let v=1; v<n; v++){ if(parent[v]!==-1) edges.push([coords[v], coords[parent[v]]]); }
+    return edges;
+  }
+
+  function ensurePillCSS(){
+    if (document.getElementById('permit-pill-css')) return;
+    const s = document.createElement('style'); s.id='permit-pill-css';
+    s.textContent = `
+      .permit-pill{background:#000;color:#e11d48;border:1px solid rgba(255,255,255,.28);
+        padding:4px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.35);
+        font-weight:800;white-space:nowrap;}
+      @keyframes permitBlink{0%{opacity:.60} 50%{opacity:1} 100%{opacity:.60}}
+      .permit-blink{animation:permitBlink 1.2s ease-in-out infinite;}
+    `;
+    document.head.appendChild(s);
+  }
+
+  function prefixPolygon(feats){
+    const coords = feats.map(f=>f.geometry.coordinates);
+    const eps = adaptiveEpsMeters(coords);
+    const subFC = turf.featureCollection(feats);
+    const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
+
+    let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
+    if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
+
+    const edges = mstEdges(coords);
+    let corridor = null;
+    const lineW = Math.max(5, eps * MST_LINE_BUF_F);
+    for (const e of edges){
+      const ls = turf.lineString(e);
+      const b  = turf.buffer(ls, lineW, {units:'meters'});
+      corridor = corridor ? (turf.union(corridor, b) || corridor) : b;
+    }
+
+    let pbuf = null;
+    const rPoint = Math.max(5, eps * POINT_BUF_F);
+    for (const f of feats){
+      const b = turf.buffer(f, rPoint, {units:'meters'});
+      pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
+    }
+
+    let merged = null;
+    for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
+    if (!merged) return { geom:null, eps };
+
+    try { merged = turf.buffer(merged, MORPH_CLOSE_M, {units:'meters'}); merged = turf.buffer(merged, -MORPH_CLOSE_M, {units:'meters'}); } catch(_){}
+    try { merged = turf.buffer(merged, BASE_BUFFER_M, {units:'meters'}); } catch(_){}
+    try { merged = turf.simplify(merged, {tolerance: degTol, highQuality:false}); } catch(_){}
+
+    return { geom: merged, eps };
+  }
+
+  const coordKey = (lng,lat) => `${lng.toFixed(6)},${lat.toFixed(6)}`;
+  function buildVoronoiMap(allPoints){
+    const feats = allPoints.map(p => turf.point([p.lng, p.lat], { key: coordKey(p.lng,p.lat) }));
+    if (!feats.length) return new Map();
+    const fc = turf.featureCollection(feats);
+    const bbox = turf.bbox(turf.buffer(fc, VOR_MARGIN_M, {units:'meters'}));
+    const vor  = turf.voronoi(fc, { bbox });
+    const map = new Map();
+    if (vor && Array.isArray(vor.features)){
+      for (const cell of vor.features){
+        if (!cell) continue;
+        for (const f of feats){
+          const k = f.properties.key;
+          if (map.has(k)) continue;
+          try { if (turf.booleanPointInPolygon(f, cell)) { map.set(k, cell); } } catch(_){}
+        }
+      }
+    }
+    return map;
+  }
+
+  function buildAreasLayer(points){
+    const byPrefix = new Map();
+    for (const pt of points){ if(!pt||!pt.prefix) continue; if(!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []); byPrefix.get(pt.prefix).push(pt); }
+    if (!byPrefix.size) return L.layerGroup();
+
+    const vorMap = buildVoronoiMap(points);
+    const layer = L.layerGroup();
+
+    byPrefix.forEach((pts, prefix) => {
+      const feats = pts.map(p=>turf.point([p.lng,p.lat], p));
+      const { geom:rawGeom } = prefixPolygon(feats);
+      if (!rawGeom) return;
+
+      let ownCells = null;
+      for (const p of pts){
+        const cell = vorMap.get(coordKey(p.lng,p.lat));
+        if (!cell) continue;
+        ownCells = ownCells ? (turf.union(ownCells, cell) || ownCells) : cell;
+      }
+      if (!ownCells) return;
+
+      let constrained = null;
+      try { constrained = turf.intersect(rawGeom, ownCells) || ownCells; } catch(_){ constrained = ownCells; }
+
+      let safe = constrained;
+      try { safe = turf.buffer(constrained, -CLEAR_GAP_M, {units:'meters'}); safe = turf.intersect(safe, ownCells) || safe; } catch(_){}
+
+      const erodedCells = (() => { try { return turf.buffer(ownCells, -CLEAR_GAP_M, {units:'meters'}); } catch(_){ return ownCells; }})();
+      const recoverR = Math.max(2, CLEAR_GAP_M * RECOVER_F);
+      for (const p of pts){
+        const pt = turf.point([p.lng,p.lat]);
+        try{
+          if (!turf.booleanPointInPolygon(pt, safe)) {
+            const disk = turf.buffer(pt, recoverR, {units:'meters'});
+            const clipped = turf.intersect(disk, erodedCells);
+            if (clipped) safe = turf.union(safe, clipped) || safe;
+          }
+        }catch(_){}
+      }
+
+      const gj = L.geoJSON(safe, { style: POLY_STYLE, interactive:false });
+      layer.addLayer(gj);
+
+      const pin = turf.pointOnFeature(safe).geometry.coordinates;
+      const html = `<div class="permit-pill permit-blink"><span>${prefix}</span></div>`;
+      const lbl  = L.marker([pin[1], pin[0]], { icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }), interactive:false, keyboard:false });
+      layer.addLayer(lbl);
+    });
+
+    return layer;
+  }
+
+  // === TOP-RIGHT toggle control (default ON) ===
+  const PermitAreasControl = L.Control.extend({
+    onAdd: function(){
+      const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
+      div.innerHTML = `
+        <label title="Show polygons around poles that share the same permit prefix">
+          <input type="checkbox" id="permitAreasToggle" checked />
+          Permit Areas
+        </label>
+        <small>Single, precise, non-touch areas per prefix</small>
+      `;
+      return div;
+    }
+  });
+
+  async function gatherPoints(){
+    const S = window.STATE || {};
+    const hasSTATE = Array.isArray(S.poles) && Array.isArray(S.permits) && (S.poles.length || S.permits.length);
+    if (hasSTATE) return buildPointsFromSTATE(getJob());
+    return buildPointsFromFiles(getJob());
+  }
+
+  function wireToggle(map){
+    const t = document.getElementById('permitAreasToggle');
+    if (!t) return;
+    t.addEventListener('change', ()=>{
+      const layer = window.__permitAreasLayer;
+      if (!layer) return;
+      if (t.checked) { if (!map.hasLayer(layer)) layer.addTo(map); } else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+    });
+  }
+
+  async function rebuild(){
+    const map = mapInstance();
+    if (!isLeafletMap(map) || !window.L) return;
+    if (window.__permitAreasLayer && map.hasLayer(window.__permitAreasLayer)) map.removeLayer(window.__permitAreasLayer);
+    ensurePillCSS();
+    const points = await gatherPoints();
+    const layer  = buildAreasLayer(points);
+    window.__permitAreasLayer = layer;
+    const toggle = document.getElementById('permitAreasToggle');
+    if (!toggle || toggle.checked) { if (layer) layer.addTo(map); }
+  }
+
+  function boot(){
+    const map = mapInstance();
+    if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
+    // NOTE: position changed to TOP-RIGHT per your request
+    const ctrl = new PermitAreasControl({ position: 'topright' });
+    map.addControl(ctrl);
+
+    const waitToggle = () => {
+      if (document.getElementById('permitAreasToggle')) { wireToggle(map); rebuild(); }
+      else setTimeout(waitToggle, 100);
+    };
+    waitToggle();
+
+    window.addEventListener('data:loaded',   rebuild);
+    window.addEventListener('poles:loaded',  rebuild);
+    window.addEventListener('permits:loaded',rebuild);
+    window.addEventListener('state:updated', rebuild);
+
+    window.refreshPermitAreas = rebuild;
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
