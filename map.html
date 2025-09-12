@@ -42,6 +42,7 @@
     }
     .pole-tag .id{font-weight:700}
     .pole-tag .status{color:#374151}
+    .pole-tag .notes{color:#6b7280;font-size:10px;margin-top:2px}
     .leaflet-tooltip.pole-tag.selected{ background:#2563eb;border-color:#2563eb;color:#fff; }
     .leaflet-tooltip.pole-tag.selected .status{color:#e5efff}
     .leaflet-tooltip.pole-tag.selected .id{color:#fff}
@@ -475,6 +476,43 @@
   }
 
   /* ================= Build + Toggle areas ================= */
+  // === Permit notes → label appender (non-invasive) ==========================
+  function readNotes(r){
+    return r?.notes ?? r?.Notes ?? r?.permit_notes ?? r?.PermitNotes ?? r?.Permit_Notes ?? r?.note ?? r?.Note ?? null;
+  }
+  function buildPermitIndex(){
+    const S = window.STATE || {};
+    const list = Array.isArray(S.permits) ? S.permits : [];
+    const m = new Map();
+    for (const r of list){
+      const key = `${r?.job_name ?? r?.jobName ?? ""}::${r?.tag ?? r?.Tag ?? ""}::${r?.SCID ?? r?.scid ?? ""}`;
+      if (key.includes("::")) m.set(key, r);
+    }
+    return m;
+  }
+  function applyNotesToLabels(){
+    const job = (new URLSearchParams(location.search).get('job') || "").toString();
+    const idx = buildPermitIndex();
+    const labels = document.querySelectorAll('.leaflet-tooltip.pole-tag:not(.scid-only)');
+    labels.forEach(el=>{
+      // Labels look like: "SCID 001 - Tag 52883"
+      const m = (el.textContent || "").match(/SCID\s*(\d+).*?Tag\s*([A-Za-z0-9_-]+)/i);
+      if (!m) return;
+      const scid = m[1], tag = m[2];
+      const rec  = idx.get(`${job}::${tag}::${scid}`);
+      const note = readNotes(rec);
+      if (!note) return;
+
+      let notesDiv = el.querySelector('.notes');
+      if (!notesDiv){
+        notesDiv = document.createElement('div');
+        notesDiv.className = 'notes';
+        el.appendChild(notesDiv);
+      }
+      notesDiv.textContent = String(note); // simple safe text insert
+    });
+  }
+
   async function gatherPoints(){
     const S = window.STATE || {};
     const hasSTATE = Array.isArray(S.poles) && Array.isArray(S.permits) && (S.poles.length || S.permits.length);
@@ -555,6 +593,13 @@
     window.addEventListener('poles:loaded',  ()=>{ rebuildAreas(); rebuildScidLayer(); });
     window.addEventListener('permits:loaded',()=>{ rebuildAreas(); rebuildScidLayer(); });
     window.addEventListener('state:updated', ()=>{ rebuildAreas(); rebuildScidLayer(); });
+
+    ['data:loaded','poles:loaded','permits:loaded','state:updated'].forEach(ev=>{
+      window.addEventListener(ev, ()=> setTimeout(applyNotesToLabels, 0));
+    });
+
+    // first pass shortly after the controls/labels appear
+    setTimeout(applyNotesToLabels, 300);
 
     // Manual hooks if needed
     window.refreshPermitAreas = rebuildAreas;
