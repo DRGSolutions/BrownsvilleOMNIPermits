@@ -140,24 +140,24 @@
   <script src="assets/js/map.js"></script>
   <script src="assets/js/watch.js"></script>
 
-<!-- === Permit Areas overlay (single, precise, no-touch per prefix; black pill w/ red bold blinking text) === -->
+<!-- === Permit Areas overlay (single, precise, no-touch per prefix) + TOP-RIGHT toggle === -->
 <script>
 (function(){
   'use strict';
 
   /* ================= Tunables ================= */
-  const EPS_CLAMP_MIN_M     = 30;   // min adaptive neighborhood (meters)
-  const EPS_CLAMP_MAX_M     = 160;  // max adaptive neighborhood
-  const MAXEDGE_MIN_M       = 60;   // concave hull min tightness
-  const MAXEDGE_FACTOR      = 1.9;  // concave maxEdge ~= eps * factor (smaller = tighter)
-  const MST_LINE_BUF_F      = 0.35; // MST corridor half-width = eps * this
-  const POINT_BUF_F         = 0.33; // per-pole disk radius = eps * this
-  const BASE_BUFFER_M       = 10;   // small breathing room
-  const SIMPLIFY_TOL_M      = 3;    // smoothing tolerance (meters)
-  const MORPH_CLOSE_M       = 2;    // tiny close-open to seal pinholes (meters)
-  const VOR_MARGIN_M        = 600;  // Voronoi bbox padding (meters)
-  const CLEAR_GAP_M         = 8;    // hard separation gap between different prefixes (meters)
-  const RECOVER_F           = 0.45; // recovery disk radius = CLEAR_GAP_M * this (must be < 1)
+  const EPS_CLAMP_MIN_M     = 30;
+  const EPS_CLAMP_MAX_M     = 160;
+  const MAXEDGE_MIN_M       = 60;
+  const MAXEDGE_FACTOR      = 1.9;
+  const MST_LINE_BUF_F      = 0.35;
+  const POINT_BUF_F         = 0.33;
+  const BASE_BUFFER_M       = 10;
+  const SIMPLIFY_TOL_M      = 3;
+  const MORPH_CLOSE_M       = 2;
+  const VOR_MARGIN_M        = 600;
+  const CLEAR_GAP_M         = 8;
+  const RECOVER_F           = 0.45;
 
   const POLY_STYLE = { color:'#7b61ff', weight:2, opacity:0.95, fillOpacity:0.10, dashArray:'6,4' };
 
@@ -181,7 +181,6 @@
   function readPermitId(r){
     return r?.permit_id ?? r?.permitId ?? r?.permit_no ?? r?.permit_number ?? r?.permit ?? r?.Permit ?? r?.id ?? null;
   }
-  // Trim ALL trailing "_<digits>" segments → shared prefix (…_SEG4)
   function toPrefix(id){ if (!id || typeof id !== 'string') return null; let s=id.trim(); while (/_\d+$/.test(s)) s=s.replace(/_\d+$/,''); return s; }
 
   async function smartFetch(paths){
@@ -222,7 +221,6 @@
     return pts;
   }
 
-  // Adaptive eps from nearest-neighbor stats
   function percentile(sorted,p){ if(!sorted.length) return 0; const i=(sorted.length-1)*p; const lo=Math.floor(i), hi=Math.ceil(i); return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(i-lo); }
   function nearestNeighborMeters(coords){
     const out=[]; for(let i=0;i<coords.length;i++){ let best=Infinity;
@@ -239,7 +237,6 @@
     return Math.min(Math.max(eps, EPS_CLAMP_MIN_M), EPS_CLAMP_MAX_M);
   }
 
-  // Minimum Spanning Tree (Prim) on coordinates [[lng,lat],...] (meters)
   function mstEdges(coords){
     const n = coords.length; if (n<=1) return [];
     const inMST=new Array(n).fill(false), dist=new Array(n).fill(Infinity), parent=new Array(n).fill(-1);
@@ -257,7 +254,6 @@
     return edges;
   }
 
-  // Black pill (blinking) with red bold text
   function ensurePillCSS(){
     if (document.getElementById('permit-pill-css')) return;
     const s = document.createElement('style'); s.id='permit-pill-css';
@@ -271,18 +267,15 @@
     document.head.appendChild(s);
   }
 
-  // Build ONE tight polygon for a whole prefix (no per-cluster splits)
   function prefixPolygon(feats){
     const coords = feats.map(f=>f.geometry.coordinates);
     const eps = adaptiveEpsMeters(coords);
     const subFC = turf.featureCollection(feats);
     const maxEdge = Math.max(MAXEDGE_MIN_M, eps * MAXEDGE_FACTOR);
 
-    // concave hull (fallback convex)
     let poly = (feats.length >= 3) ? turf.concave(subFC, {maxEdge, units:'meters'}) : null;
     if (!poly) poly = (feats.length >= 3) ? turf.convex(subFC) : null;
 
-    // MST corridor for linear runs
     const edges = mstEdges(coords);
     let corridor = null;
     const lineW = Math.max(5, eps * MST_LINE_BUF_F);
@@ -292,7 +285,6 @@
       corridor = corridor ? (turf.union(corridor, b) || corridor) : b;
     }
 
-    // per-point disks
     let pbuf = null;
     const rPoint = Math.max(5, eps * POINT_BUF_F);
     for (const f of feats){
@@ -300,7 +292,6 @@
       pbuf = pbuf ? (turf.union(pbuf, b) || pbuf) : b;
     }
 
-    // union + polish
     let merged = null;
     for (const g of [poly, corridor, pbuf]){ if(!g) continue; merged = merged ? (turf.union(merged, g) || merged) : g; }
     if (!merged) return { geom:null, eps };
@@ -312,7 +303,6 @@
     return { geom: merged, eps };
   }
 
-  // Voronoi: per-pole cell map (key by rounded coordinate)
   const coordKey = (lng,lat) => `${lng.toFixed(6)},${lat.toFixed(6)}`;
   function buildVoronoiMap(allPoints){
     const feats = allPoints.map(p => turf.point([p.lng, p.lat], { key: coordKey(p.lng,p.lat) }));
@@ -335,23 +325,18 @@
   }
 
   function buildAreasLayer(points){
-    // group ALL poles by prefix
     const byPrefix = new Map();
     for (const pt of points){ if(!pt||!pt.prefix) continue; if(!byPrefix.has(pt.prefix)) byPrefix.set(pt.prefix, []); byPrefix.get(pt.prefix).push(pt); }
     if (!byPrefix.size) return L.layerGroup();
 
-    // global Voronoi built from ALL poles (enforces disjointness later)
     const vorMap = buildVoronoiMap(points);
-
     const layer = L.layerGroup();
 
     byPrefix.forEach((pts, prefix) => {
-      // one geometry per prefix
       const feats = pts.map(p=>turf.point([p.lng,p.lat], p));
       const { geom:rawGeom } = prefixPolygon(feats);
       if (!rawGeom) return;
 
-      // union of THIS prefix's Voronoi cells
       let ownCells = null;
       for (const p of pts){
         const cell = vorMap.get(coordKey(p.lng,p.lat));
@@ -360,15 +345,12 @@
       }
       if (!ownCells) return;
 
-      // constrain raw geometry to own Voronoi territory
       let constrained = null;
       try { constrained = turf.intersect(rawGeom, ownCells) || ownCells; } catch(_){ constrained = ownCells; }
 
-      // enforce a hard empty gap to neighbors: erode by CLEAR_GAP_M (stay within ownCells)
       let safe = constrained;
       try { safe = turf.buffer(constrained, -CLEAR_GAP_M, {units:'meters'}); safe = turf.intersect(safe, ownCells) || safe; } catch(_){}
 
-      // recover any poles that were clipped (but only inside the eroded ownCells)
       const erodedCells = (() => { try { return turf.buffer(ownCells, -CLEAR_GAP_M, {units:'meters'}); } catch(_){ return ownCells; }})();
       const recoverR = Math.max(2, CLEAR_GAP_M * RECOVER_F);
       for (const p of pts){
@@ -382,11 +364,9 @@
         }catch(_){}
       }
 
-      // draw final (single geometry per prefix; may be MultiPolygon internally, but we render once)
       const gj = L.geoJSON(safe, { style: POLY_STYLE, interactive:false });
       layer.addLayer(gj);
 
-      // label: guaranteed inside the polygon
       const pin = turf.pointOnFeature(safe).geometry.coordinates;
       const html = `<div class="permit-pill permit-blink"><span>${prefix}</span></div>`;
       const lbl  = L.marker([pin[1], pin[0]], { icon: L.divIcon({ className:'', html, iconAnchor:[0,0] }), interactive:false, keyboard:false });
@@ -396,7 +376,7 @@
     return layer;
   }
 
-  // UI control
+  // === TOP-RIGHT toggle control (default ON) ===
   const PermitAreasControl = L.Control.extend({
     onAdd: function(){
       const div = L.DomUtil.create('div', 'leaflet-control permit-areas-control');
@@ -443,7 +423,8 @@
   function boot(){
     const map = mapInstance();
     if (!isLeafletMap(map) || !window.L) { setTimeout(boot, 200); return; }
-    const ctrl = new PermitAreasControl({ position: 'topleft' });
+    // NOTE: position changed to TOP-RIGHT per your request
+    const ctrl = new PermitAreasControl({ position: 'topright' });
     map.addControl(ctrl);
 
     const waitToggle = () => {
@@ -452,13 +433,12 @@
     };
     waitToggle();
 
-    // Hot-swap refresh hooks
     window.addEventListener('data:loaded',   rebuild);
     window.addEventListener('poles:loaded',  rebuild);
     window.addEventListener('permits:loaded',rebuild);
     window.addEventListener('state:updated', rebuild);
 
-    window.refreshPermitAreas = rebuild; // manual hook if needed
+    window.refreshPermitAreas = rebuild;
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
