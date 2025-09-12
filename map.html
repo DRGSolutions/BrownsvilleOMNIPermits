@@ -139,6 +139,7 @@
     'use strict';
 
     /* ================= Tunables (same behavior you approved) ================= */
+    const baseJob = s => String(s||'').trim().split(/\s+/)[0]; // "BRN01-F161 PLA" -> "BRN01-F161"
     const EPS_CLAMP_MIN_M     = 30;
     const EPS_CLAMP_MAX_M     = 160;
     const MAXEDGE_MIN_M       = 60;
@@ -600,90 +601,103 @@
   })();
   </script>
 
-  <!-- === Mass Notes + Delete Selected Permits (+ immediate SHA refresh & real GitHub write) === -->
-  <script>
-  (function(){
-    'use strict';
+  <!-- === Mass Notes + Delete Selected Permits (+ immediate SHA refresh & GitHub write) === -->
+<script>
+(function(){
+  'use strict';
 
-    const getJob = () => new URLSearchParams(location.search).get('job') || '';
-    const S = () => (window.STATE || {});
-    const readStatus = r => r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? '(no status)';
-    const setMsg = txt => { const el = document.getElementById('msg'); if (el) el.textContent = txt; };
-    const normSCID = window.__normSCID || function(v){ const n = parseInt(v,10); return Number.isFinite(n) ? String(n) : String(v).replace(/^0+/, ''); };
+  const getJob = () => new URLSearchParams(location.search).get('job') || '';
+  const baseJob = s => String(s || '').trim().split(/\s+/)[0]; // "BRN01-F161 PLA" -> "BRN01-F161"
+  const S = () => (window.STATE || {});
+  const readStatus = r => r?.status ?? r?.permit_status ?? r?.PermitStatus ?? r?.['Permit Status'] ?? r?.Status ?? '(no status)';
+  const setMsg = txt => { const el = document.getElementById('msg'); if (el) el.textContent = txt; };
+  const normSCID = window.__normSCID || function(v){ const n = parseInt(v,10); return Number.isFinite(n) ? String(n) : String(v).replace(/^0+/, ''); };
 
-    /* ---------- Minimal helpers (local copy) ---------- */
-    function isLeafletMap(m){ return !!(m && typeof m.addControl==='function' && typeof m.addLayer==='function' && typeof m.getCenter==='function' && m._leaflet_id!=null); }
-    function mapInstance(){
-      if (isLeafletMap(window.__leaflet_map__)) return window.__leaflet_map__;
-      for (const k of Object.keys(window)){ try{ const v=window[k]; if (isLeafletMap(v)) return v; }catch(_){} }
-      return null;
+  /* ---------- Minimal map helpers ---------- */
+  function isLeafletMap(m){ return !!(m && typeof m.addControl==='function' && typeof m.addLayer==='function' && typeof m.getCenter==='function' && m._leaflet_id!=null); }
+  function mapInstance(){
+    if (isLeafletMap(window.__leaflet_map__)) return window.__leaflet_map__;
+    for (const k of Object.keys(window)){ try{ const v = window[k]; if (isLeafletMap(v)) return v; }catch(_){ }
     }
-    const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
-    const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
+    return null;
+  }
+  const getLat = o => o?.lat ?? o?.latitude ?? o?.Latitude ?? o?.LAT ?? null;
+  const getLng = o => o?.lng ?? o?.lon ?? o?.longitude ?? o?.Longitude ?? o?.LON ?? o?.LONG ?? null;
 
-    /* ---------- Selection from drawn shapes (Leaflet-Draw) ---------- */
-    function latlngsToCoords(latlngs){
-      if (!Array.isArray(latlngs) || !latlngs.length) return null;
-      const conv = a => a.map(p => Array.isArray(p) ? conv(p) : [p.lng, p.lat]);
-      let coords = conv(latlngs);
-      if (coords.length && typeof coords[0][0] === 'number') coords = [coords];
-      coords = coords.map(r => {
-        if (r.length < 3) return r;
-        const f = r[0], l = r[r.length-1];
-        if (f[0] !== l[0] || f[1] !== l[1]) r = [...r, f];
-        return r;
-      });
-      return coords;
+  /* ---------- Drawn-shape collection (Leaflet-Draw) ---------- */
+  function latlngsToCoords(latlngs){
+    if (!Array.isArray(latlngs) || !latlngs.length) return null;
+    const conv = a => a.map(p => Array.isArray(p) ? conv(p) : [p.lng, p.lat]);
+    let coords = conv(latlngs);
+    if (coords.length && typeof coords[0][0] === 'number') coords = [coords];
+    coords = coords.map(r => {
+      if (r.length < 3) return r;
+      const f = r[0], l = r[r.length-1];
+      if (f[0] !== l[0] || f[1] !== l[1]) r = [...r, f];
+      return r;
+    });
+    return coords;
+  }
+  function collectSelectionGeoms(){
+    const map = mapInstance();
+    const geoms = [];
+    if (!map || !window.turf || !window.L) return geoms;
+
+    const layers = [];
+    [window.drawnItems, window.DRAWN_ITEMS, window.__drawn, window.__drawGroup].forEach(g=>{
+      try{ g && g.eachLayer && g.eachLayer(l => layers.push(l)); }catch(_){}
+    });
+    map.eachLayer(l => layers.push(l));
+
+    const seen = new Set();
+    for (const l of layers){
+      try{
+        if (!l || seen.has(l._leaflet_id)) continue; seen.add(l._leaflet_id);
+        if (l instanceof L.Circle){
+          const c = l.getLatLng(), r = l.getRadius();
+          geoms.push(turf.circle([c.lng, c.lat], r, {units:'meters', steps:64}));
+        } else if (l instanceof L.Rectangle || l instanceof L.Polygon){
+          const coords = latlngsToCoords(l.getLatLngs());
+          if (coords) geoms.push(turf.polygon(coords));
+        }
+      }catch(_){}
     }
+    return geoms;
+  }
 
-    function collectSelectionGeoms(){
-      const map = mapInstance();
-      const geoms = [];
-      if (!map || !window.turf || !window.L) return geoms;
+  /* ---------- Unified selection (map getter → globals → DOM → shapes) ---------- */
+  function getSelectedSCIDs(){
+    const ns = v => normSCID(v);
+    const out = new Set();
 
-      const layers = [];
-      // Prefer a common drawn group if present
-      const groups = [window.drawnItems, window.DRAWN_ITEMS, window.__drawn, window.__drawGroup];
-      for (const g of groups){ try{ if (g && typeof g.eachLayer === 'function') g.eachLayer(l => layers.push(l)); }catch(_){} }
-      // Fallback: scan all map layers
-      map.eachLayer(l => layers.push(l));
-
-      const seen = new Set();
-      for (const l of layers){
-        try{
-          if (!l || seen.has(l._leaflet_id)) continue; seen.add(l._leaflet_id);
-          if (l instanceof L.Circle){
-            const c = l.getLatLng(), r = l.getRadius(); // meters
-            geoms.push(turf.circle([c.lng, c.lat], r, {units:'meters', steps:64}));
-          } else if (l instanceof L.Rectangle || l instanceof L.Polygon){
-            const coords = latlngsToCoords(l.getLatLngs());
-            if (coords) geoms.push(turf.polygon(coords));
-          }
-        }catch(_){}
+    // A) map.js explicit getter (best)
+    try {
+      if (typeof window.getSelectedPoles === 'function') {
+        const arr = window.getSelectedPoles();
+        if (Array.isArray(arr)) arr.forEach(p => { const id = p?.SCID ?? p?.scid ?? p?.id; if (id!=null) out.add(ns(id)); });
       }
-      return geoms;
-    }
+    } catch(_) {}
 
-    /* ---------- Unified selection: tracker → globals → DOM → drawn shapes ---------- */
-    function getSelectedSCIDs(){
-      const ns = v => normSCID(v);
-      const out = new Set();
+    // B) known globals
+    const cand = [
+      window.SELECTION_SCIDS,
+      window.SELECTED_SCIDS,
+      window.SELECTION?.scids,
+      window.SELECTION?.poles?.map(p => p?.SCID ?? p?.scid ?? p?.id),
+      window.STATE?.selection?.scids,
+      window.STATE?.selectedScids
+    ];
+    for (const a of cand) if (Array.isArray(a)) a.forEach(id => out.add(ns(id)));
 
-      // 1) our live tracker (set by the first script's MutationObserver)
-      if (Array.isArray(window.__lastSelectedScids)){
-        for (const id of window.__lastSelectedScids) out.add(ns(id));
-      }
+    // C) our live tracker (from the first script)
+    if (Array.isArray(window.__lastSelectedScids)) window.__lastSelectedScids.forEach(id => out.add(ns(id)));
 
-      // 2) common globals from map.js (if any)
-      const cand = [window.SELECTED_SCIDS, window.SELECTION_SCIDS, window.SELECTION?.scids, window.SELECTION?.ids,
-                    window.STATE?.selectedScids, window.STATE?.selection?.scids];
-      for (const a of cand){ if (Array.isArray(a)) for (const id of a) out.add(ns(id)); }
-
-      // 3) DOM (.selected labels or blue background)
+    // D) DOM fallbacks
+    if (!out.size) {
       document.querySelectorAll('.leaflet-tooltip.pole-tag.selected').forEach(el=>{
         const m = (el.textContent||'').match(/SCID\s+(\d+)/i); if (m) out.add(ns(m[1]));
       });
-      if (!out.size){
+      if (!out.size) {
         document.querySelectorAll('.leaflet-tooltip.pole-tag').forEach(el=>{
           const cs = window.getComputedStyle(el);
           const bg = (cs.backgroundColor||'').replace(/\s+/g,'').toLowerCase();
@@ -692,243 +706,244 @@
           }
         });
       }
+    }
 
-      // 4) Drawn shapes (most reliable)
-      try{
-        const geoms = collectSelectionGeoms();
-        if (geoms.length){
-          const job = getJob();
-          const poles = (S().poles || []).filter(p => !job || String(p.job_name) === String(job));
-          for (const p of poles){
-            const lat = +getLat(p), lng = +getLng(p);
-            if (!Number.isFinite(lat) || !Number.isFinite(lng) || p.SCID == null) continue;
-            const pt = turf.point([lng, lat]);
-            for (const g of geoms){
-              if (turf.booleanPointInPolygon(pt, g)){ out.add(ns(p.SCID)); break; }
-            }
-          }
+    // E) drawn shapes hit-test
+    try{
+      const geoms = collectSelectionGeoms();
+      if (geoms.length){
+        const job = baseJob(getJob());
+        const poles = (S().poles || []).filter(p => !job || baseJob(p.job_name) === job);
+        for (const p of poles){
+          const lat=+getLat(p), lng=+getLng(p);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng) || p.SCID==null) continue;
+          const pt = turf.point([lng,lat]);
+          if (geoms.some(g => turf.booleanPointInPolygon(pt,g))) out.add(ns(p.SCID));
         }
-      }catch(_){}
+      }
+    }catch(_){}
 
-      return [...out];
-    }
+    return [...out];
+  }
 
-    /* ---------- Canonical JSON + GitHub write layer ---------- */
-    const GH = () => (window.APP_CONFIG || {}); // {OWNER, REPO, DEFAULT_BRANCH, DATA_DIR, GH_TOKEN?, WRITE_ENDPOINT?}
-    const DATA_DIR = () => GH().DATA_DIR || 'data';
+  /* ---------- Persist to GitHub (optional) + SHA reload ---------- */
+  const GH = () => (window.APP_CONFIG || {}); // {OWNER, REPO, DEFAULT_BRANCH, DATA_DIR, GH_TOKEN?, WRITE_ENDPOINT?, AUTO_MERGE?}
+  const DATA_DIR = () => GH().DATA_DIR || 'data';
 
-    function canonStringify(x){
-      const seen = new WeakSet();
-      return JSON.stringify(x, function(k,v){
-        if (v && typeof v==='object'){
-          if (seen.has(v)) return v;
-          seen.add(v);
-          if (!Array.isArray(v)){
-            return Object.keys(v).sort().reduce((o,key)=>{o[key]=v[key]; return o;}, {});
-          }
-        }
-        return v;
-      }, 2);
-    }
-
-    async function githubFetch(url, opts={}){
-      const token = GH().GH_TOKEN || localStorage.getItem('gh_pat');
-      const h = Object.assign({'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}, opts.headers||{});
-      if (token) h.Authorization = `Bearer ${token}`;
-      const r = await fetch(url, {...opts, headers:h, cache:'no-store'});
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText} @ ${url}`);
-      return r.json();
-    }
-    async function ghHeadSha(){
-      const {OWNER,REPO}=GH(); if(!OWNER||!REPO) return null;
-      const br = GH().DEFAULT_BRANCH || 'main';
-      const j = await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/ref/heads/${br}`);
-      return j?.object?.sha || null;
-    }
-    async function ghGetContentSha(path, ref){
-      const {OWNER,REPO}=GH(); if(!OWNER||!REPO) return null;
-      try{
-        const j = await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(ref||GH().DEFAULT_BRANCH||'main')}`);
-        return j?.sha || null;
-      }catch(_){ return null; }
-    }
-    async function ghCreateBranch(baseSha, name){
-      const {OWNER,REPO}=GH(); return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/refs`, {method:'POST', body:JSON.stringify({ref:`refs/heads/${name}`, sha:baseSha})});
-    }
-    async function ghPutFile(path, content, branch, sha){
+  function canonStringify(x){
+    const seen = new WeakSet();
+    return JSON.stringify(x, function(k,v){
+      if (v && typeof v==='object'){
+        if (seen.has(v)) return v;
+        seen.add(v);
+        if (!Array.isArray(v)) return Object.keys(v).sort().reduce((o,key)=>{o[key]=v[key]; return o;}, {});
+      }
+      return v;
+    }, 2);
+  }
+  async function githubFetch(url, opts={}){
+    const token = GH().GH_TOKEN || localStorage.getItem('gh_pat');
+    const headers = {'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28', ...(opts.headers||{})};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const r = await fetch(url, {...opts, headers, cache:'no-store'});
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText} @ ${url}`);
+    return r.json();
+  }
+  async function ghHeadSha(){
+    const {OWNER,REPO}=GH(); if(!OWNER||!REPO) return null;
+    const br = GH().DEFAULT_BRANCH || 'main';
+    const j = await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/ref/heads/${br}`);
+    return j?.object?.sha || null;
+  }
+  async function ghGetContentSha(path, ref){
+    const {OWNER,REPO}=GH(); if(!OWNER||!REPO) return null;
+    try{
+      const j = await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(ref||GH().DEFAULT_BRANCH||'main')}`);
+      return j?.sha || null;
+    }catch(_){ return null; }
+  }
+  async function ghCreateBranch(baseSha, name){
+    const {OWNER,REPO}=GH();
+    return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/refs`, {method:'POST', body:JSON.stringify({ref:`refs/heads/${name}`, sha:baseSha})});
+  }
+  async function ghPutFile(path, content, branch, sha){
+    const {OWNER,REPO}=GH();
+    return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}`, {
+      method:'PUT',
+      body:JSON.stringify({message:`map: update ${path}`, content:btoa(unescape(encodeURIComponent(content))), branch, sha})
+    });
+  }
+  async function ghOpenPR(headBranch){
+    const {OWNER,REPO}=GH(); const base=GH().DEFAULT_BRANCH||'main';
+    return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls`, {method:'POST', body:JSON.stringify({title:`Map UI update (${new Date().toISOString()})`, head:headBranch, base})});
+  }
+  async function ghAutoMerge(pr){
+    try{
+      if (!GH().AUTO_MERGE) return;
       const {OWNER,REPO}=GH();
-      return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}`, {
-        method:'PUT',
-        body:JSON.stringify({message:`map: update ${path}`, content:btoa(unescape(encodeURIComponent(content))), branch, sha})
-      });
-    }
-    async function ghOpenPR(headBranch){
-      const {OWNER,REPO}=GH(); const base=GH().DEFAULT_BRANCH||'main';
-      return githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls`, {method:'POST', body:JSON.stringify({title:`Map UI update (${new Date().toISOString()})`, head:headBranch, base})});
-    }
-    async function ghAutoMerge(pr){
+      await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls/${pr.number}/merge`, {method:'PUT', body:JSON.stringify({merge_method:'squash', commit_title:pr.title})});
+    }catch(_){}
+  }
+
+  async function persistPermitsIfPossible(message){
+    if (GH().WRITE_ENDPOINT){
       try{
-        const {OWNER,REPO}=GH(); if(!GH().AUTO_MERGE) return;
-        await githubFetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls/${pr.number}/merge`, {method:'PUT', body:JSON.stringify({merge_method:'squash', commit_title:pr.title})});
-      }catch(_){}
+        await fetch(GH().WRITE_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message, permits:S().permits, poles:S().poles})});
+      }catch(e){ console.warn('WRITE_ENDPOINT failed:', e); }
     }
+    const {OWNER,REPO}=GH(); const token = GH().GH_TOKEN || localStorage.getItem('gh_pat');
+    if (OWNER && REPO && token){
+      const base = await ghHeadSha(); if(!base) throw new Error('Cannot read base branch sha');
+      const branch = `map-ui-${Date.now().toString(36)}`;
+      await ghCreateBranch(base, branch);
+      const path = `${DATA_DIR()}/permits.json`;
+      const sha  = await ghGetContentSha(path, branch);
+      await ghPutFile(path, canonStringify(S().permits || []), branch, sha || undefined);
+      const pr = await ghOpenPR(branch);
+      await ghAutoMerge(pr);
+    }
+  }
 
-    async function persistPermitsIfPossible(message){
-      // Strategy 1: external write endpoint (optional)
-      if (GH().WRITE_ENDPOINT){
-        try{ await fetch(GH().WRITE_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message, permits:S().permits, poles:S().poles})}); }
-        catch(e){ console.warn('WRITE_ENDPOINT failed:', e); }
+  async function reloadFromSHA(){
+    const cfg=GH(), dataDir=DATA_DIR();
+    try{
+      if (cfg.OWNER){
+        const head = await fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/branches/${cfg.DEFAULT_BRANCH||'main'}`, {cache:'no-store'}).then(r=>r.json()).then(j=>j?.commit?.sha);
+        const tree = await fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/git/trees/${head}?recursive=1`, {cache:'no-store'}).then(r=>r.json());
+        const find = p => (tree?.tree||[]).find(t=>t.type==='blob' && t.path===p)?.sha;
+        const [pb, qb] = [find(`${dataDir}/poles.json`), find(`${dataDir}/permits.json`)];
+        const grab = sha => sha ? fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/git/blobs/${sha}`, {headers:{'Accept':'application/vnd.github.raw'}, cache:'no-store'}).then(r=>r.text()) : null;
+        const [polesTxt, permitsTxt] = await Promise.all([grab(pb), grab(qb)]);
+        const poles = polesTxt ? JSON.parse(polesTxt) : null;
+        const permits = permitsTxt ? JSON.parse(permitsTxt) : null;
+        if (Array.isArray(poles))   window.STATE.poles   = poles;
+        if (Array.isArray(permits)) window.STATE.permits = permits;
+      } else {
+        const [poles, permits] = await Promise.all([
+          fetch(`${dataDir}/poles.json`,   {cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+          fetch(`${dataDir}/permits.json`, {cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+        ]);
+        if (Array.isArray(poles))   window.STATE.poles   = poles;
+        if (Array.isArray(permits)) window.STATE.permits = permits;
       }
-      // Strategy 2: GitHub direct (token required)
-      const {OWNER,REPO}=GH(); const token = GH().GH_TOKEN || localStorage.getItem('gh_pat');
-      if (OWNER && REPO && token){
-        const base = await ghHeadSha(); if(!base) throw new Error('Cannot read base branch sha');
-        const branch = `map-ui-${Date.now().toString(36)}`;
-        await ghCreateBranch(base, branch);
-        const path = `${DATA_DIR()}/permits.json`;
-        const sha  = await ghGetContentSha(path, branch);
-        const content = canonStringify(S().permits || []);
-        await ghPutFile(path, content, branch, sha || undefined);
-        const pr = await ghOpenPR(branch);
-        await ghAutoMerge(pr);
+    }catch(_){}
+    window.dispatchEvent(new Event('data:loaded'));
+    window.dispatchEvent(new Event('poles:loaded'));
+    window.dispatchEvent(new Event('permits:loaded'));
+    window.dispatchEvent(new Event('state:updated'));
+    try{ localStorage.setItem('permits:rev', String(Date.now())); }catch(_){}
+    if (window.refreshPermitAreas) window.refreshPermitAreas();
+    if (window.refreshScidLabels)  window.refreshScidLabels();
+  }
+  async function refreshAfterWrite(){ await reloadFromSHA(); }
+
+  /* ---------- Mass Notes (never append SCID) ---------- */
+  function massApplyNotesToSelected(){
+    const notes=(document.getElementById('notes')?.value||'').trim(); if(!notes) return;
+    const job = baseJob(getJob());
+    const sel = new Set(getSelectedSCIDs());
+    const st = S(); if (!Array.isArray(st.permits) || !sel.size) return;
+
+    let changed = 0;
+    for (const r of st.permits){
+      if (baseJob(r?.job_name) === job && sel.has(normSCID(r?.SCID))){
+        if ('notes' in r){ if (r.notes !== notes){ r.notes = notes; changed++; } }
+        else if ('Notes' in r){ if (r.Notes !== notes){ r.Notes = notes; changed++; } }
+        else { r.notes = notes; changed++; }
       }
     }
-
-    /* ---------- SHA reload (for both map & index) ---------- */
-    async function reloadFromSHA(){
-      const cfg = GH(), dataDir = DATA_DIR();
-      try{
-        if (cfg.OWNER){
-          const head = await fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/branches/${cfg.DEFAULT_BRANCH||'main'}`, {cache:'no-store'}).then(r=>r.json()).then(j=>j?.commit?.sha);
-          const tree = await fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/git/trees/${head}?recursive=1`, {cache:'no-store'}).then(r=>r.json());
-          const find = p => (tree?.tree||[]).find(t=>t.type==='blob' && t.path===p)?.sha;
-          const [pb, qb] = [find(`${dataDir}/poles.json`), find(`${dataDir}/permits.json`)];
-          const grab = async sha => sha ? fetch(`https://api.github.com/repos/${cfg.OWNER}/${cfg.REPO}/git/blobs/${sha}`, {headers:{'Accept':'application/vnd.github.raw'}, cache:'no-store'}).then(r=>r.text()) : null;
-          const [polesTxt, permitsTxt] = await Promise.all([grab(pb), grab(qb)]);
-          const poles = polesTxt ? JSON.parse(polesTxt) : null;
-          const permits = permitsTxt ? JSON.parse(permitsTxt) : null;
-          if (Array.isArray(poles))   window.STATE.poles   = poles;
-          if (Array.isArray(permits)) window.STATE.permits = permits;
-        } else {
-          const [poles, permits] = await Promise.all([
-            fetch(`${dataDir}/poles.json`,   {cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
-            fetch(`${dataDir}/permits.json`, {cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
-          ]);
-          if (Array.isArray(poles))   window.STATE.poles   = poles;
-          if (Array.isArray(permits)) window.STATE.permits = permits;
-        }
-      }catch(_){}
-
-      window.dispatchEvent(new Event('data:loaded'));
-      window.dispatchEvent(new Event('poles:loaded'));
+    if (changed){
       window.dispatchEvent(new Event('permits:loaded'));
       window.dispatchEvent(new Event('state:updated'));
-      try{ localStorage.setItem('permits:rev', String(Date.now())); }catch(_){}
+      setMsg(`Notes updated on ${changed} permit${changed===1?'':'s'}.`);
+    }
+  }
+
+  function hookApplyForNotes(){
+    const btn=document.getElementById('btnApply'); if (!btn) return;
+    btn.addEventListener('click', async ()=>{
+      massApplyNotesToSelected();
+      try{ await persistPermitsIfPossible('map: mass apply/modify'); }catch(e){ console.warn(e); }
+      await refreshAfterWrite();
+    }, false);
+  }
+
+  /* ---------- Delete flow (by status) ---------- */
+  function openDeleteStatusPicker(statusCounts,onConfirm){
+    const overlay=document.createElement('div'); overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:5000;display:flex;align-items:center;justify-content:center';
+    const box=document.createElement('div'); box.style.cssText='background:#0f1219;color:#e5e7eb;border:1px solid #1f2430;border-radius:12px;min-width:340px;max-width:420px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px system-ui';
+    box.innerHTML=`<div style="font-weight:700;margin-bottom:8px">Delete selected permits</div>
+      <div style="font-size:12px;color:#9aa3b2;margin-bottom:8px">Choose which <b>statuses</b> to delete from the selected poles.</div>
+      <div id="stList" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 12px 0;max-height:220px;overflow:auto"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="delCancel" style="padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer">Cancel</button>
+        <button id="delGo" style="padding:8px 10px;border-radius:8px;border:1px solid #7f1d1d;background:#1f2937;color:#fca5a5;cursor:pointer;font-weight:700">Delete</button></div>`;
+    const list=box.querySelector('#stList');
+    Object.entries(statusCounts).forEach(([st,cnt])=>{
+      const id='st_'+Math.random().toString(36).slice(2);
+      const row=document.createElement('label'); row.style.cssText='display:flex;align-items:center;gap:8px';
+      row.innerHTML=`<input type="checkbox" id="${id}" checked/><span>${st}</span><span style="margin-left:auto;color:#9aa3b2">(${cnt})</span>`;
+      list.appendChild(row); row.querySelector('input').dataset.status=st;
+    });
+    overlay.appendChild(box); document.body.appendChild(overlay);
+    function close(){ overlay.remove(); }
+    box.querySelector('#delCancel').onclick=close;
+    box.querySelector('#delGo').onclick=()=>{
+      const checks=Array.from(list.querySelectorAll('input[type=checkbox]')).filter(c=>c.checked).map(c=>c.dataset.status);
+      if(!checks.length){ close(); return; }
+      const total=Object.entries(statusCounts).filter(([s])=>checks.includes(s)).reduce((a,[,c])=>a+c,0);
+      const ok=window.confirm(`Are you sure you want to delete ${total} permit${total===1?'':'s'} with status: ${checks.join(', ')}?`);
+      if(!ok) return; close(); onConfirm(checks);
+    };
+  }
+
+  async function deleteSelectedPermits(){
+    const job = baseJob(getJob());
+    const st = S();
+    const selected = getSelectedSCIDs();
+    const sel = new Set(selected);
+
+    if (!Array.isArray(st.permits) || !sel.size){
+      setMsg('No poles selected with permits to delete.');
+      return;
+    }
+
+    const candidates = (st.permits || []).filter(r =>
+      baseJob(r?.job_name) === job && sel.has(normSCID(r?.SCID))
+    );
+    if (!candidates.length){ setMsg('Selected poles have no permits to delete.'); return; }
+
+    const statusCounts = {};
+    for (const r of candidates){ const s = readStatus(r); statusCounts[s] = (statusCounts[s]||0) + 1; }
+
+    openDeleteStatusPicker(statusCounts, async (chosenStatuses)=>{
+      const keep = (st.permits || []).filter(r =>
+        !(baseJob(r?.job_name) === job && sel.has(normSCID(r?.SCID)) && chosenStatuses.includes(readStatus(r)))
+      );
+      const removed = st.permits.length - keep.length;
+      if (!removed){ setMsg('Nothing deleted.'); return; }
+
+      window.STATE.permits = keep;
+      window.dispatchEvent(new Event('permits:loaded'));
+      window.dispatchEvent(new Event('state:updated'));
       if (window.refreshPermitAreas) window.refreshPermitAreas();
       if (window.refreshScidLabels)  window.refreshScidLabels();
-    }
-    async function refreshAfterWrite(){ await reloadFromSHA(); }
+      setMsg(`Deleted ${removed} permit${removed===1?'':'s'} from ${sel.size} pole${sel.size===1?'':'s'}.`);
 
-    /* ---------- Mass Notes (never append SCID) ---------- */
-    function massApplyNotesToSelected(){
-      const notes=(document.getElementById('notes')?.value||'').trim(); if(!notes) return;
-      const job=getJob(), scids=new Set(getSelectedSCIDs()); const st=S(); if(!Array.isArray(st.permits)||!scids.size) return;
-      let changed=0;
-      for (const r of st.permits){
-        if (String(r?.job_name)===String(job) && scids.has(normSCID(r?.SCID))){
-          if ('notes' in r){ if (r.notes!==notes){ r.notes=notes; changed++; } }
-          else if ('Notes' in r){ if (r.Notes!==notes){ r.Notes=notes; changed++; } }
-          else { r.notes=notes; changed++; }
-        }
-      }
-      if (changed){
-        window.dispatchEvent(new Event('permits:loaded'));
-        window.dispatchEvent(new Event('state:updated'));
-        setMsg(`Notes updated on ${changed} permit${changed===1?'':'s'}.`);
-      }
-    }
+      try{ await persistPermitsIfPossible('map: delete selected permits'); }catch(e){ console.warn(e); }
+      await refreshAfterWrite();
+    });
+  }
 
-    function hookApplyForNotes(){
-      const btn=document.getElementById('btnApply'); if (!btn) return;
-      btn.addEventListener('click', async ()=>{
-        massApplyNotesToSelected();
-        try{ await persistPermitsIfPossible('map: mass apply/modify'); }catch(e){ console.warn(e); }
-        await refreshAfterWrite();
-      }, false);
-    }
+  function init(){
+    const del=document.getElementById('btnDelete'); if (del) del.addEventListener('click', deleteSelectedPermits);
+    const apply=document.getElementById('btnApply'); if (apply) hookApplyForNotes();
+    window.addEventListener('permits:saved', reloadFromSHA);
+    window.addEventListener('github:commit', reloadFromSHA);
+  }
 
-    /* ---------- Delete flow (by status) ---------- */
-    function openDeleteStatusPicker(statusCounts,onConfirm){
-      const overlay=document.createElement('div'); overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:5000;display:flex;align-items:center;justify-content:center';
-      const box=document.createElement('div'); box.style.cssText='background:#0f1219;color:#e5e7eb;border:1px solid #1f2430;border-radius:12px;min-width:340px;max-width:420px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px system-ui';
-      box.innerHTML=`<div style="font-weight:700;margin-bottom:8px">Delete selected permits</div>
-        <div style="font-size:12px;color:#9aa3b2;margin-bottom:8px">Choose which <b>statuses</b> to delete from the selected poles.</div>
-        <div id="stList" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 12px 0;max-height:220px;overflow:auto"></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button id="delCancel" style="padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer">Cancel</button>
-          <button id="delGo" style="padding:8px 10px;border-radius:8px;border:1px solid #7f1d1d;background:#1f2937;color:#fca5a5;cursor:pointer;font-weight:700">Delete</button></div>`;
-      const list=box.querySelector('#stList');
-      Object.entries(statusCounts).forEach(([st,cnt])=>{
-        const id='st_'+Math.random().toString(36).slice(2);
-        const row=document.createElement('label'); row.style.cssText='display:flex;align-items:center;gap:8px';
-        row.innerHTML=`<input type="checkbox" id="${id}" checked/><span>${st}</span><span style="margin-left:auto;color:#9aa3b2">(${cnt})</span>`;
-        list.appendChild(row); row.querySelector('input').dataset.status=st;
-      });
-      overlay.appendChild(box); document.body.appendChild(overlay);
-      function close(){ overlay.remove(); }
-      box.querySelector('#delCancel').onclick=close;
-      box.querySelector('#delGo').onclick=()=>{
-        const checks=Array.from(list.querySelectorAll('input[type=checkbox]')).filter(c=>c.checked).map(c=>c.dataset.status);
-        if(!checks.length){ close(); return; }
-        const total=Object.entries(statusCounts).filter(([s])=>checks.includes(s)).reduce((a,[,c])=>a+c,0);
-        const ok=window.confirm(`Are you sure you want to delete ${total} permit${total===1?'':'s'} with status: ${checks.join(', ')}?`);
-        if(!ok) return; close(); onConfirm(checks);
-      };
-    }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 
-    async function deleteSelectedPermits(){
-      const job = getJob();
-      const st  = S();
-      const scids = new Set(getSelectedSCIDs());
-      if (!Array.isArray(st.permits) || !scids.size){
-        setMsg('No poles selected with permits to delete.');
-        return;
-      }
-
-      const candidates = st.permits.filter(r => String(r?.job_name)===String(job) && scids.has(normSCID(r?.SCID)));
-      if (!candidates.length){ setMsg('Selected poles have no permits to delete.'); return; }
-
-      const statusCounts = {};
-      for (const r of candidates){
-        const s = readStatus(r); statusCounts[s] = (statusCounts[s]||0) + 1;
-      }
-
-      openDeleteStatusPicker(statusCounts, async (chosenStatuses)=>{
-        const keep = st.permits.filter(r => !(String(r?.job_name)===String(job) && scids.has(normSCID(r?.SCID)) && chosenStatuses.includes(readStatus(r))));
-        const removed = st.permits.length - keep.length;
-        if (!removed){ setMsg('Nothing deleted.'); return; }
-
-        window.STATE.permits = keep;
-        window.dispatchEvent(new Event('permits:loaded'));
-        window.dispatchEvent(new Event('state:updated'));
-        if (window.refreshPermitAreas) window.refreshPermitAreas();
-        if (window.refreshScidLabels)  window.refreshScidLabels();
-        setMsg(`Deleted ${removed} permit${removed===1?'':'s'} from ${scids.size} pole${scids.size===1?'':'s'}.`);
-
-        try{ await persistPermitsIfPossible('map: delete selected permits'); }catch(e){ console.warn(e); }
-        await refreshAfterWrite();
-      });
-    }
-
-    function init(){
-      const del=document.getElementById('btnDelete'); if (del) del.addEventListener('click', deleteSelectedPermits);
-      const apply=document.getElementById('btnApply'); if (apply) hookApplyForNotes();
-      window.addEventListener('permits:saved', reloadFromSHA);
-      window.addEventListener('github:commit', reloadFromSHA);
-    }
-
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
-
-  })();
-  </script>
+})();
+</script>
