@@ -192,47 +192,17 @@
     const targets=poles.filter(p=>scidBetween(p.SCID,fromId,toId));
     if(targets.length===0){ setMassMsg('<span class="err">No poles found in that SCID range for the selected Job.</span>'); return; }
 
-    // --- NOTES mass-update (read + optional overwrite confirmation) ---
-    const notesToApplyRaw = ($('#massNotes')?.value || '').trim();
-    const wantNotes = !!notesToApplyRaw;
-    let overwriteNotes = true;
-
-    if (wantNotes && mode!=='assign') {
-      let total=0, withNotes=0;
-      for (const p of targets){
-        const key=`${p.job_name}::${p.tag}::${p.SCID}`;
-        const rel=byPole.get(key)||[];
-        for (const r of rel){ total++; if ((r.notes||'').trim()) withNotes++; }
-      }
-      if (withNotes>0){
-        overwriteNotes = confirm(
-          `${withNotes} of ${total} selected permit(s) already have notes.\n\n` +
-          `Do you want to OVERWRITE their existing notes with:\n\n"${notesToApplyRaw}"?`
-        );
-        // If user clicks Cancel, we'll still update status (and add notes only to those without notes).
-      }
-    }
-    // --- end NOTES mass-update ---
-
     const changes=[];
     if(mode==='assign'){
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
         if(rel.length>0) continue;
         changes.push({ type:'upsert_permit', permit:{
           permit_id:`${baseId}_${p.SCID}`, job_name:p.job_name, tag:p.tag, SCID:p.SCID,
-          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: wantNotes ? notesToApplyRaw : '' }});
+          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes:'' }});
       }
     }else{
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
-        for(const r of rel){
-          const patch = { permit_status: status };
-          if (wantNotes){
-            const hadNotes = !!((r.notes||'').trim());
-            if (overwriteNotes || !hadNotes) patch.notes = notesToApplyRaw;
-          }
-          changes.push({ type:'update_permit', permit_id:r.permit_id, patch });
-        }
-      }
+        for(const r of rel){ changes.push({ type:'update_permit', permit_id:r.permit_id, patch:{ permit_status:status } }); } }
     }
     if(changes.length===0){ setMassMsg(mode==='assign'
       ? '<span class="ok">Nothing to do (all poles in range already have permits).</span>'
