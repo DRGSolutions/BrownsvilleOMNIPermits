@@ -140,7 +140,7 @@
     // If map already exists, still attach
     if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
 
-    // ================= helper + injector (no fetch; uses job+tag+SCID) =================
+    // ================= helper + injector (no fetch; tolerant SCID) =================
     function attachNotesInjector(map){
       if (!map || map.__pnote_hooked__) return;
       map.__pnote_hooked__ = true;
@@ -153,13 +153,37 @@
         document.head.appendChild(s);
       }
 
-      // Read current job (same mechanism as when it worked)
-      const jobParam = (() => {
+      // Current job from URL (same mechanism as before)
+      const jobParamNorm = (() => {
         const qs = new URLSearchParams(location.search);
         const v = qs.get('job') || '';
-        try { return decodeURIComponent(v.replace(/\+/g,' ')).trim(); }
-        catch { return String(v).trim(); }
+        return normJob(v);
       })();
+
+      // ------- Normalizers (key change that fixes the mismatch) -------
+      function normJob(s){ return String(s||'').trim(); }
+      function normTag(s){ return String(s||'').trim(); }
+      function normScidNoZeros(s){
+        const str = String(s ?? '').trim();
+        // remove leading zeros only if followed by a digit (001 -> 1; 000 -> 0)
+        return str.replace(/^0+(?=\d)/, '');
+      }
+      function pad3(nz){ 
+        const z = String(nz);
+        return /^\d+$/.test(z) ? z.padStart(3,'0') : z; 
+      }
+
+      // Try three variants for SCID (raw → no-zeros → 3-digit padded)
+      function scidVariants(s){
+        const raw = String(s ?? '').trim();
+        const nz  = normScidNoZeros(raw);
+        const p3  = pad3(nz);
+        const out = [];
+        if (raw) out.push(raw);
+        if (nz && nz !== raw) out.push(nz);
+        if (p3 && p3 !== raw && p3 !== nz) out.push(p3);
+        return out;
+      }
 
       function getPermitsFromState(){
         const S = window.STATE || {};
@@ -168,23 +192,27 @@
             : [];
       }
 
-      // Build an index keyed by job + tag + scid (this is the key that worked)
+      // Build indices:
+      //  main:  job::tag::scidVariant  → record
+      //  anyJ:  tag::scidVariant       → record (fallback when ?job= is absent/mismatch)
       function buildIndex(){
-        const idx = new Map();
+        const idx  = new Map();
+        const anyJ = new Map();
         const list = getPermitsFromState();
         for (const r of list){
-          const job  = r.job_name ?? r.jobName ?? r.job ?? '';
-          const tag  = r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '';
+          const job  = normJob(r.job_name ?? r.jobName ?? r.job ?? '');
+          const tag  = normTag(r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '');
           const scid = r.SCID ?? r.scid ?? r.pole_scid ?? r.scid_num ?? '';
-          if (job && (tag || scid)){
-            const k = `${job}::${tag}::${scid}`;
-            idx.set(k, r);
+          if (!tag && !scid) continue;
+          const scids = scidVariants(scid);
+          for (const sv of scids){
+            if (job) idx.set(`${job}::${tag}::${sv}`, r);
+            anyJ.set(`${tag}::${sv}`, r);
           }
         }
-        return idx;
+        return { idx, anyJ };
       }
 
-      // Keep a fresh index; rebuild when STATE updates
       function ensureIndex(){
         if (!map.__permits_idx__ || map.__permits_idx_stale__) {
           map.__permits_idx__ = buildIndex();
@@ -192,6 +220,8 @@
         }
         return map.__permits_idx__;
       }
+
+      // mark stale when your app updates STATE
       ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
         window.addEventListener(ev, ()=>{ map.__permits_idx_stale__ = true; });
       });
@@ -228,22 +258,32 @@
         const parsed = parseScidTag(txt);
         if(!parsed) return;
 
-        const idx = ensureIndex();
-        if (!idx || idx.size === 0){
+        const { idx, anyJ } = ensureIndex();
+        if (!idx || (idx.size===0 && anyJ.size===0)) {
           if (retry < 15) setTimeout(()=>tryAppend(node, retry+1), 150); // wait for STATE to populate
           return;
         }
 
-        // Primary lookup: job + tag + scid (the combo that worked)
-        let rec = idx.get(`${jobParam}::${parsed.tag}::${parsed.scid}`);
+        const tagN = normTag(parsed.tag);
+        const scids = scidVariants(parsed.scid);
 
-        // Fallback: if job is missing in URL, match any job with same tag+scid
-        if (!rec && !jobParam){
-          for (const [k, r] of idx){
-            const [, t, s] = k.split('::');
-            if (t === parsed.tag && s === parsed.scid){ rec = r; break; }
+        // 1) strict: job + tag + scid (trying all scid variants)
+        let rec = null;
+        if (jobParamNorm){
+          for (const sv of scids){
+            rec = idx.get(`${jobParamNorm}::${tagN}::${sv}`);
+            if (rec) break;
           }
         }
+
+        // 2) fallback when job param missing/mismatched: any job with same tag+scid variant
+        if (!rec){
+          for (const sv of scids){
+            rec = anyJ.get(`${tagN}::${sv}`);
+            if (rec) break;
+          }
+        }
+
         const note = readNote(rec);
         if(!note) return;
 
@@ -272,6 +312,7 @@
 
   })();
   </script>
+
 
 
   <!-- shared config + map logic + watcher graphics (unchanged) -->
