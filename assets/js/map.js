@@ -9,14 +9,7 @@
   // Header
   $('#jobName').textContent = JOB ? `Job: ${JOB}` : 'Job: —';
 
-  // ---- Data loader (commit -> branch fallback) ----
-  async function getLatestSha() {
-    const url = `https://api.github.com/repos/${CFG.OWNER}/${CFG.REPO}/commits/${CFG.DEFAULT_BRANCH}?_=${Date.now()}`;
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
-    const j = await r.json();
-    return j.sha;
-  }
+  // ---- Data loader (branch-only; no commits API to avoid 403) ----
   async function fetchJson(url) {
     const r = await fetch(url, { cache: 'no-store' });
     return { ok: r.ok, status: r.status, json: r.ok ? await r.json() : null, url };
@@ -32,12 +25,8 @@
   }
   async function loadData() {
     const dirs = Array.from(new Set([CFG.DATA_DIR, 'docs/data', 'data'].filter(Boolean)));
-    try {
-      const sha = await getLatestSha();
-      return await tryLoadBases(dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${sha}/${d}`));
-    } catch {
-      return await tryLoadBases(dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`));
-    }
+    const bases = dirs.map(d => `https://raw.githubusercontent.com/${CFG.OWNER}/${CFG.REPO}/${CFG.DEFAULT_BRANCH}/${d}`);
+    return await tryLoadBases(bases);
   }
 
   // ---- API helper ----
@@ -109,9 +98,8 @@
       bounds.push([lat,lon]);
     }
     if (bounds.length) map.fitBounds(bounds,{padding:[40,40]});
-    setTimeout(()=>map.invalidateSize(),50); // prevent hiccup under panel
+    setTimeout(()=>map.invalidateSize(),50);
 
-    // After rebuilding, re-apply selection visuals
     recomputeSelection();
   }
 
@@ -205,14 +193,9 @@
           (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:'' ));
 
       // 🔔 Trigger the same watcher/graphics:
-      // 1) in THIS tab (map) – to show overlay + reload data here
       window.dispatchEvent(new CustomEvent('watch:start'));
-      // 2) in the MAIN tab – to show overlay + reload data there
-      if (window.opener && !window.opener.closed) {
-        try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {}
-      }
+      if (window.opener && !window.opener.closed) { try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {} }
       if (bc) { try { bc.postMessage('watch-start'); } catch {} }
-      // 3) Fallback broadcast (if opener is unavailable)
       try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
     } catch(e){
       console.error(e);
@@ -222,14 +205,13 @@
     }
   }
 
-  // ---- Delete (new; mirrors Apply pipeline) ----
+  // ---- Delete (mirrors Apply pipeline; no changes elsewhere) ----
   async function onDelete(){
     const msg=(t)=>{ const el=$('#msg'); if(el) el.innerHTML=t||''; };
 
     if (!JOB){ msg('<span style="color:#ef4444">Open this from the main page with a Job selected.</span>'); return; }
     if (selectedSet.size===0){ msg('<span style="color:#ef4444">Draw one or more polygons to select poles first.</span>'); return; }
 
-    // Build delete operations from currently selected poles & existing permits
     const seen = new Set();
     const changes = [];
     for(const m of Array.from(selectedSet)){
@@ -240,7 +222,6 @@
         const id = r.permit_id;
         if (!id || seen.has(id)) continue;
         seen.add(id);
-        // Use the same change-envelope style as Apply
         changes.push({ type:'delete_permit', permit_id: id });
       }
     }
@@ -253,11 +234,9 @@
       msg(`<span style="color:#34d399">Submitted ${changes.length} delete(s).</span> `+
           (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:'' ));
 
-      // 🔔 Same watcher/refresh signals as Apply
+      // 🔔 Same refresh signals as Apply
       window.dispatchEvent(new CustomEvent('watch:start'));
-      if (window.opener && !window.opener.closed) {
-        try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {}
-      }
+      if (window.opener && !window.opener.closed) { try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {} }
       if (bc) { try { bc.postMessage('watch-start'); } catch {} }
       try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
     } catch(e){
@@ -274,7 +253,7 @@
     const d=$('#date'); if(d && !d.value) d.valueAsDate=new Date();
     const modeSel=$('#mode');
     const assignOnly=()=>document.querySelectorAll('.assign-only');
-    const refresh=()=>{ const show=(modeSel.value==='assign'); for(const el of assignOnly()) el.style.display=show?'':'none'; };
+    const refresh=()=>{ const show=(modeSel && modeSel.value==='assign'); for(const el of assignOnly()) el.style.display=show?'':'none'; };
     if (modeSel) { modeSel.addEventListener('change', refresh); refresh(); }
 
     // Wire buttons (Apply is required; Delete is optional if panel provided)
