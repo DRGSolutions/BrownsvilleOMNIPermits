@@ -132,8 +132,8 @@
       const _map = L.map;
       L.map = function(){
         const m = _map.apply(this, arguments);
-        window.__leaflet_map__ = m;  // expose the instance
-        attachNotesInjector(m);      // attach when the map is created
+        window.__leaflet_map__ = m;      // expose the instance
+        attachNotesInjector(m);          // attach when the map is created
         return m;
       };
     }
@@ -141,12 +141,12 @@
     // If the map already exists (wrapper loaded late), still attach
     if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
 
-    // ================= helper + injector (idempotent) ==================
+    // ================= helper + injector (no network fetches) ==================
     function attachNotesInjector(map){
       if (!map || map.__pnote_hooked__) return;
       map.__pnote_hooked__ = true;
 
-      // Inject a tiny style for the notes line (safe to run once)
+      // Style for the notes line (added once)
       if (!document.getElementById('pnote-style')){
         const s = document.createElement('style');
         s.id = 'pnote-style';
@@ -154,49 +154,23 @@
         document.head.appendChild(s);
       }
 
-      // ---- Permit data access (STATE first, else fetch common paths) ----
-      const JSON_CANDIDATES = [
-        'permits.json','./permits.json',
-        'data/permits.json','./data/permits.json',
-        'assets/permits.json','./assets/permits.json',
-        'assets/data/permits.json','./assets/data/permits.json'
-      ];
-
-      async function getPermitsList(){
+      function makeIndexFromState(){
         const S = window.STATE || {};
-        let list = Array.isArray(S.permits) ? S.permits : (Array.isArray(S.data?.permits) ? S.data.permits : null);
-        if (!list){
-          for(const url of JSON_CANDIDATES){
-            try{
-              const r = await fetch(url, {cache:'no-store'});
-              if(r.ok){
-                const j = await r.json();
-                list = Array.isArray(j) ? j : (Array.isArray(j?.permits) ? j.permits : null);
-                if (list) break;
-              }
-            }catch(_){}
-          }
-        }
-        return Array.isArray(list) ? list : [];
-      }
-
-      function makeIndex(list){
-        // Key by TAG+SCID only (job-independent so it works everywhere)
+        const list = Array.isArray(S.permits) ? S.permits
+                  : Array.isArray(S.data?.permits) ? S.data.permits
+                  : [];
         const idx = new Map();
-        for(const r of list){
+        for (const r of list){
           const tag  = r?.tag ?? r?.Tag ?? r?.pole_tag ?? r?.PoleTag ?? '';
           const scid = r?.SCID ?? r?.scid ?? r?.pole_scid ?? r?.scid_num ?? '';
-          if (tag || scid){
-            const k = `${String(tag).trim()}::${String(scid).trim()}`;
-            if (!idx.has(k)) idx.set(k, r); // first match wins
-          }
+          if (tag || scid) idx.set(`${String(tag).trim()}::${String(scid).trim()}`, r);
         }
         return idx;
       }
 
       function readNote(rec){
-        const cand = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
-        for (const v of cand){
+        const c = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
+        for (const v of c){
           if (typeof v === 'string' && v.trim()) return v.trim();
           if (Array.isArray(v)){
             for (const it of v){
@@ -215,49 +189,51 @@
       }
 
       function parseScidTagFromText(text){
-        if(!text) return null;
-        // Handles "SCID 001 - Tag 52883" (hyphen/dots/extra spaces allowed)
-        const m = text.match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
+        const m = String(text||'').match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
         return m ? { scid: m[1], tag: m[2] } : null;
       }
 
-      function ensureNote(container, note){
-        if (!container || container.querySelector?.('.pnote')) return;
-        const div = document.createElement('div');
-        div.className = 'pnote';
-        div.textContent = note;      // plain text append under status line
-        container.appendChild(div);
-      }
-
-      async function tryAppendNote(container){
-        if(!container) return;
-        const txt = (container.innerText || container.textContent || '').trim();
+      function tryAppendNote(node){
+        if(!node || node.querySelector?.('.pnote')) return;
+        const txt = (node.innerText || node.textContent || '').trim();
         const parsed = parseScidTagFromText(txt);
         if(!parsed) return;
 
-        map.__permits_idx__ = map.__permits_idx__ || makeIndex(await getPermitsList());
-        const rec  = map.__permits_idx__.get(`${parsed.tag}::${parsed.scid}`);
+        const idx  = map.__permits_idx__;
+        if(!idx) return; // wait until STATE is present
+
+        const rec  = idx.get(`${parsed.tag}::${parsed.scid}`);
         const note = readNote(rec);
-        if (note) ensureNote(container, note);
+        if(!note) return;
+
+        const div = document.createElement('div');
+        div.className = 'pnote';
+        div.textContent = note;  // plain text append under status line
+        node.appendChild(div);
       }
 
-      // Hook both Leaflet POPUPS and TOOLTIPS
-      map.on('popupopen', (ev)=>{
-        const el = ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content');
-        if (el) tryAppendNote(el);
-      });
-      map.on('tooltipopen', (ev)=>{
-        const el = ev?.tooltip?.getElement?.();
-        if (el) tryAppendNote(el);
+      function rebuildIndexAndRescan(){
+        map.__permits_idx__ = makeIndexFromState();
+        if (map.__permits_idx__ && map.__permits_idx__.size){
+          document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
+        }
+      }
+
+      // Initial pass (handles case where STATE is already available)
+      rebuildIndexAndRescan();
+
+      // Re-index when your app updates STATE
+      ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
+        window.addEventListener(ev, ()=> setTimeout(rebuildIndexAndRescan, 0));
       });
 
-      // Scan any existing labels/popups after load
-      const scan = ()=>document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
-      setTimeout(scan, 500);
-      setTimeout(scan, 1500);
+      // Append notes whenever a popup/tooltip opens
+      map.on('popupopen',  ev => tryAppendNote(ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content')));
+      map.on('tooltipopen',ev => tryAppendNote(ev?.tooltip?.getElement?.()));
 
-      // Watch for newly-added tooltips/popups (e.g., after pan/zoom)
+      // Observe DOM additions; only acts once index exists (no fetching)
       const mo = new MutationObserver((muts)=>{
+        if(!map.__permits_idx__) return;
         for (const m of muts){
           m.addedNodes && m.addedNodes.forEach(n=>{
             if (n.nodeType===1){
@@ -273,6 +249,7 @@
 
   })();
   </script>
+
 
 
 
