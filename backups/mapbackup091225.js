@@ -6,6 +6,7 @@
   const JOB = qs.get('job') || '';
   const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('permits') : null;
 
+
   // Header
   $('#jobName').textContent = JOB ? `Job: ${JOB}` : 'Job: —';
 
@@ -202,7 +203,7 @@
       msg(`Submitting ${changes.length} change(s)…`);
       const data = await callApi({ actorName:'Website User', reason:`Map ${mode} (${changes.length})`, changes });
       msg(`<span style="color:#34d399">Submitted ${changes.length} change(s).</span> `+
-          (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:'' ));
+          (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:''));
 
       // 🔔 Trigger the same watcher/graphics:
       // 1) in THIS tab (map) – to show overlay + reload data here
@@ -222,52 +223,6 @@
     }
   }
 
-  // ---- Delete (new; mirrors Apply pipeline) ----
-  async function onDelete(){
-    const msg=(t)=>{ const el=$('#msg'); if(el) el.innerHTML=t||''; };
-
-    if (!JOB){ msg('<span style="color:#ef4444">Open this from the main page with a Job selected.</span>'); return; }
-    if (selectedSet.size===0){ msg('<span style="color:#ef4444">Draw one or more polygons to select poles first.</span>'); return; }
-
-    // Build delete operations from currently selected poles & existing permits
-    const seen = new Set();
-    const changes = [];
-    for(const m of Array.from(selectedSet)){
-      const p = m._pole;
-      const k = `${p.job_name}::${p.tag}::${p.SCID}`;
-      const rel = pmap.get(k) || [];
-      for(const r of rel){
-        const id = r.permit_id;
-        if (!id || seen.has(id)) continue;
-        seen.add(id);
-        // Use the same change-envelope style as Apply
-        changes.push({ type:'delete_permit', permit_id: id });
-      }
-    }
-    if (changes.length===0){ msg('<span style="color:#34d399">Nothing to delete for selected poles.</span>'); return; }
-
-    const btn=$('#btnDelete'); if(btn) btn.disabled=true;
-    try{
-      msg(`Submitting ${changes.length} delete(s)…`);
-      const data = await callApi({ actorName:'Website User', reason:`Map delete (${changes.length})`, changes });
-      msg(`<span style="color:#34d399">Submitted ${changes.length} delete(s).</span> `+
-          (data.pr_url? `<a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`:'' ));
-
-      // 🔔 Same watcher/refresh signals as Apply
-      window.dispatchEvent(new CustomEvent('watch:start'));
-      if (window.opener && !window.opener.closed) {
-        try { window.opener.dispatchEvent(new CustomEvent('watch:start')); } catch {}
-      }
-      if (bc) { try { bc.postMessage('watch-start'); } catch {} }
-      try { localStorage.setItem('permits:watch-start', String(Date.now())); } catch {}
-    } catch(e){
-      console.error(e);
-      msg(`<span style="color:#ef4444">${e.message}</span>`);
-    } finally {
-      if(btn) btn.disabled=false;
-    }
-  }
-
   // ---- init ----
   document.addEventListener('DOMContentLoaded', async ()=>{
     // form toggles
@@ -275,17 +230,9 @@
     const modeSel=$('#mode');
     const assignOnly=()=>document.querySelectorAll('.assign-only');
     const refresh=()=>{ const show=(modeSel.value==='assign'); for(const el of assignOnly()) el.style.display=show?'':'none'; };
-    if (modeSel) { modeSel.addEventListener('change', refresh); refresh(); }
+    modeSel.addEventListener('change', refresh); refresh();
 
-    // Wire buttons (Apply is required; Delete is optional if panel provided)
-    const applyBtn = $('#btnApply');
-    if (applyBtn) applyBtn.addEventListener('click', onApply);
-
-    const delBtn = $('#btnDelete');
-    if (delBtn && !delBtn.__wired){
-      delBtn.__wired = true;
-      delBtn.addEventListener('click', onDelete);
-    }
+    $('#btnApply').addEventListener('click', onApply);
 
     if (!JOB){ $('#msg').innerHTML='<span style="color:#ef4444">No Job specified. Open this via “Advanced Map Selection”.</span>'; return; }
 
