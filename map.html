@@ -125,19 +125,20 @@
   <!-- === Capture the Leaflet map instance ASAP (must run BEFORE your map.js creates the map) === -->
  <script>
   (function(){
+
     // --- Wrap L.map once to expose the instance and attach our hook ---
     if (window.L && !window.__L_MAP_WRAPPED__) {
       window.__L_MAP_WRAPPED__ = true;
       const _map = L.map;
       L.map = function(){
         const m = _map.apply(this, arguments);
-        window.__leaflet_map__ = m;  // always expose the instance
+        window.__leaflet_map__ = m;  // expose the instance
         attachNotesInjector(m);      // attach when the map is created
         return m;
       };
     }
 
-    // --- If the map already exists (wrapper loaded late), still attach ---
+    // If the map already exists (wrapper loaded late), still attach
     if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
 
     // ================= helper + injector (idempotent) ==================
@@ -145,23 +146,57 @@
       if (!map || map.__pnote_hooked__) return;
       map.__pnote_hooked__ = true;
 
-      // 1) tiny style for the notes line
-      const STYLE_ID = 'pnote-style';
-      if (!document.getElementById(STYLE_ID)){
+      // Inject a tiny style for the notes line (safe to run once)
+      if (!document.getElementById('pnote-style')){
         const s = document.createElement('style');
-        s.id = STYLE_ID;
-        s.textContent = '.leaflet-popup-content .pnote{margin-top:2px;font-size:11px;color:#6b7280}';
+        s.id = 'pnote-style';
+        s.textContent = '.leaflet-popup-content .pnote,.leaflet-tooltip .pnote{margin-top:2px;font-size:11px;color:#6b7280}';
         document.head.appendChild(s);
       }
 
-      // 2) helpers
+      // ---- Permit data access (STATE first, else fetch common paths) ----
+      const JSON_CANDIDATES = [
+        //'permits.json','./permits.json',
+        'data/permits.json',//'./data/permits.json',
+        //'assets/permits.json','./assets/permits.json',
+        //'assets/data/permits.json','./assets/data/permits.json'
+      ];
+
+      async function getPermitsList(){
+        const S = window.STATE || {};
+        let list = Array.isArray(S.permits) ? S.permits : (Array.isArray(S.data?.permits) ? S.data.permits : null);
+        if (!list){
+          for(const url of JSON_CANDIDATES){
+            try{
+              const r = await fetch(url, {cache:'no-store'});
+              if(r.ok){
+                const j = await r.json();
+                list = Array.isArray(j) ? j : (Array.isArray(j?.permits) ? j.permits : null);
+                if (list) break;
+              }
+            }catch(_){}
+          }
+        }
+        return Array.isArray(list) ? list : [];
+      }
+
+      function makeIndex(list){
+        // Key by TAG+SCID only (job-independent so it works everywhere)
+        const idx = new Map();
+        for(const r of list){
+          const tag  = r?.tag ?? r?.Tag ?? r?.pole_tag ?? r?.PoleTag ?? '';
+          const scid = r?.SCID ?? r?.scid ?? r?.pole_scid ?? r?.scid_num ?? '';
+          if (tag || scid){
+            const k = `${String(tag).trim()}::${String(scid).trim()}`;
+            if (!idx.has(k)) idx.set(k, r); // first match wins
+          }
+        }
+        return idx;
+      }
+
       function readNote(rec){
-        if(!rec) return null;
-        const cand = [
-          rec.notes, rec.Notes, rec.permit_notes, rec.PermitNotes, rec.Permit_Notes,
-          rec.note, rec.Note, rec.comments, rec.Comments
-        ];
-        for(const v of cand){
+        const cand = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
+        for (const v of cand){
           if (typeof v === 'string' && v.trim()) return v.trim();
           if (Array.isArray(v)){
             for (const it of v){
@@ -178,64 +213,67 @@
         }
         return null;
       }
-      const key = (job, tag, scid)=>`${String(job||'').trim()}::${String(tag||'').trim()}::${String(scid||'').trim()}`;
 
-      async function fetchPermitsJSON(){
-        // Prefer local STATE if already loaded
-        const S = window.STATE || {};
-        if (Array.isArray(S.permits)) return S.permits;
-        if (Array.isArray(S.data?.permits)) return S.data.permits;
-
-        // Else try common files (no typo here; it's "permits.json")
-        const candidates = ["permits.json","./permits.json","data/permits.json","./data/permits.json"];
-        for (const url of candidates){
-          try{ const r = await fetch(url, {cache:"no-store"}); if(r.ok) return r.json(); }catch(_){}
-        }
-        return [];
+      function parseScidTagFromText(text){
+        if(!text) return null;
+        // Handles "SCID 001 - Tag 52883" (hyphen/dots/extra spaces allowed)
+        const m = text.match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
+        return m ? { scid: m[1], tag: m[2] } : null;
       }
 
-      async function ensureIndex(){
-        if (map.__permit_index__) return map.__permit_index__;
-        const list = await fetchPermitsJSON();
-        const m = new Map();
-        for (const r of list){
-          const job  = r.job_name || r.jobName || r.job || "";
-          const tag  = r.tag || r.Tag || r.pole_tag || r.PoleTag || "";
-          const scid = r.SCID || r.scid || r.pole_scid || r.scid_num || "";
-          if (tag || scid) m.set(key(job, tag, scid), r);
-        }
-        map.__permit_index__ = m;
-        return m;
+      function ensureNote(container, note){
+        if (!container || container.querySelector?.('.pnote')) return;
+        const div = document.createElement('div');
+        div.className = 'pnote';
+        div.textContent = note;      // plain text append under status line
+        container.appendChild(div);
       }
 
-      const jobParam = new URLSearchParams(location.search).get("job") || "";
+      async function tryAppendNote(container){
+        if(!container) return;
+        const txt = (container.innerText || container.textContent || '').trim();
+        const parsed = parseScidTagFromText(txt);
+        if(!parsed) return;
 
-      // 3) Append notes when a POPUP opens
-      map.on("popupopen", async (ev)=>{
-        const root = ev?.popup?.getElement?.();
-        if(!root) return;
-        const content = root.querySelector(".leaflet-popup-content");
-        if(!content || content.querySelector(".pnote")) return;
-
-        // Parse "SCID 001 - Tag 52883"
-        const txt = (content.innerText || content.textContent || "").trim();
-        const m = txt.match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
-        if(!m) return;
-        const scid = m[1], tag = m[2];
-
-        const idx  = await ensureIndex();
-        const rec  = idx.get(key(jobParam, tag, scid));
+        map.__permits_idx__ = map.__permits_idx__ || makeIndex(await getPermitsList());
+        const rec  = map.__permits_idx__.get(`${parsed.tag}::${parsed.scid}`);
         const note = readNote(rec);
-        if(!note) return;
+        if (note) ensureNote(container, note);
+      }
 
-        const div = document.createElement("div");
-        div.className = "pnote";
-        div.textContent = note; // safe text insert
-        content.appendChild(div);
+      // Hook both Leaflet POPUPS and TOOLTIPS
+      map.on('popupopen', (ev)=>{
+        const el = ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content');
+        if (el) tryAppendNote(el);
       });
+      map.on('tooltipopen', (ev)=>{
+        const el = ev?.tooltip?.getElement?.();
+        if (el) tryAppendNote(el);
+      });
+
+      // Scan any existing labels/popups after load
+      const scan = ()=>document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
+      setTimeout(scan, 500);
+      setTimeout(scan, 1500);
+
+      // Watch for newly-added tooltips/popups (e.g., after pan/zoom)
+      const mo = new MutationObserver((muts)=>{
+        for (const m of muts){
+          m.addedNodes && m.addedNodes.forEach(n=>{
+            if (n.nodeType===1){
+              if (n.matches?.('.leaflet-tooltip, .leaflet-popup-content')) tryAppendNote(n);
+              n.querySelectorAll?.('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
+            }
+          });
+        }
+      });
+      mo.observe(document.body, { childList:true, subtree:true });
+      map.__pnote_mo__ = mo;
     }
+
   })();
   </script>
+
 
 
 
