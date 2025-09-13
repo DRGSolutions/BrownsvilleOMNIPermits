@@ -126,27 +126,26 @@
   <script>
   (function(){
 
-    // --- Wrap L.map once to expose the instance and attach our hook ---
+    // Wrap L.map once so we can attach our hook when the map is created
     if (window.L && !window.__L_MAP_WRAPPED__) {
       window.__L_MAP_WRAPPED__ = true;
       const _map = L.map;
       L.map = function(){
         const m = _map.apply(this, arguments);
         window.__leaflet_map__ = m;      // expose the instance
-        attachNotesInjector(m);          // attach when the map is created
+        attachNotesInjector(m);          // attach when created
         return m;
       };
     }
-
-    // If the map already exists (wrapper loaded late), still attach
+    // If map already exists, still attach
     if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
 
-    // ================= helper + injector (no network fetches) ==================
+    // ================= helper + injector (no fetch; lazy index) =================
     function attachNotesInjector(map){
       if (!map || map.__pnote_hooked__) return;
       map.__pnote_hooked__ = true;
 
-      // Style for the notes line (added once)
+      // Style once
       if (!document.getElementById('pnote-style')){
         const s = document.createElement('style');
         s.id = 'pnote-style';
@@ -154,23 +153,46 @@
         document.head.appendChild(s);
       }
 
-      function makeIndexFromState(){
+      // --- Robust STATE scanning (handles many shapes) -------------------------
+      function collectArraysFromState(){
         const S = window.STATE || {};
-        const list = Array.isArray(S.permits) ? S.permits
-                  : Array.isArray(S.data?.permits) ? S.data.permits
-                  : [];
+        const seen = new Set();
+        const out = [];
+        (function walk(v, depth){
+          if (!v || depth > 3) return;
+          if (Array.isArray(v)){ if(!seen.has(v)){ seen.add(v); out.push(v); } return; }
+          if (typeof v === 'object'){
+            for (const k in v) { try { walk(v[k], depth+1); } catch(_){} }
+          }
+        })(S, 0);
+        return out;
+      }
+      function looksLikePermit(o){
+        if (!o || typeof o !== 'object') return false;
+        const ks = Object.keys(o);
+        const hasScid  = ks.some(k => /^(scid|SCID|pole_scid|scid_num)$/i.test(k));
+        const hasTag   = ks.some(k => /^(tag|Tag|pole_tag|PoleTag)$/i.test(k));
+        const hasState = ks.some(k => /status/i.test(k));
+        return (hasScid && hasTag) || (hasScid && hasState);
+      }
+      function makeIndexFromState(){
         const idx = new Map();
-        for (const r of list){
-          const tag  = r?.tag ?? r?.Tag ?? r?.pole_tag ?? r?.PoleTag ?? '';
-          const scid = r?.SCID ?? r?.scid ?? r?.pole_scid ?? r?.scid_num ?? '';
-          if (tag || scid) idx.set(`${String(tag).trim()}::${String(scid).trim()}`, r);
+        const arrays = collectArraysFromState();
+        for (const arr of arrays){
+          for (const r of arr){
+            if (!looksLikePermit(r)) continue;
+            const tag  = r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '';
+            const scid = r.SCID ?? r.scid ?? r.pole_scid ?? r.scid_num ?? '';
+            const k = `${String(tag).trim()}::${String(scid).trim()}`;
+            if (k !== '::' && !idx.has(k)) idx.set(k, r);
+          }
         }
         return idx;
       }
 
       function readNote(rec){
-        const c = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
-        for (const v of c){
+        const cand = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
+        for (const v of cand){
           if (typeof v === 'string' && v.trim()) return v.trim();
           if (Array.isArray(v)){
             for (const it of v){
@@ -193,14 +215,27 @@
         return m ? { scid: m[1], tag: m[2] } : null;
       }
 
-      function tryAppendNote(node){
+      // Build index only when needed; rebuild if empty
+      function ensureIndex(){
+        if (!map.__permits_idx__ || map.__permits_idx__.size === 0){
+          const idx = makeIndexFromState();
+          if (idx.size) map.__permits_idx__ = idx;
+        }
+        return map.__permits_idx__ || null;
+      }
+
+      function tryAppendNote(node, retry=0){
         if(!node || node.querySelector?.('.pnote')) return;
         const txt = (node.innerText || node.textContent || '').trim();
         const parsed = parseScidTagFromText(txt);
         if(!parsed) return;
 
-        const idx  = map.__permits_idx__;
-        if(!idx) return; // wait until STATE is present
+        const idx = ensureIndex();
+        if(!idx){
+          // STATE not ready yet → retry a few times
+          if (retry < 15) setTimeout(()=>tryAppendNote(node, retry+1), 150);
+          return;
+        }
 
         const rec  = idx.get(`${parsed.tag}::${parsed.scid}`);
         const note = readNote(rec);
@@ -208,47 +243,32 @@
 
         const div = document.createElement('div');
         div.className = 'pnote';
-        div.textContent = note;  // plain text append under status line
+        div.textContent = note;
         node.appendChild(div);
       }
 
-      function rebuildIndexAndRescan(){
-        map.__permits_idx__ = makeIndexFromState();
-        if (map.__permits_idx__ && map.__permits_idx__.size){
-          document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
-        }
-      }
-
-      // Initial pass (handles case where STATE is already available)
-      rebuildIndexAndRescan();
-
-      // Re-index when your app updates STATE
-      ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
-        window.addEventListener(ev, ()=> setTimeout(rebuildIndexAndRescan, 0));
-      });
-
-      // Append notes whenever a popup/tooltip opens
+      // Hook both Leaflet POPUPS and TOOLTIPS
       map.on('popupopen',  ev => tryAppendNote(ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content')));
       map.on('tooltipopen',ev => tryAppendNote(ev?.tooltip?.getElement?.()));
 
-      // Observe DOM additions; only acts once index exists (no fetching)
-      const mo = new MutationObserver((muts)=>{
-        if(!map.__permits_idx__) return;
-        for (const m of muts){
-          m.addedNodes && m.addedNodes.forEach(n=>{
-            if (n.nodeType===1){
-              if (n.matches?.('.leaflet-tooltip, .leaflet-popup-content')) tryAppendNote(n);
-              n.querySelectorAll?.('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
-            }
-          });
-        }
-      });
+      // Light passive scans (handles labels already on screen)
+      const scan = ()=>document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
+      setTimeout(scan, 300); setTimeout(scan, 1200);
+
+      // Watch DOM for new popups/tooltips and re-scan
+      const mo = new MutationObserver(()=>scan());
       mo.observe(document.body, { childList:true, subtree:true });
       map.__pnote_mo__ = mo;
+
+      // Also rebuild when your app broadcasts anything; safe if absent
+      ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
+        window.addEventListener(ev, ()=> setTimeout(scan, 0));
+      });
     }
 
   })();
   </script>
+
 
 
 
