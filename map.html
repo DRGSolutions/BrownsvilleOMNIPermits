@@ -140,7 +140,7 @@
     // If map already exists, still attach
     if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
 
-    // ================= helper + injector (no fetch; lazy index) =================
+    // ================= helper + injector (no fetch; uses job+tag+SCID) =================
     function attachNotesInjector(map){
       if (!map || map.__pnote_hooked__) return;
       map.__pnote_hooked__ = true;
@@ -153,42 +153,48 @@
         document.head.appendChild(s);
       }
 
-      // --- Robust STATE scanning (handles many shapes) -------------------------
-      function collectArraysFromState(){
+      // Read current job (same mechanism as when it worked)
+      const jobParam = (() => {
+        const qs = new URLSearchParams(location.search);
+        const v = qs.get('job') || '';
+        try { return decodeURIComponent(v.replace(/\+/g,' ')).trim(); }
+        catch { return String(v).trim(); }
+      })();
+
+      function getPermitsFromState(){
         const S = window.STATE || {};
-        const seen = new Set();
-        const out = [];
-        (function walk(v, depth){
-          if (!v || depth > 3) return;
-          if (Array.isArray(v)){ if(!seen.has(v)){ seen.add(v); out.push(v); } return; }
-          if (typeof v === 'object'){
-            for (const k in v) { try { walk(v[k], depth+1); } catch(_){} }
-          }
-        })(S, 0);
-        return out;
+        return Array.isArray(S.permits) ? S.permits
+            : Array.isArray(S.data?.permits) ? S.data.permits
+            : [];
       }
-      function looksLikePermit(o){
-        if (!o || typeof o !== 'object') return false;
-        const ks = Object.keys(o);
-        const hasScid  = ks.some(k => /^(scid|SCID|pole_scid|scid_num)$/i.test(k));
-        const hasTag   = ks.some(k => /^(tag|Tag|pole_tag|PoleTag)$/i.test(k));
-        const hasState = ks.some(k => /status/i.test(k));
-        return (hasScid && hasTag) || (hasScid && hasState);
-      }
-      function makeIndexFromState(){
+
+      // Build an index keyed by job + tag + scid (this is the key that worked)
+      function buildIndex(){
         const idx = new Map();
-        const arrays = collectArraysFromState();
-        for (const arr of arrays){
-          for (const r of arr){
-            if (!looksLikePermit(r)) continue;
-            const tag  = r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '';
-            const scid = r.SCID ?? r.scid ?? r.pole_scid ?? r.scid_num ?? '';
-            const k = `${String(tag).trim()}::${String(scid).trim()}`;
-            if (k !== '::' && !idx.has(k)) idx.set(k, r);
+        const list = getPermitsFromState();
+        for (const r of list){
+          const job  = r.job_name ?? r.jobName ?? r.job ?? '';
+          const tag  = r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '';
+          const scid = r.SCID ?? r.scid ?? r.pole_scid ?? r.scid_num ?? '';
+          if (job && (tag || scid)){
+            const k = `${job}::${tag}::${scid}`;
+            idx.set(k, r);
           }
         }
         return idx;
       }
+
+      // Keep a fresh index; rebuild when STATE updates
+      function ensureIndex(){
+        if (!map.__permits_idx__ || map.__permits_idx_stale__) {
+          map.__permits_idx__ = buildIndex();
+          map.__permits_idx_stale__ = false;
+        }
+        return map.__permits_idx__;
+      }
+      ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
+        window.addEventListener(ev, ()=>{ map.__permits_idx_stale__ = true; });
+      });
 
       function readNote(rec){
         const cand = [rec?.notes, rec?.Notes, rec?.permit_notes, rec?.PermitNotes, rec?.Permit_Notes, rec?.note, rec?.Note, rec?.comments, rec?.Comments];
@@ -210,34 +216,34 @@
         return null;
       }
 
-      function parseScidTagFromText(text){
+      function parseScidTag(text){
         const m = String(text||'').match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
         return m ? { scid: m[1], tag: m[2] } : null;
       }
 
-      // Build index only when needed; rebuild if empty
-      function ensureIndex(){
-        if (!map.__permits_idx__ || map.__permits_idx__.size === 0){
-          const idx = makeIndexFromState();
-          if (idx.size) map.__permits_idx__ = idx;
-        }
-        return map.__permits_idx__ || null;
-      }
-
-      function tryAppendNote(node, retry=0){
+      function tryAppend(node, retry=0){
         if(!node || node.querySelector?.('.pnote')) return;
+
         const txt = (node.innerText || node.textContent || '').trim();
-        const parsed = parseScidTagFromText(txt);
+        const parsed = parseScidTag(txt);
         if(!parsed) return;
 
         const idx = ensureIndex();
-        if(!idx){
-          // STATE not ready yet → retry a few times
-          if (retry < 15) setTimeout(()=>tryAppendNote(node, retry+1), 150);
+        if (!idx || idx.size === 0){
+          if (retry < 15) setTimeout(()=>tryAppend(node, retry+1), 150); // wait for STATE to populate
           return;
         }
 
-        const rec  = idx.get(`${parsed.tag}::${parsed.scid}`);
+        // Primary lookup: job + tag + scid (the combo that worked)
+        let rec = idx.get(`${jobParam}::${parsed.tag}::${parsed.scid}`);
+
+        // Fallback: if job is missing in URL, match any job with same tag+scid
+        if (!rec && !jobParam){
+          for (const [k, r] of idx){
+            const [, t, s] = k.split('::');
+            if (t === parsed.tag && s === parsed.scid){ rec = r; break; }
+          }
+        }
         const note = readNote(rec);
         if(!note) return;
 
@@ -248,19 +254,17 @@
       }
 
       // Hook both Leaflet POPUPS and TOOLTIPS
-      map.on('popupopen',  ev => tryAppendNote(ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content')));
-      map.on('tooltipopen',ev => tryAppendNote(ev?.tooltip?.getElement?.()));
+      map.on('popupopen',  ev => tryAppend(ev?.popup?.getElement?.()?.querySelector?.('.leaflet-popup-content')));
+      map.on('tooltipopen',ev => tryAppend(ev?.tooltip?.getElement?.()));
 
-      // Light passive scans (handles labels already on screen)
-      const scan = ()=>document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(tryAppendNote);
-      setTimeout(scan, 300); setTimeout(scan, 1200);
+      // Light scans for already-rendered items
+      const scan = ()=>document.querySelectorAll('.leaflet-tooltip, .leaflet-popup-content').forEach(n=>tryAppend(n));
+      setTimeout(scan, 300);
+      setTimeout(scan, 1200);
 
-      // Watch DOM for new popups/tooltips and re-scan
+      // Scan on DOM additions and when your app updates STATE
       const mo = new MutationObserver(()=>scan());
       mo.observe(document.body, { childList:true, subtree:true });
-      map.__pnote_mo__ = mo;
-
-      // Also rebuild when your app broadcasts anything; safe if absent
       ['data:loaded','permits:loaded','state:updated','poles:loaded'].forEach(ev=>{
         window.addEventListener(ev, ()=> setTimeout(scan, 0));
       });
@@ -268,9 +272,6 @@
 
   })();
   </script>
-
-
-
 
 
   <!-- shared config + map logic + watcher graphics (unchanged) -->
