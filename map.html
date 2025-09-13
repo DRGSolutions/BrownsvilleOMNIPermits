@@ -43,6 +43,7 @@
     .pole-tag .id{font-weight:700}
     .pole-tag .status{color:#374151}
     .pole-tag .notes{color:#6b7280;font-size:10px;margin-top:2px}
+    .leaflet-popup-content .pnote{margin-top:2px;font-size:11px;color:#6b7280}
     .leaflet-tooltip.pole-tag.selected{ background:#2563eb;border-color:#2563eb;color:#fff; }
     .leaflet-tooltip.pole-tag.selected .status{color:#e5efff}
     .leaflet-tooltip.pole-tag.selected .id{color:#fff}
@@ -124,17 +125,139 @@
   <!-- === Capture the Leaflet map instance ASAP (must run BEFORE your map.js creates the map) === -->
   <script>
   (function(){
+
+    // --- Wrap L.map once to expose the instance and attach our hook ---
     if (window.L && !window.__L_MAP_WRAPPED__) {
       window.__L_MAP_WRAPPED__ = true;
       const _map = L.map;
       L.map = function(){
         const m = _map.apply(this, arguments);
         window.__leaflet_map__ = m;  // always expose the instance
+        attachNotesInjector(m);      // attach when the map is created
         return m;
       };
     }
+
+    // --- If the map already exists (wrapper loaded late), still attach ---
+    if (window.__leaflet_map__) attachNotesInjector(window.__leaflet_map__);
+
+    // ================= helper + injector (idempotent) ==================
+    function attachNotesInjector(m){
+      if (!m || m.__pnote_hooked__) return;
+      m.__pnote_hooked__ = true;
+
+      // Inject a tiny style for the notes line (safe to run once)
+      const STYLE_ID = 'pnote-style';
+      if (!document.getElementById(STYLE_ID)){
+        const s = document.createElement('style');
+        s.id = STYLE_ID;
+        s.textContent = '.leaflet-popup-content .pnote{margin-top:2px;font-size:11px;color:#6b7280}';
+        document.head.appendChild(s);
+      }
+
+      const jobParam = new URLSearchParams(location.search).get('job') || '';
+
+      function key(job, tag, scid){
+        return `${String(job||'').trim()}::${String(tag||'').trim()}::${String(scid||'').trim()}`;
+      }
+
+      function readNote(rec){
+        if(!rec) return null;
+        const c = [
+          rec.notes, rec.Notes, rec.permit_notes, rec.PermitNotes, rec.Permit_Notes,
+          rec.note, rec.Note, rec.comments, rec.Comments
+        ];
+        for (const v of c){
+          if (typeof v === 'string' && v.trim()) return v.trim();
+          if (v && typeof v === 'object'){
+            if (Array.isArray(v)){
+              for (const it of v){
+                if (typeof it === 'string' && it.trim()) return it.trim();
+                if (it && typeof it === 'object'){
+                  const t = it.text || it.note || it.Notes || it.comment || it.Comment;
+                  if (typeof t === 'string' && t.trim()) return t.trim();
+                }
+              }
+            } else {
+              const t = v.text || v.note || v.Notes || v.comment || v.Comment;
+              if (typeof t === 'string' && t.trim()) return t.trim();
+            }
+          }
+        }
+        return null;
+      }
+
+      async function buildPermitIndex(){
+        if (m.__permit_index__) return m.__permit_index__;
+        let list = [];
+
+        // Prefer already-loaded state if present
+        const S = window.STATE || {};
+        if (Array.isArray(S.permits)) list = S.permits;
+        else if (Array.isArray(S.data?.permits)) list = S.data.permits;
+
+        // Otherwise, try common JSON paths
+        if (!list.length){
+          const candidates = ['permits.json','./permits.json','data/permits.json','./data/permits.json'];
+          for (const url of candidates){
+            try{
+              const r = await fetch(url, {cache:'no-store'});
+              if (r.ok){
+                const d = await r.json();
+                list = Array.isArray(d) ? d : (Array.isArray(d?.permits) ? d.permits : []);
+                if (list.length) break;
+              }
+            }catch(_){}
+          }
+        }
+
+        const idx = new Map();
+        for (const r of list){
+          const job  = r.job_name ?? r.jobName ?? r.job ?? '';
+          const tag  = r.tag ?? r.Tag ?? r.pole_tag ?? r.PoleTag ?? '';
+          const scid = r.SCID ?? r.scid ?? r.pole_scid ?? r.scid_num ?? '';
+          if (tag || scid) idx.set(key(job, tag, scid), r);
+        }
+        m.__permit_index__ = idx;
+        return idx;
+      }
+
+      function parseScidTag(contentEl){
+        const txt = (contentEl.innerText || contentEl.textContent || '').trim();
+        // e.g. "SCID 001 - Tag 52883"
+        const mm = txt.match(/SCID\s*([A-Za-z0-9._-]+).*?Tag\s*([A-Za-z0-9._-]+)/i);
+        if (mm) return { scid: mm[1], tag: mm[2] };
+        return null;
+      }
+
+      m.on('popupopen', async (ev)=>{
+        try{
+          const root = ev?.popup?.getElement?.();
+          if (!root) return;
+          const content = root.querySelector('.leaflet-popup-content');
+          if (!content || content.querySelector('.pnote')) return; // already added
+
+          const parsed = parseScidTag(content);
+          if (!parsed) return;
+
+          const idx  = await buildPermitIndex();
+          const rec  = idx.get(key(jobParam, parsed.tag, parsed.scid));
+          const note = readNote(rec);
+          if (!note) return;
+
+          const div = document.createElement('div');
+          div.className = 'pnote';
+          div.textContent = note;  // plain text append under status line
+          content.appendChild(div);
+        }catch(e){
+          console.warn('permit-notes inject failed:', e);
+        }
+      });
+    }
+
   })();
   </script>
+
 
   <!-- shared config + map logic + watcher graphics (unchanged) -->
   <script src="assets/js/config.js?v=api2"></script>
