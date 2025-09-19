@@ -2660,6 +2660,16 @@
     "notes": ""
   },
   {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG1_001",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "88699",
+    "SCID": "001",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG4_001",
     "job_name": "BRN01-F300 PLA",
     "tag": "88699",
