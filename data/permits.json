@@ -2960,6 +2960,26 @@
     "notes": ""
   },
   {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_044",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT5",
+    "SCID": "044",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_045",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "14155",
+    "SCID": "045",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_046",
     "job_name": "BRN01-F300 PLA",
     "tag": "70693",
