@@ -2810,6 +2810,156 @@
     "notes": ""
   },
   {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_046",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "70693",
+    "SCID": "046",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_047",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "96570",
+    "SCID": "047",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_048",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "20487",
+    "SCID": "048",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_049",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT6",
+    "SCID": "049",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_050",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "72717",
+    "SCID": "050",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_051",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "33770",
+    "SCID": "051",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_052",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT7",
+    "SCID": "052",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_053",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "33769",
+    "SCID": "053",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_054",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54253",
+    "SCID": "054",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_055",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "81126",
+    "SCID": "055",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_056",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54254",
+    "SCID": "056",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_057",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "96571",
+    "SCID": "057",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_058",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54257",
+    "SCID": "058",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_059",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54259",
+    "SCID": "059",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_060",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT9",
+    "SCID": "060",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "TEST_2_123_001",
     "job_name": "BRN01-F161",
     "tag": "52883",
