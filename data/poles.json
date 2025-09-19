@@ -86110,7 +86110,7 @@
   {
     "job_name": "BRN01-F300 PLA",
     "tag": "60325",
-    "SCID": null,
+    "SCID": "080",
     "owner": "BPUB",
     "pole_spec": "95-H3 DOUGLAS FIR (NESC Standard)",
     "proposed_spec": null,
