@@ -198,6 +198,14 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll();
+    // Ensure the map is positioned on first paint
+    requestAnimationFrame(() => {
+      map.invalidateSize(); // in case CSS sized #map after init
+      if (STATE.bounds && typeof STATE.bounds.isValid === 'function' && STATE.bounds.isValid()) {
+        map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
+      }
+    });
+
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
 
     // start GH SHA watcher if configured
