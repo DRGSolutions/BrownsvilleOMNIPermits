@@ -1,8 +1,11 @@
-// Per-pole markers with LOD + compact sizes.
-// mode: 'none' | 'dots' | 'shapes'
-// opts: { dotRadius:number, shapePx:number }
-// Shapes by owner: BPUB=circle, AEP=triangle, MVEC=square
+// High-performance pole rendering with LOD and no outlines.
+// Modes:
+//   'none'   → draw nothing (compute bounds only)
+//   'dots'   → ultra-fast Canvas dots (non-interactive)
+//   'shapes' → small Canvas circleMarkers (interactive popups), culled to viewport
+//
 // Fill color = dominant permit status for that pole.
+// Owner silhouettes are dropped for performance (all circles); we keep them tiny.
 
 import { poleKey, statusColor } from './data.js';
 
@@ -22,110 +25,106 @@ function dominantStatusFor(permits){
   return ss[0] || 'NONE';
 }
 
-const NS = 'http://www.w3.org/2000/svg';
-const STROKE   = 'rgba(255,255,255,0.92)';
-const STROKE_W = 3;
-const CANVAS = L.canvas({ padding: 0.4 });
+const CANVAS = L.canvas({ padding: 0.4 }); // shared renderer for everything
 
-// cache icons by owner|fill|px to keep redraws cheap
-const iconCache = new Map();
-function cacheKey(owner, fill, px){ return `${String(owner||'').toUpperCase()}|${fill}|${px}`; }
-
-function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
-
-function iconSVG(owner, fillColor, px){
-  const key = cacheKey(owner, fillColor, px);
-  const hit = iconCache.get(key);
-  if (hit) return hit;
-
-  const u = String(owner || '').toUpperCase();
-  const root = svg('svg', { viewBox:'0 0 24 24' });
-  let shape;
-  if (u === 'BPUB'){
-    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  } else if (u === 'AEP'){
-    shape = svg('polygon', { points:'12,3 21,21 3,21', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  } else if (u === 'MVEC'){
-    shape = svg('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  } else {
-    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  }
-  root.appendChild(shape);
-  root.style.width  = px + 'px';
-  root.style.height = px + 'px';
-  root.style.display = 'inline-block';
-
-  const html = root.outerHTML;
-  iconCache.set(key, html);
-  return html;
-}
-
-function makeIcon(owner, status, px){
-  const fill = statusColor(status);
-  return L.divIcon({
-    className: 'pole-icon',
-    html: iconSVG(owner, fill, px),
-    iconSize: [px, px],
-    iconAnchor: [px/2, px/2],
-    popupAnchor: [0, -10]
-  });
-}
-
-export function buildMarkers(map, layer, poles, byKey, popupHTML, mode='shapes', opts={}){
-  const dotR = Number(opts.dotRadius || 0);
+export function buildMarkers(
+  map,
+  layer,            // L.LayerGroup (will be cleared in 'dots'/'shapes')
+  poles,
+  byKey,
+  popupHTML,
+  mode = 'shapes',  // 'none' | 'dots' | 'shapes'
+  opts = {}         // { dotRadius:number, shapePx:number }
+){
+  const dotR = Number(opts.dotRadius || 2.0);
   const px   = Number(opts.shapePx || 16);
+  const z    = map.getZoom();
 
-  if (layer && layer.clearLayers) layer.clearLayers();
-
-  let bounds = null, llb = null;
+  // compute bounds always
+  let llb = null;
+  const addToBounds = (lat, lon) => {
+    if (!llb) llb = L.latLngBounds([lat, lon], [lat, lon]); else llb.extend([lat, lon]);
+  };
 
   if (mode === 'none'){
     for (const p of (poles||[])){
       if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-      if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+      addToBounds(p.lat, p.lon);
     }
     return llb || null;
   }
 
+  // Clear target layer before drawing this mode
+  if (layer && layer.clearLayers) layer.clearLayers();
+
+  // FAST DOTS (non-interactive, single Canvas pass)
   if (mode === 'dots'){
+    // Draw visible poles as cheap canvas circleMarkers (no stroke, no events)
     for (const p of (poles||[])){
-      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+      const lat = p.lat, lon = p.lon;
+      if (typeof lat !== 'number' || typeof lon !== 'number') continue;
+
       const rel = byKey.get(poleKey(p)) || [];
       const status = dominantStatusFor(rel);
       const fill = statusColor(status);
 
-      const dot = L.circleMarker([p.lat, p.lon], {
+      const dot = L.circleMarker([lat, lon], {
         renderer: CANVAS,
-        radius: dotR || 2.0,
-        stroke: false,
+        radius: dotR,       // small
+        stroke: false,      // ← no white outline
         fill: true,
-        fillOpacity: 0.9,
+        fillOpacity: 0.95,
         fillColor: fill,
-        interactive: false
+        interactive: false, // fastest
+        bubblingMouseEvents: false
       });
-      if (layer) layer.addLayer(dot); else dot.addTo(map);
 
-      if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+      if (layer) layer.addLayer(dot); else dot.addTo(map);
+      addToBounds(lat, lon);
     }
     return llb || null;
   }
 
-  // shapes
+  // INTERACTIVE CANVAS CIRCLES (still tiny, but clickable with lazy popups)
+  // Only create shapes for what’s on screen (viewport culling) to keep count low.
+  const pad = 256; // 1 tile padding for smooth panning
+  const pb  = map.getPixelBounds();
+  const min = pb.min.subtract([pad,pad]);
+  const max = pb.max.add([pad,pad]);
+
+  const inView = (lat, lon) => {
+    const pt = map.project([lat, lon], z);
+    return pt.x >= min.x && pt.x <= max.x && pt.y >= min.y && pt.y <= max.y;
+  };
+
+  const radiusPx = Math.max(2, Math.round(px / 2.2)); // compact, readable
   for (const p of (poles||[])){
-    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+    const lat = p.lat, lon = p.lon;
+    if (typeof lat !== 'number' || typeof lon !== 'number') continue;
+    if (!inView(lat, lon)) { addToBounds(lat, lon); continue; }
 
     const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
+    const fill = statusColor(status);
 
-    const m = L.marker([p.lat, p.lon], {
-      icon: makeIcon(p.owner, status, px),
-      alt: `${p.job_name || ''} ${p.tag || ''} ${p.SCID || ''}`
+    const m = L.circleMarker([lat, lon], {
+      renderer: CANVAS,
+      radius: radiusPx,
+      stroke: false,            // ← no outline (big perf win)
+      fill: true,
+      fillOpacity: 0.95,
+      fillColor: fill,
+      interactive: true,
+      bubblingMouseEvents: false
     });
 
-    if (typeof popupHTML === 'function') m.bindPopup(popupHTML(p, rel));
-    if (layer) layer.addLayer(m); else m.addTo(map);
+    // Lazy popup (created only when needed)
+    if (typeof popupHTML === 'function'){
+      m.on('click', () => { m.bindPopup(popupHTML(p, rel)).openPopup(); });
+    }
 
-    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+    if (layer) layer.addLayer(m); else m.addTo(map);
+    addToBounds(lat, lon);
   }
 
   return llb || null;
