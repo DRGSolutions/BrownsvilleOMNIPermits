@@ -1,8 +1,6 @@
 // neo-map/markers.js
-// Builds markers, adds them to the provided cluster, and returns bounds.
 // Shapes by owner: BPUB = circle, AEP = triangle, MVEC = square.
-// Each marker shows a subtle glow using the *permit status* color (same mapping
-// used for cluster rings), so when you're fully zoomed in, color semantics remain.
+// Marker FILL color now reflects the pole's dominant PERMIT STATUS color.
 
 import { poleKey, statusColor } from './data.js';
 
@@ -29,34 +27,25 @@ function dominantStatusFor(permits){
 /* Inline SVG icons (crisp at small sizes) */
 const NS = 'http://www.w3.org/2000/svg';
 const ICON_PX  = 22;
-const FILL     = 'rgba(148,160,180,0.65)';   // neutral fill (matches legend)
 const STROKE   = 'rgba(255,255,255,0.92)';   // white-ish outline
 const STROKE_W = 3;
 
-function svg(tag, attrs){
-  const el = document.createElementNS(NS, tag);
-  for (const k in attrs) el.setAttribute(k, attrs[k]);
-  return el;
-}
+function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
 
-function iconSVG(owner, tint){
+function iconSVG(owner, fillColor){
   const u = String(owner || '').toUpperCase();
   const root = svg('svg', { viewBox:'0 0 24 24' });
-
-  // Apply a subtle status glow that works for any shape:
-  // (keeps the familiar neutral fill + white outline)
-  root.style.filter = `drop-shadow(0 0 6px ${tint})`;
-
   let shape;
+
   if (u === 'BPUB'){
-    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'AEP'){
-    shape = svg('polygon', { points:'12,3 21,21 3,21', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+    shape = svg('polygon', { points:'12,3 21,21 3,21', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'MVEC'){
-    // SQUARE (rounded corners) — per your decision
-    shape = svg('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+    // SQUARE (rounded corners)
+    shape = svg('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else {
-    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+    shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   }
 
   root.appendChild(shape);
@@ -66,10 +55,11 @@ function iconSVG(owner, tint){
   return root.outerHTML;
 }
 
-function makeIcon(owner, tint){
+function makeIcon(owner, status){
+  const fill = statusColor(status); // ← use the same mapping as clusters/legend
   return L.divIcon({
     className: 'pole-icon',
-    html: iconSVG(owner, tint),
+    html: iconSVG(owner, fill),
     iconSize: [ICON_PX, ICON_PX],
     iconAnchor: [ICON_PX/2, ICON_PX/2],
     popupAnchor: [0, -10]
@@ -79,19 +69,17 @@ function makeIcon(owner, tint){
 export function buildMarkers(map, cluster, poles, byKey, popupHTML){
   cluster.clearLayers();
 
-  let bounds = null;
-  let llb = null;
+  let bounds = null, llb = null;
 
   for (const p of (poles || [])){
     if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
 
     const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
-    const tint   = statusColor(status); // <- same mapping your clusters use
 
     const marker = L.marker([p.lat, p.lon], {
-      icon: makeIcon(p.owner, tint),
-      __status: status   // consumed by app.js cluster iconCreateFunction
+      icon: makeIcon(p.owner, status),
+      __status: status   // used by app.js cluster coloring
     });
 
     if (typeof popupHTML === 'function') {
@@ -100,8 +88,7 @@ export function buildMarkers(map, cluster, poles, byKey, popupHTML){
 
     cluster.addLayer(marker);
 
-    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]);
-    else llb.extend([p.lat, p.lon]);
+    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
   }
 
   if (llb) bounds = llb;

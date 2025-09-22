@@ -1,23 +1,54 @@
-export function toast(msg, ms=1800){
-  const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block';
-  setTimeout(()=> t.style.display='none', ms);
+// neo-map/ui.js
+// Popup content themed to your dark UI.
+// Each permit line's TEXT color = its permit status color.
+
+import { statusColor } from './data.js';
+
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+/** Build popup HTML for a pole and its related permits */
+export function popupHTML(p, permits){
+  const owner = esc(p.owner ?? '—');
+  const tag   = esc(p.tag ?? '—');
+  const scid  = esc(p.SCID ?? '—');
+  const spec  = esc(p.pole_spec ?? p.spec ?? '—');
+  const mr    = esc(p.mr_level ?? p.mr ?? '—');
+
+  const latOk = typeof p.lat === 'number', lonOk = typeof p.lon === 'number';
+  const lat   = latOk ? p.lat.toFixed(6) : '—';
+  const lon   = lonOk ? p.lon.toFixed(6) : '—';
+  const gps   = (latOk && lonOk)
+    ? `<a href="https://maps.google.com/?q=${p.lat},${p.lon}" target="_blank" rel="noopener">(${lat}, ${lon})</a>`
+    : '—';
+
+  const permitRows = (permits || []).map(r => {
+    const id  = esc(r.permit_id ?? r.permitId ?? r.id ?? '');
+    const st  = String(r.permit_status ?? r.status ?? 'UNKNOWN').trim();
+    const col = statusColor(st);
+    const who = esc(r.created_by ?? r.by ?? r.createdBy ?? '');
+    const dt  = esc(r.created_date ?? r.date ?? r.submitted_date ?? '');
+    const parts = [id, st, who ? `by ${who}` : '', dt].filter(Boolean).join(' • ');
+    return `<div class="permit-pill" style="color:${col}">${parts}</div>`;
+  });
+
+  return `
+  <div class="pp">
+    <div class="pp-title">${esc(p.job_name ?? '')}</div>
+    <div class="pp-sub muted">Owner: ${owner} · Tag: ${tag} · SCID: ${scid}</div>
+    <div class="pp-line">Spec: <span class="muted">${spec}</span> &nbsp;→&nbsp; MR: <span class="muted">${mr}</span></div>
+    <div class="pp-line">GPS: ${gps}</div>
+    <div class="pp-sep"></div>
+    <div class="pp-section-title muted">Permits</div>
+    ${permitRows.length ? permitRows.join('') : '<div class="muted">None</div>'}
+  </div>`;
 }
 
-export function popupHTML(p, rel){
-  const coord = (typeof p.lat==='number' && typeof p.lon==='number') ? `(${p.lat.toFixed(6)}, ${p.lon.toFixed(6)})` : '—';
-  const safe = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const permits = (rel||[]).length ? rel.map(r=>`
-      <div style="border:1px solid #283244;background:#0f1219;border-radius:10px;padding:8px 10px;margin:6px 0">
-        <div class="small"><code>${safe(r.permit_id)}</code> · ${safe(r.permit_status)}${r.submitted_by?` · by ${safe(r.submitted_by)}`:''}${r.submitted_at?` · ${safe(r.submitted_at)}`:''}</div>
-        ${r.notes? `<div class="small muted" style="margin-top:6px;white-space:pre-wrap"><b>Notes:</b> ${safe(r.notes)}</div>`:''}
-      </div>`).join('')
-    : `<div class="small badge none">NONE</div> <span class="muted small">No permits yet.</span>`;
-  return `
-    <div class="popup">
-      <div class="popup-title">${safe(p.job_name)}</div>
-      <div class="popup-sub"><b>Owner:</b> ${safe(p.owner)} · <b>Tag:</b> ${safe(p.tag)} · <b>SCID:</b> ${safe(p.SCID)}</div>
-      <div class="small muted" style="margin-bottom:6px"><b>Spec:</b> ${safe(p.pole_spec)} → ${safe(p.proposed_spec)} · <b>MR:</b> ${safe(p.mr_level)} · <b>GPS:</b> ${coord}</div>
-      <div class="small muted" style="margin-bottom:4px">Permits</div>
-      ${permits}
-    </div>`;
+/** Simple toast (uses #toast in index.html) */
+export function toast(text, ms = 1500){
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'block';
+  clearTimeout(el.__t);
+  el.__t = setTimeout(() => { el.style.display = 'none'; }, ms);
 }
