@@ -145,7 +145,8 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
     for (const b of STATE.badges) map.removeLayer(b);
     STATE.areas=[]; STATE.badges=[];
   } else {
-    STATE.areas = buildJobAreas(map, STATE.poles);
+    /*STATE.areas = buildJobAreas(map, STATE.poles); */
+    STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey);
     STATE.badges = buildAreaBadges(map, STATE.poles, STATE.byKey);
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
