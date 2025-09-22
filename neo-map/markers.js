@@ -1,4 +1,7 @@
 // neo-map/markers.js
+// Build pole markers (cluster children) and return bounds.
+// Shapes by owner: BPUB=circle, AEP=triangle, MVEC=square.
+
 import { poleKey } from './data.js';
 
 function dominantStatusFor(permits){
@@ -13,30 +16,35 @@ function dominantStatusFor(permits){
     s => s === 'Created - NOT Submitted',
     s => s === 'Approved'
   ];
-  for (const pred of order){ const hit = ss.find(pred); if (hit) return hit; }
+  for (const pred of order){
+    const hit = ss.find(pred);
+    if (hit) return hit.includes('Not Approved - *') ? 'Not Approved - Other Issues' : hit;
+  }
   return ss[0] || 'NONE';
 }
 
+// Inline SVG icons (crisp at small sizes)
 const NS = 'http://www.w3.org/2000/svg';
-const ICON_PX = 22;
-const FILL    = 'rgba(148,160,180,0.65)';
-const STROKE  = 'rgba(255,255,255,0.92)';
+const ICON_PX = 22; // visual size
+const FILL    = 'rgba(148,160,180,0.65)';   // same soft slate you use in the legend
+const STROKE  = 'rgba(255,255,255,0.92)';   // white outline
 const STROKE_W = 3;
 
-function svgEl(tag, attrs){ const el = document.createElementNS(NS, tag); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+function svgEl(name, attrs){ const el = document.createElementNS(NS, name); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
 
 function iconSVG(owner){
   const svg = svgEl('svg', { viewBox:'0 0 24 24' });
-  const u = String(owner||'').toUpperCase();
   let shape;
-  if (u === 'BPUB'){
+  const u = String(owner||'').toUpperCase();
+  if (u === 'BPUB') {
     shape = svgEl('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  } else if (u === 'AEP'){
+  } else if (u === 'AEP') {
     shape = svgEl('polygon', { points:'12,3 21,21 3,21', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
-  } else if (u === 'MVEC'){
-    // SQUARE (rounded corners) — this is the change
+  } else if (u === 'MVEC') {
+    // SQUARE (changed from diamond)
     shape = svgEl('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else {
+    // default
     shape = svgEl('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   }
   svg.appendChild(shape);
@@ -58,7 +66,8 @@ function makeIcon(owner){
 
 export function buildMarkers(map, cluster, poles, byKey, popupHTML){
   cluster.clearLayers();
-  let bounds = null, llb = null;
+  let bounds = null;
+  let llb = null;
 
   for (const p of (poles||[])){
     if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
@@ -66,12 +75,21 @@ export function buildMarkers(map, cluster, poles, byKey, popupHTML){
     const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
 
-    const m = L.marker([p.lat, p.lon], { icon: makeIcon(p.owner), __status: status });
-    if (typeof popupHTML === 'function') m.bindPopup(popupHTML(p, rel));
+    const m = L.marker([p.lat, p.lon], {
+      icon: makeIcon(p.owner),
+      __status: status  // used by your cluster coloring
+    });
+
+    if (typeof popupHTML === 'function') {
+      m.bindPopup(popupHTML(p, rel));
+    }
+
     cluster.addLayer(m);
 
-    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]);
+    else llb.extend([p.lat, p.lon]);
   }
+
   if (llb) bounds = llb;
   return bounds;
 }
