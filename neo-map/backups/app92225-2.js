@@ -11,7 +11,7 @@ const map = L.map('map', { zoomControl:false, preferCanvas:true });
 L.control.zoom({ position:'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO' }).addTo(map);
 
-/* ───────────────────────────── VIEW PERSISTENCE ───────────────────────────── */
+// [VIEW-PERSISTENCE] — save/restore current view
 const VIEW_KEY = 'neo-map:view';
 function saveView(m){
   try{
@@ -23,12 +23,13 @@ function saveView(m){
 function readSavedView(){
   try{ const s = localStorage.getItem(VIEW_KEY); return s ? JSON.parse(s) : null; }catch{ return null; }
 }
-// restore saved view if available (no animation)
+// restore saved view if available (no animation, minimal change to your current behavior)
 (() => {
   const saved = readSavedView();
   if (saved) map.setView([saved.lat, saved.lng], saved.zoom, { animate:false });
 })();
 map.on('moveend zoomend', () => saveView(map));
+// optional: keep tiles sized right on window changes
 window.addEventListener('resize', () => map.invalidateSize());
 
 /* ========= Cluster coloring by dominant permit status (worst → best) ========= */
@@ -142,27 +143,25 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-// Manual refresh
+// NEW: manual refresh button (fetches latest SHAs and reloads)
 const btnRefresh = document.getElementById('btnRefresh');
 if (btnRefresh) {
   btnRefresh.addEventListener('click', async ()=>{
     try{
       toast('Refreshing data…');
 
-      // preserve view
+      // [VIEW-PERSISTENCE] snapshot current view
       const prev = { center: map.getCenter(), zoom: map.getZoom() };
 
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
       renderAll();
 
+      // [VIEW-PERSISTENCE] restore view after layers rebuilt
       requestAnimationFrame(()=>{
         map.setView(prev.center, prev.zoom, { animate:false });
         saveView(map);
       });
-
-      // ensure legend/tools tweaks remain in place
-      tuneLegendAndTools();
 
       toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
     }catch(e){
@@ -224,65 +223,6 @@ document.getElementById('btnReport')?.addEventListener('click', ()=>{
 
 document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeReport());
 
-/* ───────────────────── Legend + Tools fine-tuning (DOM-safe) ───────────────── */
-function tuneLegendAndTools(){
-  try {
-    // 1) Legend: ensure MVEC is a DIAMOND and make utility shapes a bit smaller
-    const legend = document.querySelector('#legend, .legend');
-    if (legend){
-      // Find rows/items that contain the utility labels
-      const rows = Array.from(legend.querySelectorAll('.row, .legend-row, li, .item, .legend-item, div'))
-        .filter(el => /BPUB|AEP|MVEC/i.test(el.textContent||''));
-
-      for (const r of rows){
-        const txt = (r.textContent||'').trim();
-        // try to find a "shape" element inside the row
-        const shape = r.querySelector('.shape, .icon, .legend-shape, span, div');
-        if (!shape) continue;
-
-        // shrink utility shapes (only in legend; not map markers)
-        const addScale = (s) => s ? s + ' scale(0.85)' : 'scale(0.85)';
-
-        if (/MVEC/i.test(txt)) {
-          // rotate to diamond and slightly round corners to match map markers
-          shape.style.transform = addScale(shape.style.transform) + ' rotate(45deg)';
-          shape.style.borderRadius = '6px';
-          shape.style.background = 'transparent';
-          if (!shape.style.border) shape.style.border = '3px solid rgba(255,255,255,0.92)';
-          if (!shape.style.width)  shape.style.width  = '22px';
-          if (!shape.style.height) shape.style.height = '22px';
-        } else if (/BPUB/i.test(txt)) {
-          shape.style.transform = addScale(shape.style.transform);
-          shape.style.borderRadius = '999px';
-          if (!shape.style.border) shape.style.border = '3px solid rgba(255,255,255,0.92)';
-          if (!shape.style.width)  shape.style.width  = '22px';
-          if (!shape.style.height) shape.style.height = '22px';
-        } else if (/AEP/i.test(txt)) {
-          // triangles are often built with CSS borders; just scale the container
-          shape.style.transform = addScale(shape.style.transform);
-        }
-      }
-
-      // tighten vertical rhythm inside legend a bit
-      legend.style.lineHeight = '1.15';
-    }
-
-    // 2) Map Tools: shorten the explanatory sentence and tighten spacing
-    const tools = document.querySelector('#tools, .tools');
-    if (tools){
-      // Replace long sentence if present
-      const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
-      const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
-      if (long) long.textContent = 'Click a shape to view pole & permits.';
-      // Slightly reduce spacing between elements if the container supports gap
-      if (getComputedStyle(tools).gap) tools.style.gap = '8px';
-    }
-  } catch (e) {
-    // Non-fatal; DOM can vary slightly without breaking the app
-    console.warn('[neo-map] legend/tools tune skipped:', e?.message);
-  }
-}
-
 /* =============================== Boot =============================== */
 (async function(){
   try{
@@ -290,29 +230,26 @@ function tuneLegendAndTools(){
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll();
-    // keep current view + UI polish
-    saveView(map);
-    tuneLegendAndTools();
-
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
 
     // start GH SHA watcher if configured
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
-        // preserve view across auto-refresh
+
+        // [VIEW-PERSISTENCE] snapshot current view before applying update
         const prev = { center: map.getCenter(), zoom: map.getZoom() };
 
         STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll();
 
+        // [VIEW-PERSISTENCE] restore view right after layers update
         requestAnimationFrame(()=>{
           map.setView(prev.center, prev.zoom, { animate:false });
           saveView(map);
-          tuneLegendAndTools();
         });
 
         toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
-      }, 60000); // check every 60s
+      }, 60000); // check every 60s (adjust if you like)
     }
   }catch(e){
     console.error(e);
