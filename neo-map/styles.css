@@ -56,6 +56,14 @@ select,input{border:1px solid var(--border);background:#0f1219;color:var(--fg);p
 }
 
 /* =================== REPORT PANEL =================== */
+/* 92225
+/* Map Tools: center + compact */
+#tools.tools { text-align: center; }
+#tools .btnrow { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+#tools h3 { margin: 0 0 8px; text-align: center; }
+#tools p.small { margin: 8px auto 0; max-width: 380px; }
+/* 92225 */
+
 .hidden{display:none}
 .panel--report{
   top:50%;left:50%;transform:translate(-50%,-50%);

@@ -1,41 +1,77 @@
-import { statusColor, dominantStatusFor } from './data.js';
+// neo-map/markers.js
+import { poleKey } from './data.js';
 
-export function markerSVG(owner, fill, size=28){
-  const stroke='#fff', sw=2, half=size/2;
-  if (owner==='AEP'){
-    return `<svg viewBox="0 0 ${size} ${size}">
-      <polygon points="${half},${sw} ${size-sw},${size-sw} ${sw},${size-sw}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
-    </svg>`;
-  }
-  if (owner==='MVEC'){
-    const r=size*0.34, cx=half, cy=half;
-    return `<svg viewBox="0 0 ${size} ${size}">
-      <polygon points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
-    </svg>`;
-  }
-  return `<svg viewBox="0 0 ${size} ${size}">
-    <circle cx="${half}" cy="${half}" r="${half-4}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
-  </svg>`;
+function dominantStatusFor(permits){
+  if(!permits || !permits.length) return 'NONE';
+  const ss = permits.map(r => String(r.permit_status||'').trim());
+  const order = [
+    s => s.startsWith('Not Approved - Cannot Attach'),
+    s => s.startsWith('Not Approved - PLA Issues'),
+    s => s.startsWith('Not Approved - MRE Issues'),
+    s => s.startsWith('Not Approved - Other Issues'),
+    s => s === 'Submitted - Pending',
+    s => s === 'Created - NOT Submitted',
+    s => s === 'Approved'
+  ];
+  for (const pred of order){ const hit = ss.find(pred); if (hit) return hit; }
+  return ss[0] || 'NONE';
 }
 
-export function shapeIcon(owner, color){
-  return L.divIcon({ className:'shape-icon', html:markerSVG(owner,color), iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-12] });
+const NS = 'http://www.w3.org/2000/svg';
+const ICON_PX = 22;
+const FILL    = 'rgba(148,160,180,0.65)';
+const STROKE  = 'rgba(255,255,255,0.92)';
+const STROKE_W = 3;
+
+function svgEl(tag, attrs){ const el = document.createElementNS(NS, tag); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+
+function iconSVG(owner){
+  const svg = svgEl('svg', { viewBox:'0 0 24 24' });
+  const u = String(owner||'').toUpperCase();
+  let shape;
+  if (u === 'BPUB'){
+    shape = svgEl('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+  } else if (u === 'AEP'){
+    shape = svgEl('polygon', { points:'12,3 21,21 3,21', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+  } else if (u === 'MVEC'){
+    // SQUARE (rounded corners) — this is the change
+    shape = svgEl('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+  } else {
+    shape = svgEl('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
+  }
+  svg.appendChild(shape);
+  svg.style.width = ICON_PX+'px';
+  svg.style.height = ICON_PX+'px';
+  svg.style.display = 'inline-block';
+  return svg.outerHTML;
+}
+
+function makeIcon(owner){
+  return L.divIcon({
+    className: 'pole-icon',
+    html: iconSVG(owner),
+    iconSize: [ICON_PX, ICON_PX],
+    iconAnchor: [ICON_PX/2, ICON_PX/2],
+    popupAnchor: [0, -10]
+  });
 }
 
 export function buildMarkers(map, cluster, poles, byKey, popupHTML){
   cluster.clearLayers();
-  let bounds=null;
-  for(const p of poles){
-    const rel = byKey.get(`${p.job_name}::${p.tag}::${p.SCID}`) || [];
+  let bounds = null, llb = null;
+
+  for (const p of (poles||[])){
+    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+
+    const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
-    const icon = shapeIcon(p.owner, statusColor(status));
-    const m = L.marker([p.lat, p.lon], { icon, renderer:L.canvas() });
-    // store status for cluster color computation
-    m.options.__status = status;
-    m.bindPopup(popupHTML(p, rel), { maxWidth:420, minWidth:320, autoPanPaddingTopLeft:[360,110] });
+
+    const m = L.marker([p.lat, p.lon], { icon: makeIcon(p.owner), __status: status });
+    if (typeof popupHTML === 'function') m.bindPopup(popupHTML(p, rel));
     cluster.addLayer(m);
-    bounds = bounds ? bounds.extend(m.getLatLng()) : L.latLngBounds(m.getLatLng(), m.getLatLng());
+
+    if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
   }
-  if (bounds) map.fitBounds(bounds.pad(0.15));
+  if (llb) bounds = llb;
   return bounds;
 }

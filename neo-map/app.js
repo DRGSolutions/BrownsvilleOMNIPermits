@@ -11,26 +11,6 @@ const map = L.map('map', { zoomControl:false, preferCanvas:true });
 L.control.zoom({ position:'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO' }).addTo(map);
 
-/* ───────────────────────────── VIEW PERSISTENCE ───────────────────────────── */
-const VIEW_KEY = 'neo-map:view';
-function saveView(m){
-  try{
-    if(!m || !m._loaded) return;
-    const c = m.getCenter(), z = m.getZoom();
-    localStorage.setItem(VIEW_KEY, JSON.stringify({lat:c.lat, lng:c.lng, zoom:z}));
-  }catch{}
-}
-function readSavedView(){
-  try{ const s = localStorage.getItem(VIEW_KEY); return s ? JSON.parse(s) : null; }catch{ return null; }
-}
-// restore saved view if available (no animation)
-(() => {
-  const saved = readSavedView();
-  if (saved) map.setView([saved.lat, saved.lng], saved.zoom, { animate:false });
-})();
-map.on('moveend zoomend', () => saveView(map));
-window.addEventListener('resize', () => map.invalidateSize());
-
 /* ========= Cluster coloring by dominant permit status (worst → best) ========= */
 const STATUS_ORDER = [
   s => String(s||'').startsWith('Not Approved -'),
@@ -142,28 +122,15 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-// Manual refresh
+// NEW: manual refresh button (fetches latest SHAs and reloads)
 const btnRefresh = document.getElementById('btnRefresh');
 if (btnRefresh) {
   btnRefresh.addEventListener('click', async ()=>{
     try{
       toast('Refreshing data…');
-
-      // preserve view
-      const prev = { center: map.getCenter(), zoom: map.getZoom() };
-
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
       renderAll();
-
-      requestAnimationFrame(()=>{
-        map.setView(prev.center, prev.zoom, { animate:false });
-        saveView(map);
-      });
-
-      // ensure legend/tools tweaks remain in place
-      tuneLegendAndTools();
-
       toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
     }catch(e){
       console.error(e);
@@ -224,127 +191,6 @@ document.getElementById('btnReport')?.addEventListener('click', ()=>{
 
 document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeReport());
 
-/* ───────────────────── Legend + Tools fine-tuning (DOM-safe) ───────────────── */
-function tuneLegendAndTools(){
-  try {
-    const legend = document.getElementById('legend') || document.querySelector('.legend');
-    if (!legend) return;
-
-    // Clean up anything from earlier attempts
-    legend.querySelectorAll('.shape-icon').forEach(n => n.remove());
-
-    // --- Read the status chip size from "Approved" so our utility shapes are a touch smaller
-    let chipPx = 20, approvedSwatch = null;
-    const approvedRow = Array.from(legend.querySelectorAll('*')).find(el => /\bApproved\b/i.test(el.textContent || ''));
-    if (approvedRow){
-      approvedSwatch = Array.from(approvedRow.querySelectorAll('i,b,span,em,div,.swatch,.chip,.color,.dot'))
-        .find(e => {
-          const cs = getComputedStyle(e); const w = parseFloat(cs.width), h = parseFloat(cs.height);
-          return w>8 && w<40 && Math.abs(w-h)<3;
-        }) || null;
-      if (approvedSwatch){
-        const cs = getComputedStyle(approvedSwatch);
-        chipPx = Math.round(Math.min(parseFloat(cs.width)||20, parseFloat(cs.height)||20));
-        // restore Approved chip color
-        const desired = (getComputedStyle(document.documentElement).getPropertyValue('--chip-approved') || '').trim() || '#34d399';
-        approvedSwatch.style.backgroundColor = desired;
-        approvedSwatch.style.borderColor = desired;
-      }
-    }
-    const ICON_PX = Math.max(14, Math.round(chipPx * 0.85)); // utility shapes a bit smaller than status chips
-
-    // Sample fill/border from BPUB so all three utility icons match your theme exactly
-    let fill   = 'rgba(148,160,180,0.65)';
-    let stroke = 'rgba(255,255,255,0.92)';
-    let strokeW = 3;
-    const bpubRow = Array.from(legend.querySelectorAll('*')).find(el => /\bBPUB\b/i.test(el.textContent || ''));
-    if (bpubRow){
-      const sample = Array.from(bpubRow.querySelectorAll('span,div,i,b,svg')).find(e => {
-        const cs = getComputedStyle(e); const w = parseFloat(cs.width), h = parseFloat(cs.height);
-        return w>8 && w<40 && Math.abs(w-h)<3;
-      });
-      if (sample){
-        const cs = getComputedStyle(sample);
-        if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') fill = cs.backgroundColor;
-        const bc = cs.borderTopColor || cs.borderColor; if (bc) stroke = bc;
-        const bw = parseFloat(cs.borderTopWidth); if (!isNaN(bw) && bw>0) strokeW = bw;
-      }
-    }
-
-    // Helper: replace the leading small square-ish node in a row with our SVG icon
-    function replaceIcon(labelRe, makeSvg){
-      const row = Array.from(legend.querySelectorAll('*')).find(el => labelRe.test((el.textContent||'').trim()));
-      if (!row) return;
-      let holder = Array.from(row.children).find(ch => {
-        const cs = getComputedStyle(ch); const w = parseFloat(cs.width), h = parseFloat(cs.height);
-        return w>8 && w<40 && Math.abs(w-h)<3;
-      });
-      if (!holder){
-        holder = document.createElement('span');
-        row.insertBefore(holder, row.firstChild);
-      }
-      // Nuke existing visuals in that holder and drop in our SVG
-      holder.innerHTML = '';
-      holder.removeAttribute('style');
-      holder.className = '';
-      const svg = makeSvg(ICON_PX, fill, stroke, strokeW);
-      // Make the SVG behave like the original chip
-      svg.style.width = ICON_PX + 'px';
-      svg.style.height = ICON_PX + 'px';
-      svg.style.display = 'inline-block';
-      svg.style.marginRight = '10px';
-      svg.style.verticalAlign = 'middle';
-      holder.replaceWith(svg);
-    }
-
-    const NS = 'http://www.w3.org/2000/svg';
-    const makeCircle = (px, fill, stroke, w) => {
-      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
-      const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx','12'); c.setAttribute('cy','12'); c.setAttribute('r','8');
-      c.setAttribute('fill', fill); c.setAttribute('stroke', stroke); c.setAttribute('stroke-width', String(w));
-      s.appendChild(c); return s;
-    };
-    const makeTriangle = (px, fill, stroke, w) => {
-      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
-      const p = document.createElementNS(NS, 'polygon'); p.setAttribute('points','12,3 21,21 3,21');
-      p.setAttribute('fill', fill); p.setAttribute('stroke', stroke); p.setAttribute('stroke-width', String(w));
-      s.appendChild(p); return s;
-    };
-    // MVEC: diamond built from TWO triangles + an outline (no rotated containers)
-    const makeDiamondFromTriangles = (px, fill, stroke, w) => {
-      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
-      // Top half triangle
-      const t = document.createElementNS(NS, 'polygon');
-      t.setAttribute('points','12,2.5 21.5,12 12,12 2.5,12');
-      t.setAttribute('fill', fill); t.setAttribute('stroke','none');
-      // Bottom half triangle
-      const b = document.createElementNS(NS, 'polygon');
-      b.setAttribute('points','12,21.5 21.5,12 12,12 2.5,12');
-      b.setAttribute('fill', fill); b.setAttribute('stroke','none');
-      // Outer diamond outline
-      const d = document.createElementNS(NS, 'polygon');
-      d.setAttribute('points','12,2.5 21.5,12 12,21.5 2.5,12');
-      d.setAttribute('fill','none'); d.setAttribute('stroke', stroke); d.setAttribute('stroke-width', String(w));
-      s.appendChild(t); s.appendChild(b); s.appendChild(d);
-      return s;
-    };
-
-    replaceIcon(/\bBPUB\b/i, makeCircle);
-    replaceIcon(/\bAEP\b/i , makeTriangle);
-    replaceIcon(/\bMVEC\b/i, makeDiamondFromTriangles);
-
-    // Short, professional tools note
-    const tools = document.getElementById('tools') || document.querySelector('.tools');
-    if (tools){
-      const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
-      const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
-      if (long) long.textContent = 'Click a shape to view pole & permits.';
-    }
-  } catch (e) {
-    console.warn('[neo-map] legend/tools tune failed:', e);
-  }
-}
-
 /* =============================== Boot =============================== */
 (async function(){
   try{
@@ -352,29 +198,15 @@ function tuneLegendAndTools(){
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll();
-    // keep current view + UI polish
-    saveView(map);
-    tuneLegendAndTools();
-
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
 
     // start GH SHA watcher if configured
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
-        // preserve view across auto-refresh
-        const prev = { center: map.getCenter(), zoom: map.getZoom() };
-
         STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll();
-
-        requestAnimationFrame(()=>{
-          map.setView(prev.center, prev.zoom, { animate:false });
-          saveView(map);
-          tuneLegendAndTools();
-        });
-
         toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
-      }, 60000); // check every 60s
+      }, 60000); // check every 60s (adjust if you like)
     }
   }catch(e){
     console.error(e);

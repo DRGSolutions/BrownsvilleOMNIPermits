@@ -80,10 +80,9 @@
           <svg viewBox="0 0 24 24"><polygon points="12,4 20,20 4,20" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
           <div>AEP (triangle)</div>
         </div>
-        <!-- MVEC legend row (square) -->
         <div class="item">
-          <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
-          <div>MVEC (square)</div>
+          <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="2" fill="#94a3b8" stroke="white" stroke-width="2"/></svg>
+          <div>MVEC (diamond)</div>
         </div>
       </div>
       <div>
@@ -99,17 +98,17 @@
   </aside>
 
   <!-- TOOLS (Top-Right) -->
-  <!-- Map Tools card -->
-<div id="tools" class="tools">
-  <h3>Map Tools</h3>
-  <div class="btnrow">
-    <button id="btnFit" class="btn">Fit to Poles</button>
-    <button id="btnToggleAreas" class="btn">Toggle Job Areas</button>
-    <button id="btnReport" class="btn btn-accent">Open Insights</button>
-    <button id="btnRefresh" class="btn">Refresh Data</button>
-  </div>
-  <p class="muted small">Click a shape to view pole &amp; permits.</p>
-</div>
+  <aside id="tools" class="panel panel--tools">
+    <h3>Map Tools</h3>
+    <div class="row">
+      <button id="btnFit" class="btn">Fit to Poles</button>
+      <button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button>
+      <!-- NEW: Insights button -->
+      <button id="btnReport" class="btn btn-accent">Open Insights</button>
+      <button id="btnRefresh" class="btn">Refresh Data</button>
+    </div>
+    <small class="muted">Click a shape to view pole & permits. Areas are precise concave hulls per job with overlap-aware outlines.</small>
+  </aside>
 
   <!-- Toast -->
   <div id="toast"></div>
