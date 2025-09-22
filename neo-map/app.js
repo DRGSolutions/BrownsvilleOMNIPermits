@@ -227,101 +227,92 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
 /* ───────────────────── Legend + Tools fine-tuning (DOM-safe) ───────────────── */
 function tuneLegendAndTools(){
   try {
-    /* ---------------- Legend: safe redraw of utility shapes ---------------- */
     const legend = document.querySelector('#legend, .legend');
     if (legend){
-      // 0) Undo any accidental rotations from earlier versions (safety net)
+      // Clean up anything my earlier attempt might have injected
+      legend.querySelectorAll('.shape-icon').forEach(n => n.remove());
       legend.querySelectorAll('[style]').forEach(el => {
-        if (el.style.transform && /rotate\(/.test(el.style.transform)) el.style.transform = '';
-      });
-
-      // 1) Find rows by label text; then inject a small SVG icon at the start.
-      const findRow = (re) => {
-        const candidates = Array.from(
-          legend.querySelectorAll('.legend-item, .row, li, .item, .legend-row, div')
-        );
-        return candidates.find(el => re.test((el.textContent || '').trim()));
-      };
-
-      const ensureIcon = (row) => {
-        if (!row) return null;
-        // If we already drew one before, reuse it
-        let holder = row.querySelector('.shape-icon');
-        if (!holder){
-          holder = document.createElement('span');
-          holder.className = 'shape-icon';
-          // place before any text
-          if (row.firstChild) row.insertBefore(holder, row.firstChild);
-          else row.appendChild(holder);
+        if (el.style.transform && /rotate\(/.test(el.style.transform)) {
+          // remove ONLY rotate(), keep other transforms if present
+          el.style.transform = el.style.transform.replace(/rotate\([^)]*\)/g,'').trim();
+          if (!el.style.transform) el.style.removeProperty('transform');
         }
-        return holder;
-      };
+      });
+      const oldCss = document.getElementById('legend-shape-css');
+      if (oldCss) oldCss.remove();
 
-      const svgCircle = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" />
-        </svg>`;
-      const svgTriangle = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <polygon points="12,4 20,20 4,20" />
-        </svg>`;
-      const svgDiamond = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <polygon points="12,3 21,12 12,21 3,12" />
-        </svg>`;
+      // Find the MVEC row strictly inside the legend (don’t grab wrappers)
+      const rows = Array.from(legend.querySelectorAll('*'))
+        .filter(el => el.children && el.children.length && /\bMVEC\b/i.test(el.textContent || ''));
 
-      // Rows
-      const rowBPUB = findRow(/\bBPUB\b/i);
-      const rowAEP  = findRow(/\bAEP\b/i);
-      const rowMVEC = findRow(/\bMVEC\b/i);
+      // pick the *innermost* row that actually contains the MVEC label
+      let mvecRow = null;
+      for (const el of rows){
+        const txt = (el.textContent || '').trim();
+        const parentTxt = (el.parentElement?.textContent || '').trim();
+        if (/\bMVEC\b/i.test(txt) && (!parentTxt || parentTxt.length > txt.length)) { mvecRow = el; break; }
+      }
+      if (!mvecRow) mvecRow = rows[0];
 
-      const hBPUB = ensureIcon(rowBPUB);
-      const hAEP  = ensureIcon(rowAEP);
-      const hMVEC = ensureIcon(rowMVEC);
+      if (mvecRow){
+        // The shape element is usually the first small box/span before the text
+        let shape = mvecRow.querySelector('.shape, .legend-shape, .icon, .swatch, span, i, b');
+        if (!shape || /MVEC/i.test(shape.textContent || '')) {
+          // If we didn’t find a proper shape node, create one right before the label text
+          shape = document.createElement('span');
+          shape.className = 'legend-shape';
+          mvecRow.insertBefore(shape, mvecRow.firstChild);
+        }
 
-      if (hBPUB) hBPUB.innerHTML = svgCircle;
-      if (hAEP)  hAEP.innerHTML  = svgTriangle;
-      if (hMVEC) hMVEC.innerHTML = svgDiamond; // ← diamond for MVEC
-
-      // 2) Hide any pre-existing box/shape elements so we don’t double-render
-      [rowBPUB, rowAEP, rowMVEC].forEach(row => {
-        if (!row) return;
-        const first = row.firstElementChild;
-        if (first && !first.classList.contains('shape-icon')) {
-          // Heuristic: square-ish element with visible border/background
-          const cs = getComputedStyle(first);
-          const w = parseFloat(cs.width), h = parseFloat(cs.height);
-          const hasBorder = ['borderTopStyle','borderRightStyle','borderBottomStyle','borderLeftStyle']
-            .some(k => cs[k] && cs[k] !== 'none');
-          if (Math.abs(w - h) < 2 && (hasBorder || cs.backgroundColor !== 'rgba(0, 0, 0, 0)')) {
-            first.style.display = 'none';
+        // Sample style (size/border/fill) from the BPUB shape so MVEC matches *exactly*
+        let size = 22, borderWidth = '3px', borderColor = 'rgba(255,255,255,0.92)', fill = null;
+        const bpubRow = Array.from(legend.querySelectorAll('*')).find(el => /\bBPUB\b/i.test(el.textContent || ''));
+        if (bpubRow){
+          const sample = bpubRow.querySelector('.shape, .legend-shape, .icon, .swatch, span, i, b') || null;
+          if (sample){
+            const cs = getComputedStyle(sample);
+            const w = parseFloat(cs.width), h = parseFloat(cs.height);
+            if (w > 0 && h > 0) size = Math.round(Math.min(w,h));
+            if (cs.borderTopWidth && cs.borderTopWidth !== '0px') borderWidth = cs.borderTopWidth;
+            if (cs.borderTopColor) borderColor = cs.borderTopColor;
+            if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') fill = cs.backgroundColor;
           }
         }
-      });
+        if (!fill) {
+          // reasonable fallback to your original fill tone
+          fill = 'rgba(148, 160, 180, 0.65)';
+        }
 
-      // 3) One-time CSS for size/appearance (smaller utility icons)
-      if (!document.getElementById('legend-shape-css')) {
-        const style = document.createElement('style');
-        style.id = 'legend-shape-css';
-        style.textContent = `
-          /* Utility shape icons: a touch smaller than status chips */
-          .legend .shape-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:10px;vertical-align:middle}
-          .legend .shape-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
-          .legend{line-height:1.15}
-        `;
-        document.head.appendChild(style);
+        // Build a diamond INSIDE the shape box (so we don’t rotate containers or text)
+        shape.innerHTML = '';
+        shape.style.display = 'inline-block';
+        shape.style.width = `${size}px`;
+        shape.style.height = `${size}px`;
+        shape.style.marginRight = '10px';
+        shape.style.position = 'relative';
+        shape.style.border = '';           // keep container clean
+        shape.style.background = 'transparent';
+        shape.style.borderRadius = '';     // box itself unstyled
+
+        const diamond = document.createElement('span');
+        diamond.style.display = 'block';
+        diamond.style.width = '100%';
+        diamond.style.height = '100%';
+        diamond.style.background = fill;
+        diamond.style.border = `${borderWidth} solid ${borderColor}`;
+        diamond.style.borderRadius = '6px';
+        diamond.style.transform = 'rotate(45deg)';
+        diamond.style.transformOrigin = '50% 50%';
+        shape.appendChild(diamond);
       }
     }
 
-    /* ---------------- Map Tools: shorten explanatory copy ---------------- */
+    // Map Tools copy: keep it short & professional
     const tools = document.querySelector('#tools, .tools');
     if (tools){
       const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
       const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
       if (long) long.textContent = 'Click a shape to view pole & permits.';
-      // Tighten spacing if the container supports CSS gap
-      const cs = getComputedStyle(tools);
-      if (cs.gap && cs.gap !== 'normal') tools.style.gap = '8px';
     }
   } catch (e) {
     console.warn('[neo-map] legend/tools tune failed:', e);
