@@ -83,7 +83,7 @@ function renderAll(filtered=null){
   // rebuild areas + badges if visible
   if (STATE.areasVisible){
     const inView = filtered||STATE.poles;
-    STATE.areas = buildJobAreas(map, inView, STATE.byKey); // in renderAll()
+    STATE.areas = buildJobAreas(map, inView, STATE.byKey);
     STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey); // when toggling ON
     /* STATE.badges = buildAreaBadges(map, inView, STATE.byKey); NEW */
   }
