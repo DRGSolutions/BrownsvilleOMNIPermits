@@ -1,6 +1,8 @@
-// Build per-pole markers (no clustering) and return bounds.
-// Shapes by owner: BPUB = circle, AEP = triangle, MVEC = square.
-// Marker FILL = dominant PERMIT STATUS color for that pole (so max zoom reads right).
+// Per-pole markers with LOD modes:
+//   mode='none'  → draw nothing (compute bounds only)
+//   mode='dots'  → ultra-fast Canvas dots (no popup, tiny radius)
+//   mode='shapes'→ full SVG icons per owner (BPUB circle, AEP triangle, MVEC square)
+// Fill color = dominant permit status for that pole.
 
 import { poleKey, statusColor } from './data.js';
 
@@ -24,6 +26,7 @@ const NS = 'http://www.w3.org/2000/svg';
 const ICON_PX  = 22;
 const STROKE   = 'rgba(255,255,255,0.92)';
 const STROKE_W = 3;
+const CANVAS = L.canvas({ padding: 0.4 }); // shared canvas renderer
 
 function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
 
@@ -58,10 +61,44 @@ function makeIcon(owner, status){
   });
 }
 
-export function buildMarkers(map, layer, poles, byKey, popupHTML){
+export function buildMarkers(map, layer, poles, byKey, popupHTML, mode='shapes'){
   if (layer && layer.clearLayers) layer.clearLayers();
+
   let bounds = null, llb = null;
 
+  if (mode === 'none') {
+    for (const p of (poles||[])){
+      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+      if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+    }
+    return llb || null;
+  }
+
+  if (mode === 'dots'){
+    for (const p of (poles||[])){
+      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+
+      const rel = byKey.get(poleKey(p)) || [];
+      const status = dominantStatusFor(rel);
+      const fill = statusColor(status);
+
+      const dot = L.circleMarker([p.lat, p.lon], {
+        renderer: CANVAS,
+        radius: 2.2,          // tiny + cheap
+        stroke: false,
+        fill: true,
+        fillOpacity: 0.9,
+        fillColor: fill,
+        interactive: false    // no events at low zoom
+      });
+      if (layer) layer.addLayer(dot); else dot.addTo(map);
+
+      if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
+    }
+    return llb || null;
+  }
+
+  // mode === 'shapes'
   for (const p of (poles||[])){
     if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
 
@@ -79,6 +116,5 @@ export function buildMarkers(map, layer, poles, byKey, popupHTML){
     if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
   }
 
-  if (llb) bounds = llb;
-  return bounds;
+  return llb || null;
 }

@@ -5,14 +5,29 @@ import { ruleRow, readRules, matchRule } from './filters.js';
 import { popupHTML, toast } from './ui.js';
 import { openReport, closeReport } from './report.js';
 
+/* ────────────────────────── LOD (level of detail) ──────────────────────────
+   - zoom < 11  → NO per-pole markers (only areas/labels)
+   - 11 ≤ zoom < 14 → fast Canvas dots (tiny, no popups)
+   - zoom ≥ 14 → full SVG shape markers with popups
+*/
+const LOD = { DOT_MIN: 11, SHAPE_MIN: 14 };
+
+function markerMode(z) {
+  if (z < LOD.DOT_MIN) return 'none';
+  if (z < LOD.SHAPE_MIN) return 'dots';
+  return 'shapes';
+}
+
+/* ─────────────────────────────── STATE ─────────────────────────────── */
 const STATE = {
   poles: [],
   permits: [],
   byKey: new Map(),
-  markerLayer: null,     // ← no clustering; simple layer group
+  markerLayer: null,     // simple LayerGroup (no clustering)
   areas: [],
   areasVisible: true,
   bounds: null,
+  filtered: null,        // remember current filtered set for LOD redraws
   shas: { poles: null, permits: null },
   watcherStop: null
 };
@@ -37,10 +52,13 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
 STATE.markerLayer = L.layerGroup().addTo(map);
 
 /* ============================= Rendering ============================= */
-function renderAll(filtered = null) {
-  // markers
-  STATE.bounds = buildMarkers(map, STATE.markerLayer, filtered || STATE.poles, STATE.byKey, popupHTML);
+function renderMarkers() {
+  const mode = markerMode(map.getZoom());
+  const data = STATE.filtered || STATE.poles;
+  STATE.bounds = buildMarkers(map, STATE.markerLayer, data, STATE.byKey, popupHTML, mode);
+}
 
+function renderAreas() {
   // clear old areas
   if (STATE.areas.length) {
     for (const a of STATE.areas) {
@@ -50,14 +68,26 @@ function renderAll(filtered = null) {
     }
     STATE.areas = [];
   }
-
-  // rebuild areas
   if (STATE.areasVisible) {
-    const inView = filtered || STATE.poles;
-    STATE.areas = buildJobAreas(map, inView, STATE.byKey);
+    const data = STATE.filtered || STATE.poles;
+    STATE.areas = buildJobAreas(map, data, STATE.byKey);
   }
 }
 
+function renderAll(filtered = null) {
+  STATE.filtered = filtered;
+  renderMarkers();
+  renderAreas();
+}
+
+/* LOD redraw on zoom (debounced to avoid thrash) */
+let lodT = null;
+map.on('zoomend', () => {
+  clearTimeout(lodT);
+  lodT = setTimeout(() => renderMarkers(), 60);
+});
+
+/* ============================= Filters ============================= */
 function applyFilters() {
   const spec = readRules();
   const result = STATE.poles.filter(p => {
@@ -91,7 +121,7 @@ document.getElementById('btnClear').addEventListener('click', () => {
   document.getElementById('qStatus').value = '';
   document.getElementById('qSearch').value = '';
   document.getElementById('rules').innerHTML = '';
-  renderAll();
+  renderAll(null);
 });
 document.getElementById('qOwner').addEventListener('change', applyFilters);
 document.getElementById('qStatus').addEventListener('change', applyFilters);
@@ -112,7 +142,7 @@ document.getElementById('btnToggleAreas').addEventListener('click', () => {
     }
     STATE.areas = [];
   } else {
-    STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey);
+    renderAreas();
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
@@ -125,7 +155,7 @@ if (btnRefresh) {
       toast('Refreshing data…');
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
-      renderAll();
+      renderAll(STATE.filtered); // keep current filter if any
 
       requestAnimationFrame(() => {
         map.invalidateSize();
@@ -193,10 +223,9 @@ document.getElementById('btnReportClose')?.addEventListener('click', () => close
     toast('Loading poles & permits…');
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
-    renderAll();
+    renderAll(null);
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles ? ` @ ${shas.poles.slice(0, 7)}…` : ''})`);
 
-    // first paint: ensure tiles + markers appear
     requestAnimationFrame(() => {
       map.invalidateSize();
       if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
@@ -205,7 +234,7 @@ document.getElementById('btnReportClose')?.addEventListener('click', () => close
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas }) => {
         STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
-        renderAll();
+        renderAll(STATE.filtered);
         toast(`Auto-updated @ ${shas.poles.slice(0, 7)}…`);
       }, 60000);
     }
