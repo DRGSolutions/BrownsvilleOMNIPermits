@@ -19,8 +19,19 @@ const STATE = {
 
 const map = L.map('map', { zoomControl: false, preferCanvas: true });
 L.control.zoom({ position: 'bottomright' }).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+
+/* ── Base tiles: DARK (no labels) + labels-only overlay in a higher pane ── */
+const labelsPane = map.createPane('labels');
+labelsPane.style.zIndex = '650';              // above polygons/overlays
+labelsPane.style.pointerEvents = 'none';      // labels must not eat clicks
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
   attribution: '© OpenStreetMap © CARTO'
+}).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  pane: 'labels'
 }).addTo(map);
 
 /* ========= Cluster coloring by dominant permit status (worst → best) ========= */
@@ -67,34 +78,10 @@ STATE.cluster = L.markerClusterGroup({
 });
 map.addLayer(STATE.cluster);
 
-/* ===== Purge any leftover non-clickable badges (from older builds) ===== */
-function purgeNonClickableBadges() {
-  try {
-    const toRemove = [];
-    map.eachLayer((l) => {
-      if (l instanceof L.Marker) {
-        const icon = l.options?.icon?.options || {};
-        const cls = String(icon.className || '');
-        const html = String(icon.html || '');
-        const interactive = l.options?.interactive !== false; // true if undefined
-        // Heuristics: old badges used these classes OR were non-interactive markers.
-        if (!interactive || /area-badge|badge/i.test(cls) || /area-badge/i.test(html)) {
-          toRemove.push(l);
-        }
-      }
-    });
-    toRemove.forEach(l => map.removeLayer(l));
-    // Belt & suspenders: remove stray DOM nodes if any were injected directly
-    document.querySelectorAll('.area-badge, .area-badge-ic').forEach(n => n.remove());
-  } catch {}
-}
-
 /* ============================= Rendering ============================= */
 function renderAll(filtered = null) {
-  // markers
   STATE.bounds = buildMarkers(map, STATE.cluster, filtered || STATE.poles, STATE.byKey, popupHTML);
 
-  // clear old areas
   if (STATE.areas.length) {
     for (const a of STATE.areas) {
       if (a.layer) map.removeLayer(a.layer);
@@ -104,14 +91,10 @@ function renderAll(filtered = null) {
     STATE.areas = [];
   }
 
-  // rebuild areas
   if (STATE.areasVisible) {
     const inView = filtered || STATE.poles;
     STATE.areas = buildJobAreas(map, inView, STATE.byKey);
   }
-
-  // hard-remove any legacy, non-clickable badges
-  purgeNonClickableBadges();
 }
 
 function applyFilters() {
@@ -170,7 +153,6 @@ document.getElementById('btnToggleAreas').addEventListener('click', () => {
   } else {
     STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey);
   }
-  purgeNonClickableBadges();
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
@@ -253,6 +235,7 @@ document.getElementById('btnReportClose')?.addEventListener('click', () => close
     renderAll();
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles ? ` @ ${shas.poles.slice(0, 7)}…` : ''})`);
 
+    // first paint: ensure tiles + markers appear
     requestAnimationFrame(() => {
       map.invalidateSize();
       if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
