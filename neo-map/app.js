@@ -227,59 +227,104 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
 /* ───────────────────── Legend + Tools fine-tuning (DOM-safe) ───────────────── */
 function tuneLegendAndTools(){
   try {
-    // 1) Legend: ensure MVEC is a DIAMOND and make utility shapes a bit smaller
+    /* ---------------- Legend: safe redraw of utility shapes ---------------- */
     const legend = document.querySelector('#legend, .legend');
     if (legend){
-      // Find rows/items that contain the utility labels
-      const rows = Array.from(legend.querySelectorAll('.row, .legend-row, li, .item, .legend-item, div'))
-        .filter(el => /BPUB|AEP|MVEC/i.test(el.textContent||''));
+      // 0) Undo any accidental rotations from earlier versions (safety net)
+      legend.querySelectorAll('[style]').forEach(el => {
+        if (el.style.transform && /rotate\(/.test(el.style.transform)) el.style.transform = '';
+      });
 
-      for (const r of rows){
-        const txt = (r.textContent||'').trim();
-        // try to find a "shape" element inside the row
-        const shape = r.querySelector('.shape, .icon, .legend-shape, span, div');
-        if (!shape) continue;
+      // 1) Find rows by label text; then inject a small SVG icon at the start.
+      const findRow = (re) => {
+        const candidates = Array.from(
+          legend.querySelectorAll('.legend-item, .row, li, .item, .legend-row, div')
+        );
+        return candidates.find(el => re.test((el.textContent || '').trim()));
+      };
 
-        // shrink utility shapes (only in legend; not map markers)
-        const addScale = (s) => s ? s + ' scale(0.85)' : 'scale(0.85)';
-
-        if (/MVEC/i.test(txt)) {
-          // rotate to diamond and slightly round corners to match map markers
-          shape.style.transform = addScale(shape.style.transform) + ' rotate(45deg)';
-          shape.style.borderRadius = '6px';
-          shape.style.background = 'transparent';
-          if (!shape.style.border) shape.style.border = '3px solid rgba(255,255,255,0.92)';
-          if (!shape.style.width)  shape.style.width  = '22px';
-          if (!shape.style.height) shape.style.height = '22px';
-        } else if (/BPUB/i.test(txt)) {
-          shape.style.transform = addScale(shape.style.transform);
-          shape.style.borderRadius = '999px';
-          if (!shape.style.border) shape.style.border = '3px solid rgba(255,255,255,0.92)';
-          if (!shape.style.width)  shape.style.width  = '22px';
-          if (!shape.style.height) shape.style.height = '22px';
-        } else if (/AEP/i.test(txt)) {
-          // triangles are often built with CSS borders; just scale the container
-          shape.style.transform = addScale(shape.style.transform);
+      const ensureIcon = (row) => {
+        if (!row) return null;
+        // If we already drew one before, reuse it
+        let holder = row.querySelector('.shape-icon');
+        if (!holder){
+          holder = document.createElement('span');
+          holder.className = 'shape-icon';
+          // place before any text
+          if (row.firstChild) row.insertBefore(holder, row.firstChild);
+          else row.appendChild(holder);
         }
-      }
+        return holder;
+      };
 
-      // tighten vertical rhythm inside legend a bit
-      legend.style.lineHeight = '1.15';
+      const svgCircle = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" />
+        </svg>`;
+      const svgTriangle = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <polygon points="12,4 20,20 4,20" />
+        </svg>`;
+      const svgDiamond = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <polygon points="12,3 21,12 12,21 3,12" />
+        </svg>`;
+
+      // Rows
+      const rowBPUB = findRow(/\bBPUB\b/i);
+      const rowAEP  = findRow(/\bAEP\b/i);
+      const rowMVEC = findRow(/\bMVEC\b/i);
+
+      const hBPUB = ensureIcon(rowBPUB);
+      const hAEP  = ensureIcon(rowAEP);
+      const hMVEC = ensureIcon(rowMVEC);
+
+      if (hBPUB) hBPUB.innerHTML = svgCircle;
+      if (hAEP)  hAEP.innerHTML  = svgTriangle;
+      if (hMVEC) hMVEC.innerHTML = svgDiamond; // ← diamond for MVEC
+
+      // 2) Hide any pre-existing box/shape elements so we don’t double-render
+      [rowBPUB, rowAEP, rowMVEC].forEach(row => {
+        if (!row) return;
+        const first = row.firstElementChild;
+        if (first && !first.classList.contains('shape-icon')) {
+          // Heuristic: square-ish element with visible border/background
+          const cs = getComputedStyle(first);
+          const w = parseFloat(cs.width), h = parseFloat(cs.height);
+          const hasBorder = ['borderTopStyle','borderRightStyle','borderBottomStyle','borderLeftStyle']
+            .some(k => cs[k] && cs[k] !== 'none');
+          if (Math.abs(w - h) < 2 && (hasBorder || cs.backgroundColor !== 'rgba(0, 0, 0, 0)')) {
+            first.style.display = 'none';
+          }
+        }
+      });
+
+      // 3) One-time CSS for size/appearance (smaller utility icons)
+      if (!document.getElementById('legend-shape-css')) {
+        const style = document.createElement('style');
+        style.id = 'legend-shape-css';
+        style.textContent = `
+          /* Utility shape icons: a touch smaller than status chips */
+          .legend .shape-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:10px;vertical-align:middle}
+          .legend .shape-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
+          .legend{line-height:1.15}
+        `;
+        document.head.appendChild(style);
+      }
     }
 
-    // 2) Map Tools: shorten the explanatory sentence and tighten spacing
+    /* ---------------- Map Tools: shorten explanatory copy ---------------- */
     const tools = document.querySelector('#tools, .tools');
     if (tools){
-      // Replace long sentence if present
       const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
       const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
       if (long) long.textContent = 'Click a shape to view pole & permits.';
-      // Slightly reduce spacing between elements if the container supports gap
-      if (getComputedStyle(tools).gap) tools.style.gap = '8px';
+      // Tighten spacing if the container supports CSS gap
+      const cs = getComputedStyle(tools);
+      if (cs.gap && cs.gap !== 'normal') tools.style.gap = '8px';
     }
   } catch (e) {
-    // Non-fatal; DOM can vary slightly without breaking the app
-    console.warn('[neo-map] legend/tools tune skipped:', e?.message);
+    console.warn('[neo-map] legend/tools tune failed:', e);
   }
 }
 
