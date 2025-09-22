@@ -1,184 +1,156 @@
-// Clickable job areas (concave hulls) + the ORIGINAL clickable circle label.
-// - Label fill = dominant permit status color for that area.
-// - Polygon fill shows the status MIX proportionally using an SVG linearGradient.
+import { hashColor } from './data.js';
 
-import { poleKey, statusColor } from './data.js';
+// ---------- internal helpers ----------
+const km = m => m/1000;
+const bboxIntersects = (a,b) => !(b[0]>a[2] || b[2]<a[0] || b[3]<a[1] || b[1]>a[3]);
 
-// ───────── status helpers ─────────
-function bucket(status) {
-  const s = String(status || '').trim();
-  if (s === 'Approved') return 'Approved';
-  if (s === 'Submitted - Pending') return 'Submitted - Pending';
-  if (s === 'Created - NOT Submitted') return 'Created - NOT Submitted';
-  if (s.startsWith('Not Approved - Cannot Attach')) return 'Not Approved - Cannot Attach';
-  if (s.startsWith('Not Approved -')) return 'Not Approved - Other Issues';
-  return 'NONE';
+// singletons created once per map
+let SVG_GLOW = null, SVG_EDGE = null;
+
+function ensurePanesAndRenderers(map){
+  // panes: above tiles, below markers
+  if (!map.getPane('jobGlow')) {
+    const glow = map.createPane('jobGlow'); glow.style.zIndex = 420; glow.style.pointerEvents = 'none';
+  }
+  if (!map.getPane('jobEdge')) {
+    const edge = map.createPane('jobEdge'); edge.style.zIndex = 430; edge.style.pointerEvents = 'none';
+  }
+  if (!map.getPane('jobLabel')) {
+    const lbl = map.createPane('jobLabel'); lbl.style.zIndex = 440; lbl.style.pointerEvents = 'none';
+  }
+
+  // force **SVG** renderers so pane ordering is respected even with preferCanvas:true
+  if (!SVG_GLOW) SVG_GLOW = L.svg({ pane:'jobGlow' });
+  if (!SVG_EDGE) SVG_EDGE = L.svg({ pane:'jobEdge' });
+
+  // attach once
+  if (!SVG_GLOW._map) SVG_GLOW.addTo(map);
+  if (!SVG_EDGE._map) SVG_EDGE.addTo(map);
 }
-function dominantStatus(permits) {
-  if (!permits || !permits.length) return 'NONE';
-  const ss = permits.map(r => String(r.permit_status || '').trim());
-  const order = [
-    s => s.startsWith('Not Approved - Cannot Attach'),
-    s => s.startsWith('Not Approved - PLA Issues'),
-    s => s.startsWith('Not Approved - MRE Issues'),
-    s => s.startsWith('Not Approved - Other Issues'),
-    s => s === 'Submitted - Pending',
-    s => s === 'Created - NOT Submitted',
-    s => s === 'Approved'
-  ];
-  for (const pred of order) {
-    const hit = ss.find(pred);
-    if (hit) {
-      return hit.startsWith('Not Approved -') && !hit.startsWith('Not Approved - Cannot Attach')
-        ? 'Not Approved - Other Issues'
-        : hit;
+
+// median nearest-neighbor spacing (meters) → robust scale for hulls
+function medianNN(pointsLngLat){
+  if (pointsLngLat.length < 2) return 80; // ~80 m default
+  const pts = pointsLngLat.map(p => turf.point(p));
+  const dists = [];
+  for (let i=0;i<pts.length;i++){
+    let best = Infinity;
+    for (let j=0;j<pts.length;j++){
+      if (i===j) continue;
+      const d = turf.distance(pts[i], pts[j], { units:'meters' });
+      if (d < best) best = d;
     }
+    if (best < Infinity) dists.push(best);
   }
-  return ss[0] || 'NONE';
+  dists.sort((a,b)=>a-b);
+  return dists.length ? dists[Math.floor(dists.length*0.5)] : 80;
 }
 
-// ───────── SVG helpers (gradient + label) ─────────
-function overlaySVG(map) {
-  return map.getPanes().overlayPane.querySelector('svg');
-}
-function ensureDefs(svg) {
-  let defs = svg.querySelector('defs');
-  if (!defs) { defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.prepend(defs); }
-  return defs;
-}
-function idFor(name) {
-  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return 'grad-' + h.toString(16);
-}
-function upsertGradient(map, id, mix) {
-  const svg = overlaySVG(map); if (!svg) return null;
-  const defs = ensureDefs(svg);
-  let g = defs.querySelector('#' + id);
-  if (!g) {
-    g = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-    g.setAttribute('id', id);
-    g.setAttribute('x1', '0'); g.setAttribute('y1', '0'); g.setAttribute('x2', '1'); g.setAttribute('y2', '0');
-    g.setAttribute('gradientUnits', 'objectBoundingBox');
-    defs.appendChild(g);
+// build single polished hull from a set of [lon,lat]
+function polishedHull(pts, scaleM){
+  if (!pts.length) return null;
+  if (pts.length === 1){
+    return turf.buffer(turf.point(pts[0]), km(scaleM*0.6), { units:'kilometers' });
   }
-  const order = ['Approved', 'Submitted - Pending', 'Created - NOT Submitted', 'Not Approved - Cannot Attach', 'Not Approved - Other Issues', 'NONE'];
-  const total = Math.max(1, order.reduce((s, k) => s + (mix[k] || 0), 0));
+  const fc = turf.featureCollection(pts.map(p=>turf.point(p)));
+  const maxEdgeKm = Math.max(km(scaleM)*6, 0.15); // adaptive, never too tiny
+  let hull = turf.concave(fc, { maxEdge: maxEdgeKm, units:'kilometers' });
+  if (!hull) hull = turf.convex(fc);
+  if (!hull) return null;
 
-  while (g.firstChild) g.removeChild(g.firstChild);
-
-  let acc = 0;
-  for (const k of order) {
-    const count = mix[k] || 0;
-    if (!count) continue;
-    const frac = count / total;
-    const col = statusColor(k);
-    const a = 0.18; // stop opacity
-
-    const o0 = (acc * 100).toFixed(4) + '%';
-    const o1 = ((acc + frac) * 100).toFixed(4) + '%';
-
-    const s0 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    s0.setAttribute('offset', o0); s0.setAttribute('stop-color', col); s0.setAttribute('stop-opacity', String(a));
-    const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    s1.setAttribute('offset', o1); s1.setAttribute('stop-color', col); s1.setAttribute('stop-opacity', String(a));
-
-    g.appendChild(s0); g.appendChild(s1);
-    acc += frac;
-  }
-  return g;
+  const padKmOut = Math.max(km(scaleM)*0.8, 0.05);
+  const padKmIn  = Math.max(km(scaleM)*0.5, 0.03);
+  let poly = turf.buffer(hull, padKmOut, { units:'kilometers' });
+  poly     = turf.buffer(poly, -padKmIn,  { units:'kilometers' });
+  poly     = turf.simplify(poly, { tolerance: 0.00020, highQuality: true });
+  return poly;
 }
 
-function circleLabelSVG(fillColor, count) {
-  const W = 64, C = 32;
-  return `
-  <svg viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" aria-hidden="true">
-    <circle cx="${C}" cy="${C}" r="24" fill="${fillColor}" stroke="white" stroke-width="3" />
-    <circle cx="${C}" cy="${C}" r="24" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1" />
-    <text x="${C}" y="${C + 4}" text-anchor="middle" font-size="14" font-weight="700" fill="#e5e7eb">${count}</text>
-  </svg>`;
-}
-
-// ───────── main export ─────────
-export function buildJobAreas(map, poles, byKey) {
-  // Group poles by job
+// split widely-separated points into spatial clusters using DBSCAN
+function splitClusters(pts, scaleM){
+  const epsKm = Math.max(km(scaleM*3.2), 0.12);   // adaptive radius
+  const fc = turf.featureCollection(pts.map(p=>turf.point(p)));
+  const clustered = turf.clustersDbscan(fc, epsKm, { minPoints: 4 });
   const groups = new Map();
-  for (const p of (poles || [])) {
-    if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-    const job = p.job_name || '(unknown job)';
-    if (!groups.has(job)) groups.set(job, []);
-    groups.get(job).push(p);
+  for (const f of clustered.features){
+    const id = f.properties.cluster;
+    const [lng,lat] = f.geometry.coordinates;
+    const key = (id === undefined || id === null || id === 'noise') ? '__noise__' : `c${id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push([lng,lat]);
+  }
+  if (!groups.size) groups.set('all', pts.slice());
+  return Array.from(groups.values());
+}
+
+// ---------- public API ----------
+export function buildJobAreas(map, poles){
+  ensurePanesAndRenderers(map);
+
+  // group by job
+  const byJob = new Map();
+  for (const p of poles){
+    const job = String(p.job_name || '').trim(); if (!job) continue;
+    const lng = +p.lon, lat = +p.lat;
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+    if (!byJob.has(job)) byJob.set(job, []);
+    byJob.get(job).push([lng, lat]);
   }
 
-  const result = [];
-
-  for (const [job, pts] of groups.entries()) {
-    if (!pts.length) continue;
-
-    // Turf input
-    const fc = turf.points(pts.map(p => [p.lon, p.lat]));
-
-    // Concave hull → fallback to convex if needed
-    let poly = turf.concave(fc, { maxEdge: 1.2, units: 'kilometers' });
-    if (!poly) poly = turf.convex(fc);
-    if (!poly) continue;
-
-    // Leaflet polygon coordinates
-    const rings = poly.geometry.coordinates[0].map(([x, y]) => [y, x]);
-
-    // Area centroid (label position)
-    const cen = turf.centroid(fc).geometry.coordinates;
-    const center = [cen[1], cen[0]];
-
-    // Mix + area-dominant status (for outline + label fill)
-    const mix = { 'Approved': 0, 'Submitted - Pending': 0, 'Created - NOT Submitted': 0, 'Not Approved - Cannot Attach': 0, 'Not Approved - Other Issues': 0, 'NONE': 0 };
-    for (const p of pts) {
-      const rel = byKey?.get(poleKey(p)) || [];
-      const d = bucket(dominantStatus(rel));
-      mix[d] = (mix[d] || 0) + 1;
+  // step 1: raw hulls (multiple per job if split)
+  const raw = [];
+  byJob.forEach((pts, job)=>{
+    const scaleM = medianNN(pts);
+    for (const sub of splitClusters(pts, scaleM)){
+      const hull = polishedHull(sub, scaleM);
+      if (hull) raw.push({ job, feature: hull });
     }
-    const areaStatus = Object.entries(mix).sort((a, b) => b[1] - a[1])[0][0];
-    const col = statusColor(areaStatus);
+  });
 
-    // Polygon (stroke = dominant; fill = gradient mix)
-    const layer = L.polygon(rings, { color: col, weight: 3, fillColor: col, fillOpacity: 0.18, interactive: true });
-    const glow = L.polygon(rings, { color: col, weight: 8, opacity: 0.12, fillOpacity: 0, interactive: false });
-    layer.addTo(map); glow.addTo(map);
-
-    // Replace fill with gradient reflecting the mix
-    const gradId = idFor(job);
-    upsertGradient(map, gradId, mix);
-    if (layer._path) {
-      layer._path.setAttribute('fill', `url(#${gradId})`);
-      layer._path.style.fillOpacity = '1';
+  // step 2: carve overlaps so borders are crisp
+  const carved = [];
+  for (let i=0; i<raw.length; i++){
+    let base = raw[i].feature;
+    const bbA = turf.bbox(base);
+    for (let j=0; j<raw.length; j++){
+      if (i===j) continue;
+      const bbB = turf.bbox(raw[j].feature);
+      if (!bboxIntersects(bbA, bbB)) continue;
+      const diff = turf.difference(base, raw[j].feature);
+      if (diff) base = diff;
     }
+    if (base) carved.push({ job: raw[i].job, feature: base });
+  }
 
-    // CLICK polygon to zoom
-    layer.on('click', () => map.fitBounds(layer.getBounds().pad(0.12)));
+  // step 3: render (glow + edge + label) using the **SVG renderers**
+  const layers = [];
+  for (const { job, feature } of carved){
+    const col = hashColor(job);
+    const center = turf.centerOfMass(feature).geometry.coordinates;
 
-    // CLICKABLE circle label (dominant status color)
-    const icon = L.divIcon({
-      className: 'area-label',
-      html: circleLabelSVG(col, pts.length),
-      iconSize: [64, 64],
-      iconAnchor: [32, 32]
-    });
-    const label = L.marker(center, {
-      icon,
-      pane: 'markerPane',
-      interactive: true,
-      riseOnHover: true,
-      zIndexOffset: 100000
+    const glow = L.geoJSON(feature, {
+      pane: 'jobGlow',
+      renderer: SVG_GLOW,
+      style: { color: col, weight: 10, opacity: 0.22, fillColor: col, fillOpacity: 0.12 }
     }).addTo(map);
 
-    // Label drives zoom; stop event so polygon under it can’t steal the click
-    label.on('click', (e) => {
-      L.DomEvent.stop(e);
-      map.fitBounds(layer.getBounds().pad(0.12));
-    });
-    label.on('mousedown touchstart', (e) => L.DomEvent.stop(e));
+    const edge = L.geoJSON(feature, {
+      pane: 'jobEdge',
+      renderer: SVG_EDGE,
+      style: { color: col, weight: 2.25, opacity: 0.98, fillColor: col, fillOpacity: 0.24 }
+    }).addTo(map);
 
-    result.push({ job, layer, glow, label });
+    const label = L.marker([center[1], center[0]], {
+      pane: 'jobLabel',
+      interactive: false,
+      icon: L.divIcon({
+        className: 'job-label',
+        html: `<div style="font-weight:800;letter-spacing:.3px;font-size:14px;color:#e6efff;text-shadow:0 2px 10px rgba(0,0,0,.7)">${job}</div>`
+      })
+    }).addTo(map);
+
+    layers.push({ job, layer: edge, glow, label });
   }
 
-  return result;
+  return layers;
 }
