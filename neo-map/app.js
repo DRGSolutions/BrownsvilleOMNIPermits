@@ -67,6 +67,28 @@ STATE.cluster = L.markerClusterGroup({
 });
 map.addLayer(STATE.cluster);
 
+/* ===== Purge any leftover non-clickable badges (from older builds) ===== */
+function purgeNonClickableBadges() {
+  try {
+    const toRemove = [];
+    map.eachLayer((l) => {
+      if (l instanceof L.Marker) {
+        const icon = l.options?.icon?.options || {};
+        const cls = String(icon.className || '');
+        const html = String(icon.html || '');
+        const interactive = l.options?.interactive !== false; // true if undefined
+        // Heuristics: old badges used these classes OR were non-interactive markers.
+        if (!interactive || /area-badge|badge/i.test(cls) || /area-badge/i.test(html)) {
+          toRemove.push(l);
+        }
+      }
+    });
+    toRemove.forEach(l => map.removeLayer(l));
+    // Belt & suspenders: remove stray DOM nodes if any were injected directly
+    document.querySelectorAll('.area-badge, .area-badge-ic').forEach(n => n.remove());
+  } catch {}
+}
+
 /* ============================= Rendering ============================= */
 function renderAll(filtered = null) {
   // markers
@@ -87,6 +109,9 @@ function renderAll(filtered = null) {
     const inView = filtered || STATE.poles;
     STATE.areas = buildJobAreas(map, inView, STATE.byKey);
   }
+
+  // hard-remove any legacy, non-clickable badges
+  purgeNonClickableBadges();
 }
 
 function applyFilters() {
@@ -145,6 +170,7 @@ document.getElementById('btnToggleAreas').addEventListener('click', () => {
   } else {
     STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey);
   }
+  purgeNonClickableBadges();
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
@@ -158,7 +184,6 @@ if (btnRefresh) {
       STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
       renderAll();
 
-      // first/refresh paint → ensure tiles/markers show up
       requestAnimationFrame(() => {
         map.invalidateSize();
         if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
@@ -228,7 +253,6 @@ document.getElementById('btnReportClose')?.addEventListener('click', () => close
     renderAll();
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles ? ` @ ${shas.poles.slice(0, 7)}…` : ''})`);
 
-    // first paint: ensure tiles + markers appear
     requestAnimationFrame(() => {
       map.invalidateSize();
       if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });

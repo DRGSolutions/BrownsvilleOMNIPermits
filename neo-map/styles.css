@@ -71,7 +71,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/
   .card.span-2{grid-column:span 1}
 }
 
-/* Area label pane & cursor */
-.leaflet-pane.areaLabelPane { pointer-events: auto; z-index: 650 !important; }
-/* ensure labels accept clicks */
+/* Hide any legacy badge DOM that might still be present and ensure labels click */
+.area-badge, .area-badge-ic { display: none !important; }
 .area-label { pointer-events: auto; cursor: pointer; }
+
