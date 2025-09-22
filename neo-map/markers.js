@@ -1,10 +1,12 @@
 // neo-map/markers.js
 // Builds markers, adds them to the provided cluster, and returns bounds.
 // Shapes by owner: BPUB = circle, AEP = triangle, MVEC = square.
+// Each marker shows a subtle glow using the *permit status* color (same mapping
+// used for cluster rings), so when you're fully zoomed in, color semantics remain.
 
-import { poleKey } from './data.js';
+import { poleKey, statusColor } from './data.js';
 
-/* Choose the "dominant" permit status for a pole (used by cluster coloring) */
+/* Choose the "dominant" permit status for a pole (used for color) */
 function dominantStatusFor(permits){
   if(!permits || !permits.length) return 'NONE';
   const ss = permits.map(r => String(r.permit_status||'').trim());
@@ -27,23 +29,31 @@ function dominantStatusFor(permits){
 /* Inline SVG icons (crisp at small sizes) */
 const NS = 'http://www.w3.org/2000/svg';
 const ICON_PX  = 22;
-const FILL     = 'rgba(148,160,180,0.65)';   // same slate tone as legend shapes
+const FILL     = 'rgba(148,160,180,0.65)';   // neutral fill (matches legend)
 const STROKE   = 'rgba(255,255,255,0.92)';   // white-ish outline
 const STROKE_W = 3;
 
-function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
+function svg(tag, attrs){
+  const el = document.createElementNS(NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
 
-function iconSVG(owner){
+function iconSVG(owner, tint){
   const u = String(owner || '').toUpperCase();
   const root = svg('svg', { viewBox:'0 0 24 24' });
-  let shape;
 
+  // Apply a subtle status glow that works for any shape:
+  // (keeps the familiar neutral fill + white outline)
+  root.style.filter = `drop-shadow(0 0 6px ${tint})`;
+
+  let shape;
   if (u === 'BPUB'){
     shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'AEP'){
     shape = svg('polygon', { points:'12,3 21,21 3,21', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'MVEC'){
-    /* SQUARE (rounded corners) — per request */
+    // SQUARE (rounded corners) — per your decision
     shape = svg('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else {
     shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:FILL, stroke:STROKE, 'stroke-width':String(STROKE_W) });
@@ -56,10 +66,10 @@ function iconSVG(owner){
   return root.outerHTML;
 }
 
-function makeIcon(owner){
+function makeIcon(owner, tint){
   return L.divIcon({
     className: 'pole-icon',
-    html: iconSVG(owner),
+    html: iconSVG(owner, tint),
     iconSize: [ICON_PX, ICON_PX],
     iconAnchor: [ICON_PX/2, ICON_PX/2],
     popupAnchor: [0, -10]
@@ -77,9 +87,10 @@ export function buildMarkers(map, cluster, poles, byKey, popupHTML){
 
     const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
+    const tint   = statusColor(status); // <- same mapping your clusters use
 
     const marker = L.marker([p.lat, p.lon], {
-      icon: makeIcon(p.owner),
+      icon: makeIcon(p.owner, tint),
       __status: status   // consumed by app.js cluster iconCreateFunction
     });
 
