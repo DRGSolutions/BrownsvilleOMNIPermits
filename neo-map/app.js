@@ -227,43 +227,54 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
 /* ───────────────────── Legend + Tools fine-tuning (DOM-safe) ───────────────── */
 function tuneLegendAndTools(){
   try {
-    const legend = document.querySelector('#legend, .legend');
+    const legend = document.getElementById('legend') || document.querySelector('.legend');
     if (!legend) return;
 
-    // Clean up any previous injected bits from older attempts
+    // Clean up anything from earlier attempts
     legend.querySelectorAll('.shape-icon').forEach(n => n.remove());
 
-    // --- Reference size: read the "Approved" chip to size utility icons a bit smaller
+    // --- Read the status chip size from "Approved" so our utility shapes are a touch smaller
     let chipPx = 20, approvedSwatch = null;
     const approvedRow = Array.from(legend.querySelectorAll('*')).find(el => /\bApproved\b/i.test(el.textContent || ''));
     if (approvedRow){
       approvedSwatch = Array.from(approvedRow.querySelectorAll('i,b,span,em,div,.swatch,.chip,.color,.dot'))
         .find(e => {
           const cs = getComputedStyle(e); const w = parseFloat(cs.width), h = parseFloat(cs.height);
-          return w>8 && w<40 && Math.abs(w-h)<3; // small square-ish chip
+          return w>8 && w<40 && Math.abs(w-h)<3;
         }) || null;
       if (approvedSwatch){
         const cs = getComputedStyle(approvedSwatch);
         chipPx = Math.round(Math.min(parseFloat(cs.width)||20, parseFloat(cs.height)||20));
-        // Restore Approved color if needed
+        // restore Approved chip color
         const desired = (getComputedStyle(document.documentElement).getPropertyValue('--chip-approved') || '').trim() || '#34d399';
         approvedSwatch.style.backgroundColor = desired;
         approvedSwatch.style.borderColor = desired;
       }
     }
-    const ICON_PX = Math.max(14, Math.round(chipPx * 0.85)); // a touch smaller than status chips
+    const ICON_PX = Math.max(14, Math.round(chipPx * 0.85)); // utility shapes a bit smaller than status chips
 
-    // Shared paint constants (match your existing legend look)
-    const fillColor   = 'rgba(148,160,180,0.65)';      // soft slate fill
-    const borderColor = 'rgba(255,255,255,0.92)';      // white-ish outline
-    const borderW     = 3;
-    const cornerR     = 6;
+    // Sample fill/border from BPUB so all three utility icons match your theme exactly
+    let fill   = 'rgba(148,160,180,0.65)';
+    let stroke = 'rgba(255,255,255,0.92)';
+    let strokeW = 3;
+    const bpubRow = Array.from(legend.querySelectorAll('*')).find(el => /\bBPUB\b/i.test(el.textContent || ''));
+    if (bpubRow){
+      const sample = Array.from(bpubRow.querySelectorAll('span,div,i,b,svg')).find(e => {
+        const cs = getComputedStyle(e); const w = parseFloat(cs.width), h = parseFloat(cs.height);
+        return w>8 && w<40 && Math.abs(w-h)<3;
+      });
+      if (sample){
+        const cs = getComputedStyle(sample);
+        if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') fill = cs.backgroundColor;
+        const bc = cs.borderTopColor || cs.borderColor; if (bc) stroke = bc;
+        const bw = parseFloat(cs.borderTopWidth); if (!isNaN(bw) && bw>0) strokeW = bw;
+      }
+    }
 
-    // Helper: find the legend row for a label, get or create the leading shape holder
-    function getRowAndHolder(labelRe){
-      const row = Array.from(legend.querySelectorAll('*')).find(el => labelRe.test((el.textContent || '').trim()));
-      if (!row) return { row:null, holder:null };
-      // Prefer to reuse an existing small square/shape element before the text if present
+    // Helper: replace the leading small square-ish node in a row with our SVG icon
+    function replaceIcon(labelRe, makeSvg){
+      const row = Array.from(legend.querySelectorAll('*')).find(el => labelRe.test((el.textContent||'').trim()));
+      if (!row) return;
       let holder = Array.from(row.children).find(ch => {
         const cs = getComputedStyle(ch); const w = parseFloat(cs.width), h = parseFloat(cs.height);
         return w>8 && w<40 && Math.abs(w-h)<3;
@@ -271,109 +282,68 @@ function tuneLegendAndTools(){
       if (!holder){
         holder = document.createElement('span');
         row.insertBefore(holder, row.firstChild);
-      } else {
-        holder.innerHTML = ''; // repurpose it cleanly
       }
-      holder.className = 'shape-icon';
-      Object.assign(holder.style, {
-        display:'inline-block', position:'relative', width:ICON_PX+'px', height:ICON_PX+'px',
-        marginRight:'10px', verticalAlign:'middle'
-      });
-      return { row, holder };
+      // Nuke existing visuals in that holder and drop in our SVG
+      holder.innerHTML = '';
+      holder.removeAttribute('style');
+      holder.className = '';
+      const svg = makeSvg(ICON_PX, fill, stroke, strokeW);
+      // Make the SVG behave like the original chip
+      svg.style.width = ICON_PX + 'px';
+      svg.style.height = ICON_PX + 'px';
+      svg.style.display = 'inline-block';
+      svg.style.marginRight = '10px';
+      svg.style.verticalAlign = 'middle';
+      holder.replaceWith(svg);
     }
 
-    // BPUB: circle
-    {
-      const { holder } = getRowAndHolder(/\bBPUB\b/i);
-      if (holder){
-        const circle = document.createElement('span');
-        Object.assign(circle.style, {
-          position:'absolute', inset:'0',
-          border:`${borderW}px solid ${borderColor}`,
-          borderRadius:'9999px',
-          background: fillColor
-        });
-        holder.appendChild(circle);
-      }
-    }
+    const NS = 'http://www.w3.org/2000/svg';
+    const makeCircle = (px, fill, stroke, w) => {
+      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
+      const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx','12'); c.setAttribute('cy','12'); c.setAttribute('r','8');
+      c.setAttribute('fill', fill); c.setAttribute('stroke', stroke); c.setAttribute('stroke-width', String(w));
+      s.appendChild(c); return s;
+    };
+    const makeTriangle = (px, fill, stroke, w) => {
+      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
+      const p = document.createElementNS(NS, 'polygon'); p.setAttribute('points','12,3 21,21 3,21');
+      p.setAttribute('fill', fill); p.setAttribute('stroke', stroke); p.setAttribute('stroke-width', String(w));
+      s.appendChild(p); return s;
+    };
+    // MVEC: diamond built from TWO triangles + an outline (no rotated containers)
+    const makeDiamondFromTriangles = (px, fill, stroke, w) => {
+      const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox','0 0 24 24');
+      // Top half triangle
+      const t = document.createElementNS(NS, 'polygon');
+      t.setAttribute('points','12,2.5 21.5,12 12,12 2.5,12');
+      t.setAttribute('fill', fill); t.setAttribute('stroke','none');
+      // Bottom half triangle
+      const b = document.createElementNS(NS, 'polygon');
+      b.setAttribute('points','12,21.5 21.5,12 12,12 2.5,12');
+      b.setAttribute('fill', fill); b.setAttribute('stroke','none');
+      // Outer diamond outline
+      const d = document.createElementNS(NS, 'polygon');
+      d.setAttribute('points','12,2.5 21.5,12 12,21.5 2.5,12');
+      d.setAttribute('fill','none'); d.setAttribute('stroke', stroke); d.setAttribute('stroke-width', String(w));
+      s.appendChild(t); s.appendChild(b); s.appendChild(d);
+      return s;
+    };
 
-    // AEP: triangle (SVG to keep edges crisp at small size)
-    {
-      const { holder } = getRowAndHolder(/\bAEP\b/i);
-      if (holder){
-        const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('viewBox','0 0 24 24');
-        svg.style.width = ICON_PX+'px';
-        svg.style.height = ICON_PX+'px';
-        const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-        poly.setAttribute('points','12,3 21,21 3,21');
-        poly.setAttribute('fill', fillColor);
-        poly.setAttribute('stroke', borderColor);
-        poly.setAttribute('stroke-width', borderW);
-        svg.appendChild(poly);
-        holder.appendChild(svg);
-      }
-    }
+    replaceIcon(/\bBPUB\b/i, makeCircle);
+    replaceIcon(/\bAEP\b/i , makeTriangle);
+    replaceIcon(/\bMVEC\b/i, makeDiamondFromTriangles);
 
-    // MVEC: diamond from TWO smaller triangles + a thin rotated border overlay
-    {
-      const { holder } = getRowAndHolder(/\bMVEC\b/i);
-      if (holder){
-        const half = Math.floor(ICON_PX / 2);
-
-        // Top triangle
-        const top = document.createElement('div');
-        Object.assign(top.style, {
-          position:'absolute', left:'50%', transform:'translateX(-50%)',
-          width:'0', height:'0',
-          borderLeft:`${half}px solid transparent`,
-          borderRight:`${half}px solid transparent`,
-          borderBottom:`${half}px solid ${fillColor}`,
-          top:'0'
-        });
-        // Bottom triangle
-        const bot = document.createElement('div');
-        Object.assign(bot.style, {
-          position:'absolute', left:'50%', transform:'translateX(-50%)',
-          width:'0', height:'0',
-          borderLeft:`${half}px solid transparent`,
-          borderRight:`${half}px solid transparent`,
-          borderTop:`${half}px solid ${fillColor}`,
-          bottom:'0'
-        });
-
-        // Thin diamond border (rotated inner element only; does NOT affect layout/text)
-        const border = document.createElement('span');
-        Object.assign(border.style, {
-          position:'absolute', left:'0', top:'0', right:'0', bottom:'0',
-          transform:'rotate(45deg)', transformOrigin:'50% 50%',
-          border:`${borderW}px solid ${borderColor}`,
-          borderRadius: `${cornerR}px`
-        });
-
-        holder.appendChild(top);
-        holder.appendChild(bot);
-        holder.appendChild(border);
-      }
-    }
-
-    // Slightly tighten the legend’s vertical rhythm
-    legend.style.lineHeight = '1.15';
-
-    // --- Map Tools: keep short/pro
-    const tools = document.querySelector('#tools, .tools');
+    // Short, professional tools note
+    const tools = document.getElementById('tools') || document.querySelector('.tools');
     if (tools){
       const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
       const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
       if (long) long.textContent = 'Click a shape to view pole & permits.';
-      const cs = getComputedStyle(tools);
-      if (cs.gap && cs.gap !== 'normal') tools.style.gap = '8px';
     }
   } catch (e) {
     console.warn('[neo-map] legend/tools tune failed:', e);
   }
 }
-
 
 /* =============================== Boot =============================== */
 (async function(){
