@@ -98,17 +98,17 @@
   </aside>
 
   <!-- TOOLS (Top-Right) -->
-  <aside id="tools" class="panel panel--tools">
-    <h3>Map Tools</h3>
-    <div class="row">
-      <button id="btnFit" class="btn">Fit to Poles</button>
-      <button id="btnToggleAreas" class="btn btn-ghost">Toggle Job Areas</button>
-      <!-- NEW: Insights button -->
-      <button id="btnReport" class="btn btn-accent">Open Insights</button>
-      <button id="btnRefresh" class="btn">Refresh Data</button>
-    </div>
-    <small class="muted">Click a shape to view pole & permits. Areas are precise concave hulls per job with overlap-aware outlines.</small>
-  </aside>
+  <!-- Map Tools card -->
+<div id="tools" class="tools">
+  <h3>Map Tools</h3>
+  <div class="btnrow">
+    <button id="btnFit" class="btn">Fit to Poles</button>
+    <button id="btnToggleAreas" class="btn">Toggle Job Areas</button>
+    <button id="btnReport" class="btn btn-accent">Open Insights</button>
+    <button id="btnRefresh" class="btn">Refresh Data</button>
+  </div>
+  <p class="muted small">Click a shape to view pole &amp; permits.</p>
+</div>
 
   <!-- Toast -->
   <div id="toast"></div>
