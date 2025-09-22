@@ -6,28 +6,33 @@ import { popupHTML, toast } from './ui.js';
 import { openReport, closeReport } from './report.js';
 
 /* ────────────────────────── LOD (level of detail) ──────────────────────────
-   - zoom < 11  → NO per-pole markers (only areas/labels)
-   - 11 ≤ zoom < 14 → fast Canvas dots (tiny, no popups)
-   - zoom ≥ 14 → full SVG shape markers with popups
+   Markers:
+     - z < 11  → none
+     - 11–13   → canvas dots
+     - ≥ 14    → full SVG shapes + popups
+   Areas (hulls):
+     - z < 13  → COARSE: 1 convex+smooth hull per job, few labels
+     - ≥ 13    → FINE: concave+smooth per job (split if needed), more labels
 */
-const LOD = { DOT_MIN: 11, SHAPE_MIN: 14 };
+export const LOD = { DOT_MIN: 11, SHAPE_MIN: 14, HULL_FINE_MIN: 13 };
 
 function markerMode(z) {
   if (z < LOD.DOT_MIN) return 'none';
   if (z < LOD.SHAPE_MIN) return 'dots';
   return 'shapes';
 }
+function hullMode(z) { return z < LOD.HULL_FINE_MIN ? 'coarse' : 'fine'; }
 
 /* ─────────────────────────────── STATE ─────────────────────────────── */
 const STATE = {
   poles: [],
   permits: [],
   byKey: new Map(),
-  markerLayer: null,     // simple LayerGroup (no clustering)
+  markerLayer: null,
   areas: [],
   areasVisible: true,
   bounds: null,
-  filtered: null,        // remember current filtered set for LOD redraws
+  filtered: null,
   shas: { poles: null, permits: null },
   watcherStop: null
 };
@@ -35,7 +40,7 @@ const STATE = {
 const map = L.map('map', { zoomControl: false, preferCanvas: true });
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-/* Base tiles: DARK (no labels) + labels-only overlay above overlays */
+/* Base tiles: DARK (no labels) + labels overlay */
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = '650';
 labelsPane.style.pointerEvents = 'none';
@@ -59,19 +64,19 @@ function renderMarkers() {
 }
 
 function renderAreas() {
-  // clear old areas
   if (STATE.areas.length) {
     for (const a of STATE.areas) {
-      if (a.layer) map.removeLayer(a.layer);
-      if (a.glow) map.removeLayer(a.glow);
-      if (a.label) map.removeLayer(a.label);
+      a?.layer && map.removeLayer(a.layer);
+      a?.glow  && map.removeLayer(a.glow);
+      a?.label && map.removeLayer(a.label);
     }
     STATE.areas = [];
   }
-  if (STATE.areasVisible) {
-    const data = STATE.filtered || STATE.poles;
-    STATE.areas = buildJobAreas(map, data, STATE.byKey);
-  }
+  if (!STATE.areasVisible) return;
+
+  const data = STATE.filtered || STATE.poles;
+  const mode = hullMode(map.getZoom()); // 'coarse' | 'fine'
+  STATE.areas = buildJobAreas(map, data, STATE.byKey, { mode });
 }
 
 function renderAll(filtered = null) {
@@ -80,11 +85,14 @@ function renderAll(filtered = null) {
   renderAreas();
 }
 
-/* LOD redraw on zoom (debounced to avoid thrash) */
+/* LOD redraw on zoom (light debounce) */
 let lodT = null;
 map.on('zoomend', () => {
   clearTimeout(lodT);
-  lodT = setTimeout(() => renderMarkers(), 60);
+  lodT = setTimeout(() => {
+    renderMarkers();
+    renderAreas();  // hull LOD + label declutter follows zoom
+  }, 80);
 });
 
 /* ============================= Filters ============================= */
@@ -136,9 +144,9 @@ document.getElementById('btnToggleAreas').addEventListener('click', () => {
   STATE.areasVisible = !STATE.areasVisible;
   if (!STATE.areasVisible) {
     for (const a of STATE.areas) {
-      if (a.layer) map.removeLayer(a.layer);
-      if (a.glow) map.removeLayer(a.glow);
-      if (a.label) map.removeLayer(a.label);
+      a?.layer && map.removeLayer(a.layer);
+      a?.glow  && map.removeLayer(a.glow);
+      a?.label && map.removeLayer(a.label);
     }
     STATE.areas = [];
   } else {
@@ -155,7 +163,7 @@ if (btnRefresh) {
       toast('Refreshing data…');
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
-      renderAll(STATE.filtered); // keep current filter if any
+      renderAll(STATE.filtered);
 
       requestAnimationFrame(() => {
         map.invalidateSize();
