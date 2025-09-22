@@ -150,7 +150,11 @@ export function buildJobAreas(map, poles, byKey) {
     // Polygon base (stroke shows dominant; fill uses MIX gradient)
     const layer = L.polygon(rings, { color: col, weight: 3, fillColor: col, fillOpacity: 0.18, interactive:true });
     // Subtle glow for readability
-    const glow  = L.polygon(rings, { color: col, weight: 8, opacity: 0.12, fillOpacity: 0, interactive:false });
+    const glow = L.polygon(rings, {
+      color: col, weight: 8, opacity: 0.12, fillOpacity: 0,
+      interactive: false        // <-- keep this
+    });
+
     layer.addTo(map); glow.addTo(map);
 
     // After path exists, replace fill with gradient that matches the mix
@@ -167,14 +171,22 @@ export function buildJobAreas(map, poles, byKey) {
     // CLICKABLE circle label (dominant status color)
     const icon = L.divIcon({
       className: 'area-label',
-      html: circleLabelSVG(col, pts.length),
+      html: circleLabelSVG(col, pts.length),   // fill already = dominant status color
       iconSize: [64,64],
       iconAnchor: [32,32]
     });
-    const label = L.marker(center, { icon, riseOnHover:true });
+
+    // ⬇️ force into the marker pane and lift above polygons
+    const label = L.marker(center, {
+      icon,
+      pane: 'markerPane',        // <-- important: always above overlayPane polygons
+      interactive: true,
+      riseOnHover: true,
+      zIndexOffset: 1000         // <-- sits above other markers if they overlap
+    });
+
     label.addTo(map);
     label.on('click', () => map.fitBounds(layer.getBounds().pad(0.12)));
-
     result.push({ job, layer, glow, label });
   }
 

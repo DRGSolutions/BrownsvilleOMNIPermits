@@ -73,4 +73,5 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/
 
 /* Area label pane & cursor */
 .leaflet-pane.areaLabelPane { pointer-events: auto; z-index: 650 !important; }
-.area-label { cursor: pointer; }
+/* ensure labels accept clicks */
+.area-label { pointer-events: auto; cursor: pointer; }
