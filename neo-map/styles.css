@@ -1,94 +1,189 @@
+/* ==========================================================================
+   Neo Map — base styles (dark theme)
+   ========================================================================== */
+
 :root{
-  --bg:#0b0c10; --panel:#0f1219; --panel2:#0c1324; --muted:#9aa3b2; --fg:#e8eef8; --border:#1e2636;
-  --chip-pending:#fb923c; --chip-approved:#34d399; --chip-created:#facc15; --chip-na-cannot:#a78bfa; --chip-na-other:#ef4444; --chip-none:#94a3b8;
-}
-*{box-sizing:border-box} html,body,#map{height:100%}
-body{margin:0;background:#0b0c10;color:var(--fg);font:14px ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
-#map{position:fixed;inset:0}
+  --bg: #0b1220;
+  --panel: #0f172a;
+  --panel-2: #0c1426;
+  --border: #1e293b;
+  --text: #e5e7eb;
+  --muted: #9aa4b2;
 
-/* Panels — solid (not see-through) */
-.panel{position:fixed;z-index:900;border:1px solid var(--border);background:var(--panel);box-shadow:0 12px 40px rgba(0,0,0,.45);border-radius:16px;padding:12px}
-.panel h3{margin:0 0 8px;font-size:14px;letter-spacing:.3px}
-.panel--filters{top:16px;left:16px;width:440px}
-.panel--legend{left:16px;bottom:16px;width:360px}
-.panel--tools{top:16px;right:16px;width:360px}
-.muted{color:var(--muted)} .mb6{margin-bottom:6px}
-
-.btn{appearance:none;cursor:pointer;border:1px solid var(--border);background:#151d2e;color:var(--fg);padding:8px 12px;border-radius:10px;font-weight:700}
-.btn:hover{background:#19243a} .btn-ghost{background:#0f1219} .btn-accent{border-color:#284a3a;background:#112622}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.field{display:flex;flex-direction:column;gap:4px}
-select,input{border:1px solid var(--border);background:#0f1219;color:var(--fg);padding:8px 10px;border-radius:10px}
-.chip{display:inline-flex;align-items:center;gap:8px;font-size:11px;border:1px solid var(--border);border-radius:999px;padding:4px 8px;background:#0f1219}
-
-#rules .rule{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-top:8px}
-#rules .remove{padding:6px 10px}
-
-.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.item{display:flex;align-items:center;gap:10px;margin:6px 0}
-.swatch{width:16px;height:16px;border:1px solid #000;border-radius:4px}
-
-.shape-icon svg{display:block}
-.leaflet-popup-content-wrapper{background:#0f1219;color:var(--fg);border-radius:12px;border:1px solid var(--border)}
-.leaflet-popup-tip{background:#0f1219}
-.popup-title{font-weight:800;margin-bottom:4px}
-.popup-sub{color:var(--muted);font-size:12px;margin-bottom:8px}
-.badge{display:inline-block;border-radius:999px;padding:2px 8px;border:1px solid #283244;font-size:11px}
-.badge.pending{background:var(--chip-pending);color:#111}
-.badge.approved{background:var(--chip-approved);color:#0b261a}
-.badge.created{background:var(--chip-created);color:#211f06}
-.badge.na_cannot{background:var(--chip-na-cannot);color:#18132b}
-.badge.na_other{background:var(--chip-na-other);color:#fff}
-.badge.none{background:var(--chip-none);color:#0b0c10}
-
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:950;background:#0f1219;border:1px solid var(--border);color:var(--fg);padding:8px 12px;border-radius:10px;display:none}
-
-/* Neon cluster bubbles colored by dominant permit status */
-.cluster.neon{background:transparent;border:none}
-.cluster-ring{
-  width:44px;height:44px;border-radius:999px;
-  box-shadow:0 0 0 4px rgba(255,255,255,.06),0 0 22px rgba(255,255,255,.25) inset,0 0 18px currentColor;
-  display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25)
-}
-.cluster-core{
-  width:34px;height:34px;border-radius:999px;background:#0b0c10;color:#e8eef8;
-  display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid rgba(255,255,255,.18)
+  /* Status chips (Legend → Permit Status) */
+  --chip-approved: #34d399;      /* ✔ green */
+  --chip-pending:  #f59e0b;      /* amber */
+  --chip-created:  #facc15;      /* yellow */
+  --chip-na-cannot:#a78bfa;      /* violet */
+  --chip-na-other: #ef4444;      /* red */
+  --chip-none:     #64748b;      /* slate */
 }
 
-/* =================== REPORT PANEL =================== */
-/* 92225
-/* Map Tools: center + compact */
-#tools.tools { text-align: center; }
-#tools .btnrow { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-#tools h3 { margin: 0 0 8px; text-align: center; }
-#tools p.small { margin: 8px auto 0; max-width: 380px; }
-/* 92225 */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
 
-.hidden{display:none}
-.panel--report{
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  width:min(1120px,calc(100vw - 48px)); height:min(86vh,calc(100vh - 48px));
-  overflow:auto; padding:14px;
+/* -------------------- Map canvas -------------------- */
+#map {
+  position: fixed;    /* fill viewport & sit under panels */
+  inset: 0;
+  z-index: 0;
 }
-.report-head{display:flex;gap:12px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px}
-.report-head .title{font-size:18px;font-weight:800;letter-spacing:.3px}
-.report-grid{
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
-}
-.card{border:1px solid var(--border);border-radius:12px;background:var(--panel2);padding:12px}
-.card-title{font-weight:800;margin-bottom:6px}
-.span-2{grid-column:span 2}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.kpi{
-  background:#0f1219;border:1px solid var(--border);border-radius:12px;padding:10px 12px;
-}
-.kpi .lbl{color:var(--muted);font-size:12px}
-.kpi .val{font-size:18px;font-weight:800;margin-top:4px}
-.kpi .sub{color:var(--muted);font-size:11px;margin-top:2px}
 
-.obs{display:grid;gap:8px}
-.obs .note{background:#0f1219;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
-#report canvas{max-width:100%}
+/* -------------------- Generic Panels -------------------- */
+.panel {
+  position: absolute;
+  z-index: 1000;
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow:
+    0 10px 30px rgba(2,8,23,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
 
-/* Optional: stronger job labels on map */
-.job-label div{padding:2px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(10,14,22,.92)}
+.panel h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.mb6 { margin-bottom: 6px; }
+
+/* Locations for existing panels */
+.panel--filters { top: 16px; left: 16px; width: 420px; }
+.panel--legend  { bottom: 16px; left: 16px; }
+
+/* -------------------- Filters panel bits -------------------- */
+.panel--filters .bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.panel--filters .row { display:flex; align-items:flex-end; gap:12px; }
+.field small { display:block; color:var(--muted); margin-bottom:4px; }
+.field input,
+.field select {
+  width: 100%;
+  background: #0b162d;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.chip select { margin-left: 6px; }
+
+/* -------------------- Buttons -------------------- */
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: #0d1a31;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .04s ease, background .15s ease, border-color .15s ease;
+}
+.btn:hover { background: #0f203b; border-color: #273449; }
+.btn:active { transform: translateY(1px); }
+
+.btn-ghost { background: transparent; }
+.btn-accent { background: #163b2d; border-color:#1f4f3d; }
+.btn-accent:hover { background:#1a4636; border-color:#2a6f55; }
+
+/* -------------------- Legend -------------------- */
+.panel--legend .legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+.panel--legend .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+.panel--legend svg {
+  width: 22px;      /* utility shapes—slightly smaller than status swatches */
+  height: 22px;
+  display: inline-block;
+}
+
+/* Status swatches (right column of legend) */
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 10px;
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.2);
+}
+
+/* -------------------- Tools (Top-Right card) -------------------- */
+#tools.tools {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1001;
+  text-align: center;
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow:
+    0 10px 30px rgba(2,8,23,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
+#tools h3 { margin: 0 0 8px; }
+#tools .btnrow { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+#tools p { margin:8px 0 0; }
+
+/* -------------------- Clusters (used by app.js) -------------------- */
+.cluster.neon .cluster-ring {
+  width: 44px; height: 44px; border-radius: 999px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.35), 0 0 18px rgba(16,185,129,.25);
+}
+.cluster.neon .cluster-core {
+  width: 28px; height: 28px; border-radius: 999px;
+  background: rgba(0,0,0,.35);
+  color:#fff; font-weight:700; font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* -------------------- Toast -------------------- */
+#toast {
+  position: fixed;
+  left: 50%; transform: translateX(-50%);
+  bottom: 18px;
+  z-index: 1200;
+  min-width: 200px;
+  padding: 10px 14px;
+  background: rgba(15,23,42,.92);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 12px;
+  display: none;  /* ui.js should toggle */
+}
+
+/* -------------------- Report panel (right drawer) -------------------- */
+.panel--report { top: 16px; right: 16px; bottom: 16px; width: 560px; overflow: auto; }
+.hidden { display: none !important; }
+
+.report-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.report-head .title { font-weight:700; }
+.report-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.card { background:#0c162b; border:1px solid var(--border); border-radius:12px; padding:12px; }
+.card .card-title { color:var(--muted); margin:0 0 8px; font-weight:700; }
+.card.span-2 { grid-column: span 2; }
+
+.kpis { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.obs { font-size:13px; line-height:1.5; color:var(--text); }
+
+/* -------------------- Responsive -------------------- */
+@media (max-width: 980px) {
+  .panel--filters { width: calc(100vw - 32px); }
+  .panel--legend  { left: 16px; right: 16px; }
+  .report-grid { grid-template-columns: 1fr; }
+  .card.span-2 { grid-column: span 1; }
+}
