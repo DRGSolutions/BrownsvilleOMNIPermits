@@ -1,11 +1,16 @@
 import { loadPolesAndPermits, poleKey, statusColor, watchForGithubUpdates } from './data.js';
 import { buildMarkers } from './markers.js';
 import { buildJobAreas } from './areas.js';
+import { buildAreaBadges } from './badges.js'; // NEW
 import { ruleRow, readRules, matchRule } from './filters.js';
 import { popupHTML, toast } from './ui.js';
 import { openReport, closeReport } from './report.js';
 
-const STATE = { poles:[], permits:[], byKey:new Map(), cluster:null, areas:[], areasVisible:true, bounds:null, shas:{poles:null,permits:null}, watcherStop:null };
+const STATE = {
+  poles:[], permits:[], byKey:new Map(),
+  cluster:null, areas:[], badges:[],        // badges NEW
+  areasVisible:true, bounds:null, shas:{poles:null,permits:null}, watcherStop:null
+};
 
 const map = L.map('map', { zoomControl:false, preferCanvas:true });
 L.control.zoom({ position:'bottomright' }).addTo(map);
@@ -57,14 +62,29 @@ map.addLayer(STATE.cluster);
 
 /* ============================= Rendering ============================= */
 function renderAll(filtered=null){
+  // markers
   STATE.bounds = buildMarkers(map, STATE.cluster, filtered||STATE.poles, STATE.byKey, popupHTML);
+
+  // clear previous areas + badges
   if (STATE.areas.length){
-    for(const a of STATE.areas){ map.removeLayer(a.layer); a.glow && map.removeLayer(a.glow); map.removeLayer(a.label); }
+    for(const a of STATE.areas){
+      if (a.layer) map.removeLayer(a.layer);
+      if (a.glow)  map.removeLayer(a.glow);
+      if (a.label) map.removeLayer(a.label);
+      if (a.badge) map.removeLayer(a.badge);
+    }
     STATE.areas=[];
   }
+  if (STATE.badges.length){
+    for (const b of STATE.badges) map.removeLayer(b);
+    STATE.badges = [];
+  }
+
+  // rebuild areas + badges if visible
   if (STATE.areasVisible){
     const inView = filtered||STATE.poles;
-    STATE.areas = buildJobAreas(map, inView);
+    STATE.areas  = buildJobAreas(map, inView);
+    STATE.badges = buildAreaBadges(map, inView, STATE.byKey); // NEW
   }
 }
 
@@ -103,6 +123,7 @@ document.getElementById('btnClear').addEventListener('click', ()=>{
   document.getElementById('rules').innerHTML='';
   renderAll();
 });
+
 document.getElementById('qOwner').addEventListener('change', applyFilters);
 document.getElementById('qStatus').addEventListener('change', applyFilters);
 document.getElementById('qSearch').addEventListener('input', ()=>{
@@ -115,14 +136,22 @@ document.getElementById('btnFit').addEventListener('click', ()=>{
 document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   STATE.areasVisible = !STATE.areasVisible;
   if (!STATE.areasVisible){
-    for(const a of STATE.areas){ map.removeLayer(a.layer); a.glow && map.removeLayer(a.glow); map.removeLayer(a.label); }
+    for(const a of STATE.areas){
+      if (a.layer) map.removeLayer(a.layer);
+      if (a.glow)  map.removeLayer(a.glow);
+      if (a.label) map.removeLayer(a.label);
+      if (a.badge) map.removeLayer(a.badge);
+    }
+    for (const b of STATE.badges) map.removeLayer(b);
+    STATE.areas=[]; STATE.badges=[];
   } else {
     STATE.areas = buildJobAreas(map, STATE.poles);
+    STATE.badges = buildAreaBadges(map, STATE.poles, STATE.byKey);
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-// NEW: manual refresh button (fetches latest SHAs and reloads)
+// manual refresh
 const btnRefresh = document.getElementById('btnRefresh');
 if (btnRefresh) {
   btnRefresh.addEventListener('click', async ()=>{
@@ -131,6 +160,13 @@ if (btnRefresh) {
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
       renderAll();
+
+      // auto-fit once on refresh if bounds changed and map not yet positioned
+      requestAnimationFrame(()=>{
+        map.invalidateSize();
+        if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
+      });
+
       toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
     }catch(e){
       console.error(e);
@@ -179,12 +215,7 @@ document.getElementById('btnReport')?.addEventListener('click', ()=>{
   const mid = Math.floor(polesPerJob.length/2);
   const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length%2? polesPerJob[mid] : Math.round((polesPerJob[mid-1]+polesPerJob[mid])/2)) : 0;
 
-  const counts = {
-    jobs: Object.keys(byJob).length,
-    polesPerJobMedian,
-    byJob,
-    naByJob
-  };
+  const counts = { jobs: Object.keys(byJob).length, polesPerJobMedian, byJob, naByJob };
 
   openReport({ poles: enriched, permits: STATE.permits, counts, ownerCounts, statusCounts });
 });
@@ -198,23 +229,20 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll();
-    // Ensure the map is positioned on first paint
-    requestAnimationFrame(() => {
-      map.invalidateSize(); // in case CSS sized #map after init
-      if (STATE.bounds && typeof STATE.bounds.isValid === 'function' && STATE.bounds.isValid()) {
-        map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
-      }
-    });
-
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
 
-    // start GH SHA watcher if configured
+    // first paint: ensure tiles + markers appear
+    requestAnimationFrame(()=>{
+      map.invalidateSize();
+      if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
+    });
+
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
         STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll();
         toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
-      }, 60000); // check every 60s (adjust if you like)
+      }, 60000);
     }
   }catch(e){
     console.error(e);

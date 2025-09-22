@@ -1,20 +1,17 @@
-/* ====== base + colors stay as you have them ====== */
 :root{
   --bg:#0b1220; --panel:#0f172a; --panel-2:#0c1426; --border:#1e293b; --text:#e5e7eb; --muted:#9aa4b2;
-  --chip-approved:#34d399; --chip-pending:#f59e0b; --chip-created:#facc15;
-  --chip-na-cannot:#a78bfa; --chip-na-other:#ef4444; --chip-none:#64748b;
+  --chip-approved:#34d399; --chip-pending:#f59e0b; --chip-created:#facc15; --chip-na-cannot:#a78bfa; --chip-na-other:#ef4444; --chip-none:#64748b;
 }
+*{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-/* Map always visible */
 #map{position:fixed;inset:0;z-index:0}
 
-/* Panels */
 .panel{position:absolute;z-index:1000;background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:0 10px 30px rgba(2,8,23,.45),inset 0 1px 0 rgba(255,255,255,.03)}
 .panel h3{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--muted)}
 .muted{color:var(--muted)} .small{font-size:12px} .mb6{margin-bottom:6px}
 
-/* Filters — back to the original width/spacing */
-.panel--filters{top:16px;left:16px;width:420px}
+/* Filters — restore professional width */
+.panel--filters{top:16px;left:16px;width:560px}
 .panel--filters .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .panel--filters .row{display:flex;align-items:flex-end;gap:12px}
 .field small{display:block;color:var(--muted);margin-bottom:4px}
@@ -22,21 +19,28 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/
 
 /* Buttons */
 .btn{appearance:none;border:1px solid var(--border);background:#0d1a31;color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer;transition:transform .04s ease,background .15s ease,border-color .15s ease}
-.btn:hover{background:#0f203b;border-color:#273449} .btn:active{transform:translateY(1px)}
-.btn-ghost{background:transparent} .btn-accent{background:#163b2d;border-color:#1f4f3d} .btn-accent:hover{background:#1a4636;border-color:#2a6f55}
+.btn:hover{background:#0f203b;border-color:#273449}.btn:active{transform:translateY(1px)}
+.btn-ghost{background:transparent}.btn-accent{background:#163b2d;border-color:#1f4f3d}.btn-accent:hover{background:#1a4636;border-color:#2a6f55}
 
-/* Legend — narrower and aligned */
+/* Legend — narrower & aligned */
 .panel--legend{bottom:16px;left:16px}
 .panel--legend .legend-grid{display:grid;grid-template-columns:max-content max-content;column-gap:12px;row-gap:4px;align-items:start}
 .panel--legend .item{display:flex;align-items:center;gap:8px;margin:4px 0}
 .panel--legend svg{width:20px;height:20px;display:inline-block}
 .swatch{width:18px;height:18px;border-radius:4px;display:inline-block;margin-right:10px;border:1px solid rgba(255,255,255,.25);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
 
-/* Map Tools (centered, compact) */
+/* Tools (Top-Right) */
 #tools.tools{position:absolute;top:16px;right:16px;z-index:1100;text-align:center;background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:0 10px 30px rgba(2,8,23,.45),inset 0 1px 0 rgba(255,255,255,.03)}
 #tools h3{margin:0 0 8px} #tools .btnrow{display:flex;justify-content:center;gap:12px;flex-wrap:wrap} #tools p{margin:8px 0 0}
 
-/* Report (Insights) — centered overlay, above Map Tools */
+/* Clusters */
+.cluster.neon .cluster-ring{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(0,0,0,.35),0 0 18px rgba(16,185,129,.25)}
+.cluster.neon .cluster-core{width:28px;height:28px;border-radius:999px;background:rgba(0,0,0,.35);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+/* Toast */
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:1200;min-width:200px;padding:10px 14px;background:rgba(15,23,42,.92);border:1px solid var(--border);color:var(--text);border-radius:12px;display:none}
+
+/* Report (Insights) — centered overlay above tools */
 .panel--report{position:fixed;z-index:4000 !important;top:16px;bottom:16px;left:50%;transform:translateX(-50%);width:min(1100px,calc(100vw - 48px));overflow:auto}
 .hidden{display:none !important}
 .report-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -45,16 +49,18 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/
 .card .card-title{color:var(--muted);margin:0 0 8px;font-weight:700}
 .card.span-2{grid-column:span 2}
 
-/* Popup theming + status-colored permit text */
+/* Popup (dark theme) + status-colored permit lines (set via inline style) */
 .leaflet-popup-content-wrapper{background:#101a30;color:var(--text);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.55)}
 .leaflet-popup-tip{background:#101a30;box-shadow:0 12px 30px rgba(0,0,0,.45)}
 .leaflet-popup-content{margin:10px 12px}
-.pp .pp-title{font-weight:700;margin-bottom:4px}
-.pp .pp-sub{font-size:12px;margin-bottom:6px}
-.pp .pp-line{font-size:13px;margin:2px 0}
-.pp .pp-sep{height:8px}
+.pp .pp-title{font-weight:700;margin-bottom:4px}.pp .pp-sub{font-size:12px;margin-bottom:6px}
+.pp .pp-line{font-size:13px;margin:2px 0}.pp .pp-sep{height:8px}
 .pp .pp-section-title{font-size:12px;margin:2px 0 6px}
 .permit-pill{display:inline-block;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid currentColor;font:12px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+/* Area mixed-status badges */
+.area-badge-ic{pointer-events:none}
+.area-badge svg{filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
 
 /* Responsive */
 @media (max-width:980px){
