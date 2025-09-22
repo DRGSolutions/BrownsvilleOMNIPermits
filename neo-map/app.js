@@ -228,96 +228,152 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
 function tuneLegendAndTools(){
   try {
     const legend = document.querySelector('#legend, .legend');
-    if (legend){
-      // Clean up anything my earlier attempt might have injected
-      legend.querySelectorAll('.shape-icon').forEach(n => n.remove());
-      legend.querySelectorAll('[style]').forEach(el => {
-        if (el.style.transform && /rotate\(/.test(el.style.transform)) {
-          // remove ONLY rotate(), keep other transforms if present
-          el.style.transform = el.style.transform.replace(/rotate\([^)]*\)/g,'').trim();
-          if (!el.style.transform) el.style.removeProperty('transform');
-        }
-      });
-      const oldCss = document.getElementById('legend-shape-css');
-      if (oldCss) oldCss.remove();
+    if (!legend) return;
 
-      // Find the MVEC row strictly inside the legend (don’t grab wrappers)
-      const rows = Array.from(legend.querySelectorAll('*'))
-        .filter(el => el.children && el.children.length && /\bMVEC\b/i.test(el.textContent || ''));
+    // Clean up any previous injected bits from older attempts
+    legend.querySelectorAll('.shape-icon').forEach(n => n.remove());
 
-      // pick the *innermost* row that actually contains the MVEC label
-      let mvecRow = null;
-      for (const el of rows){
-        const txt = (el.textContent || '').trim();
-        const parentTxt = (el.parentElement?.textContent || '').trim();
-        if (/\bMVEC\b/i.test(txt) && (!parentTxt || parentTxt.length > txt.length)) { mvecRow = el; break; }
+    // --- Reference size: read the "Approved" chip to size utility icons a bit smaller
+    let chipPx = 20, approvedSwatch = null;
+    const approvedRow = Array.from(legend.querySelectorAll('*')).find(el => /\bApproved\b/i.test(el.textContent || ''));
+    if (approvedRow){
+      approvedSwatch = Array.from(approvedRow.querySelectorAll('i,b,span,em,div,.swatch,.chip,.color,.dot'))
+        .find(e => {
+          const cs = getComputedStyle(e); const w = parseFloat(cs.width), h = parseFloat(cs.height);
+          return w>8 && w<40 && Math.abs(w-h)<3; // small square-ish chip
+        }) || null;
+      if (approvedSwatch){
+        const cs = getComputedStyle(approvedSwatch);
+        chipPx = Math.round(Math.min(parseFloat(cs.width)||20, parseFloat(cs.height)||20));
+        // Restore Approved color if needed
+        const desired = (getComputedStyle(document.documentElement).getPropertyValue('--chip-approved') || '').trim() || '#34d399';
+        approvedSwatch.style.backgroundColor = desired;
+        approvedSwatch.style.borderColor = desired;
       }
-      if (!mvecRow) mvecRow = rows[0];
+    }
+    const ICON_PX = Math.max(14, Math.round(chipPx * 0.85)); // a touch smaller than status chips
 
-      if (mvecRow){
-        // The shape element is usually the first small box/span before the text
-        let shape = mvecRow.querySelector('.shape, .legend-shape, .icon, .swatch, span, i, b');
-        if (!shape || /MVEC/i.test(shape.textContent || '')) {
-          // If we didn’t find a proper shape node, create one right before the label text
-          shape = document.createElement('span');
-          shape.className = 'legend-shape';
-          mvecRow.insertBefore(shape, mvecRow.firstChild);
-        }
+    // Shared paint constants (match your existing legend look)
+    const fillColor   = 'rgba(148,160,180,0.65)';      // soft slate fill
+    const borderColor = 'rgba(255,255,255,0.92)';      // white-ish outline
+    const borderW     = 3;
+    const cornerR     = 6;
 
-        // Sample style (size/border/fill) from the BPUB shape so MVEC matches *exactly*
-        let size = 22, borderWidth = '3px', borderColor = 'rgba(255,255,255,0.92)', fill = null;
-        const bpubRow = Array.from(legend.querySelectorAll('*')).find(el => /\bBPUB\b/i.test(el.textContent || ''));
-        if (bpubRow){
-          const sample = bpubRow.querySelector('.shape, .legend-shape, .icon, .swatch, span, i, b') || null;
-          if (sample){
-            const cs = getComputedStyle(sample);
-            const w = parseFloat(cs.width), h = parseFloat(cs.height);
-            if (w > 0 && h > 0) size = Math.round(Math.min(w,h));
-            if (cs.borderTopWidth && cs.borderTopWidth !== '0px') borderWidth = cs.borderTopWidth;
-            if (cs.borderTopColor) borderColor = cs.borderTopColor;
-            if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') fill = cs.backgroundColor;
-          }
-        }
-        if (!fill) {
-          // reasonable fallback to your original fill tone
-          fill = 'rgba(148, 160, 180, 0.65)';
-        }
+    // Helper: find the legend row for a label, get or create the leading shape holder
+    function getRowAndHolder(labelRe){
+      const row = Array.from(legend.querySelectorAll('*')).find(el => labelRe.test((el.textContent || '').trim()));
+      if (!row) return { row:null, holder:null };
+      // Prefer to reuse an existing small square/shape element before the text if present
+      let holder = Array.from(row.children).find(ch => {
+        const cs = getComputedStyle(ch); const w = parseFloat(cs.width), h = parseFloat(cs.height);
+        return w>8 && w<40 && Math.abs(w-h)<3;
+      });
+      if (!holder){
+        holder = document.createElement('span');
+        row.insertBefore(holder, row.firstChild);
+      } else {
+        holder.innerHTML = ''; // repurpose it cleanly
+      }
+      holder.className = 'shape-icon';
+      Object.assign(holder.style, {
+        display:'inline-block', position:'relative', width:ICON_PX+'px', height:ICON_PX+'px',
+        marginRight:'10px', verticalAlign:'middle'
+      });
+      return { row, holder };
+    }
 
-        // Build a diamond INSIDE the shape box (so we don’t rotate containers or text)
-        shape.innerHTML = '';
-        shape.style.display = 'inline-block';
-        shape.style.width = `${size}px`;
-        shape.style.height = `${size}px`;
-        shape.style.marginRight = '10px';
-        shape.style.position = 'relative';
-        shape.style.border = '';           // keep container clean
-        shape.style.background = 'transparent';
-        shape.style.borderRadius = '';     // box itself unstyled
-
-        const diamond = document.createElement('span');
-        diamond.style.display = 'block';
-        diamond.style.width = '100%';
-        diamond.style.height = '100%';
-        diamond.style.background = fill;
-        diamond.style.border = `${borderWidth} solid ${borderColor}`;
-        diamond.style.borderRadius = '6px';
-        diamond.style.transform = 'rotate(45deg)';
-        diamond.style.transformOrigin = '50% 50%';
-        shape.appendChild(diamond);
+    // BPUB: circle
+    {
+      const { holder } = getRowAndHolder(/\bBPUB\b/i);
+      if (holder){
+        const circle = document.createElement('span');
+        Object.assign(circle.style, {
+          position:'absolute', inset:'0',
+          border:`${borderW}px solid ${borderColor}`,
+          borderRadius:'9999px',
+          background: fillColor
+        });
+        holder.appendChild(circle);
       }
     }
 
-    // Map Tools copy: keep it short & professional
+    // AEP: triangle (SVG to keep edges crisp at small size)
+    {
+      const { holder } = getRowAndHolder(/\bAEP\b/i);
+      if (holder){
+        const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('viewBox','0 0 24 24');
+        svg.style.width = ICON_PX+'px';
+        svg.style.height = ICON_PX+'px';
+        const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+        poly.setAttribute('points','12,3 21,21 3,21');
+        poly.setAttribute('fill', fillColor);
+        poly.setAttribute('stroke', borderColor);
+        poly.setAttribute('stroke-width', borderW);
+        svg.appendChild(poly);
+        holder.appendChild(svg);
+      }
+    }
+
+    // MVEC: diamond from TWO smaller triangles + a thin rotated border overlay
+    {
+      const { holder } = getRowAndHolder(/\bMVEC\b/i);
+      if (holder){
+        const half = Math.floor(ICON_PX / 2);
+
+        // Top triangle
+        const top = document.createElement('div');
+        Object.assign(top.style, {
+          position:'absolute', left:'50%', transform:'translateX(-50%)',
+          width:'0', height:'0',
+          borderLeft:`${half}px solid transparent`,
+          borderRight:`${half}px solid transparent`,
+          borderBottom:`${half}px solid ${fillColor}`,
+          top:'0'
+        });
+        // Bottom triangle
+        const bot = document.createElement('div');
+        Object.assign(bot.style, {
+          position:'absolute', left:'50%', transform:'translateX(-50%)',
+          width:'0', height:'0',
+          borderLeft:`${half}px solid transparent`,
+          borderRight:`${half}px solid transparent`,
+          borderTop:`${half}px solid ${fillColor}`,
+          bottom:'0'
+        });
+
+        // Thin diamond border (rotated inner element only; does NOT affect layout/text)
+        const border = document.createElement('span');
+        Object.assign(border.style, {
+          position:'absolute', left:'0', top:'0', right:'0', bottom:'0',
+          transform:'rotate(45deg)', transformOrigin:'50% 50%',
+          border:`${borderW}px solid ${borderColor}`,
+          borderRadius: `${cornerR}px`
+        });
+
+        holder.appendChild(top);
+        holder.appendChild(bot);
+        holder.appendChild(border);
+      }
+    }
+
+    // Slightly tighten the legend’s vertical rhythm
+    legend.style.lineHeight = '1.15';
+
+    // --- Map Tools: keep short/pro
     const tools = document.querySelector('#tools, .tools');
     if (tools){
       const paras = Array.from(tools.querySelectorAll('p, .note, .muted, small'));
       const long = paras.find(p => /concave hull/i.test((p.textContent||'')));
       if (long) long.textContent = 'Click a shape to view pole & permits.';
+      const cs = getComputedStyle(tools);
+      if (cs.gap && cs.gap !== 'normal') tools.style.gap = '8px';
     }
   } catch (e) {
     console.warn('[neo-map] legend/tools tune failed:', e);
   }
 }
+
 
 /* =============================== Boot =============================== */
 (async function(){
