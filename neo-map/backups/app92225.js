@@ -11,27 +11,6 @@ const map = L.map('map', { zoomControl:false, preferCanvas:true });
 L.control.zoom({ position:'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO' }).addTo(map);
 
-// [VIEW-PERSISTENCE] — save/restore current view
-const VIEW_KEY = 'neo-map:view';
-function saveView(m){
-  try{
-    if(!m || !m._loaded) return;
-    const c = m.getCenter(), z = m.getZoom();
-    localStorage.setItem(VIEW_KEY, JSON.stringify({lat:c.lat, lng:c.lng, zoom:z}));
-  }catch{}
-}
-function readSavedView(){
-  try{ const s = localStorage.getItem(VIEW_KEY); return s ? JSON.parse(s) : null; }catch{ return null; }
-}
-// restore saved view if available (no animation, minimal change to your current behavior)
-(() => {
-  const saved = readSavedView();
-  if (saved) map.setView([saved.lat, saved.lng], saved.zoom, { animate:false });
-})();
-map.on('moveend zoomend', () => saveView(map));
-// optional: keep tiles sized right on window changes
-window.addEventListener('resize', () => map.invalidateSize());
-
 /* ========= Cluster coloring by dominant permit status (worst → best) ========= */
 const STATUS_ORDER = [
   s => String(s||'').startsWith('Not Approved -'),
@@ -149,20 +128,9 @@ if (btnRefresh) {
   btnRefresh.addEventListener('click', async ()=>{
     try{
       toast('Refreshing data…');
-
-      // [VIEW-PERSISTENCE] snapshot current view
-      const prev = { center: map.getCenter(), zoom: map.getZoom() };
-
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
       STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
       renderAll();
-
-      // [VIEW-PERSISTENCE] restore view after layers rebuilt
-      requestAnimationFrame(()=>{
-        map.setView(prev.center, prev.zoom, { animate:false });
-        saveView(map);
-      });
-
       toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
     }catch(e){
       console.error(e);
@@ -235,19 +203,8 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
     // start GH SHA watcher if configured
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
-
-        // [VIEW-PERSISTENCE] snapshot current view before applying update
-        const prev = { center: map.getCenter(), zoom: map.getZoom() };
-
         STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll();
-
-        // [VIEW-PERSISTENCE] restore view right after layers update
-        requestAnimationFrame(()=>{
-          map.setView(prev.center, prev.zoom, { animate:false });
-          saveView(map);
-        });
-
         toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
       }, 60000); // check every 60s (adjust if you like)
     }
