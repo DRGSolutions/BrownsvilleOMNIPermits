@@ -5,25 +5,36 @@ import { ruleRow, readRules, matchRule } from './filters.js';
 import { popupHTML, toast } from './ui.js';
 import { openReport, closeReport } from './report.js';
 
-/* ────────────────────────── LOD (level of detail) ──────────────────────────
+/* LOD (level of detail)
    Markers:
      - z < 11  → none
-     - 11–13   → canvas dots
-     - ≥ 14    → full SVG shapes + popups
-   Areas (hulls):
-     - z < 13  → COARSE: 1 convex+smooth hull per job, few labels
-     - ≥ 13    → FINE: concave+smooth per job (split if needed), more labels
+     - 11–14   → tiny canvas dots (fast)
+     - ≥ 15    → compact SVG shapes + popups
+   Areas:
+     - z < 13  → coarse (convex+smooth)  — light
+     - ≥ 13    → fine (concave+smooth)   — detailed
 */
-export const LOD = { DOT_MIN: 11, SHAPE_MIN: 14, HULL_FINE_MIN: 13 };
+export const LOD = { DOT_MIN: 11, SHAPE_MIN: 15, HULL_FINE_MIN: 13 };
 
-function markerMode(z) {
-  if (z < LOD.DOT_MIN) return 'none';
-  if (z < LOD.SHAPE_MIN) return 'dots';
-  return 'shapes';
+function markerMode(z){ return z < LOD.DOT_MIN ? 'none' : z < LOD.SHAPE_MIN ? 'dots' : 'shapes'; }
+function hullMode(z){ return z < LOD.HULL_FINE_MIN ? 'coarse' : 'fine'; }
+
+/* size helpers (tiny by default; grow only when very close) */
+function dotRadiusForZoom(z){
+  if (z < 11) return 0;
+  if (z === 11) return 1.6;
+  if (z === 12) return 1.9;
+  if (z === 13) return 2.2;
+  if (z === 14) return 2.5;
+  return 0; // not used in shapes mode
 }
-function hullMode(z) { return z < LOD.HULL_FINE_MIN ? 'coarse' : 'fine'; }
+function shapePxForZoom(z){
+  if (z >= 18) return 24;   // very close
+  if (z >= 16) return 18;   // close
+  return 16;                // first shapes level (compact)
+}
 
-/* ─────────────────────────────── STATE ─────────────────────────────── */
+/* ── STATE ── */
 const STATE = {
   poles: [],
   permits: [],
@@ -40,7 +51,7 @@ const STATE = {
 const map = L.map('map', { zoomControl: false, preferCanvas: true });
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-/* Base tiles: DARK (no labels) + labels overlay */
+/* Base tiles: dark without labels + labels overlay (labels above hull shading) */
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = '650';
 labelsPane.style.pointerEvents = 'none';
@@ -53,19 +64,24 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
   pane: 'labels'
 }).addTo(map);
 
-/* Simple marker layer (no clustering) */
+/* markers live in a simple layer group (no clustering) */
 STATE.markerLayer = L.layerGroup().addTo(map);
 
-/* ============================= Rendering ============================= */
-function renderMarkers() {
-  const mode = markerMode(map.getZoom());
+/* ── rendering ── */
+function renderMarkers(){
+  const z = map.getZoom();
+  const mode = markerMode(z);
   const data = STATE.filtered || STATE.poles;
-  STATE.bounds = buildMarkers(map, STATE.markerLayer, data, STATE.byKey, popupHTML, mode);
+  const opts = {
+    dotRadius: dotRadiusForZoom(z),
+    shapePx: shapePxForZoom(z)
+  };
+  STATE.bounds = buildMarkers(map, STATE.markerLayer, data, STATE.byKey, popupHTML, mode, opts);
 }
 
-function renderAreas() {
-  if (STATE.areas.length) {
-    for (const a of STATE.areas) {
+function renderAreas(){
+  if (STATE.areas.length){
+    for (const a of STATE.areas){
       a?.layer && map.removeLayer(a.layer);
       a?.glow  && map.removeLayer(a.glow);
       a?.label && map.removeLayer(a.label);
@@ -79,126 +95,118 @@ function renderAreas() {
   STATE.areas = buildJobAreas(map, data, STATE.byKey, { mode });
 }
 
-function renderAll(filtered = null) {
+function renderAll(filtered=null){
   STATE.filtered = filtered;
   renderMarkers();
   renderAreas();
 }
 
-/* LOD redraw on zoom (light debounce) */
+/* LOD: re-render on zoom (light debounce) */
 let lodT = null;
 map.on('zoomend', () => {
   clearTimeout(lodT);
-  lodT = setTimeout(() => {
-    renderMarkers();
-    renderAreas();  // hull LOD + label declutter follows zoom
-  }, 80);
+  lodT = setTimeout(() => { renderMarkers(); renderAreas(); }, 80);
 });
 
-/* ============================= Filters ============================= */
-function applyFilters() {
+/* ── filters ── */
+function applyFilters(){
   const spec = readRules();
-  const result = STATE.poles.filter(p => {
+  const result = STATE.poles.filter(p=>{
     const rel = STATE.byKey.get(poleKey(p)) || [];
     const q = spec.q;
-    if (q.owner && p.owner !== q.owner) return false;
-    if (q.status) {
-      if (q.status === 'NONE') { if (rel.length !== 0) return false; }
-      else if (!rel.some(r => r.permit_status === q.status)) return false;
+    if (q.owner && p.owner!==q.owner) return false;
+    if (q.status){
+      if (q.status==='NONE'){ if (rel.length!==0) return false; }
+      else if (!rel.some(r=>r.permit_status===q.status)) return false;
     }
-    if (q.search) {
+    if (q.search){
       const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
       if (!hay.includes(q.search)) return false;
     }
-    if (spec.rules.length) {
-      const hits = spec.rules.map(r => matchRule(p, r, rel));
-      return spec.logic === 'AND' ? hits.every(Boolean) : hits.some(Boolean);
+    if (spec.rules.length){
+      const hits = spec.rules.map(r=> readRules.matchRule ? readRules.matchRule(p,r,rel) : true);
+      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
     }
     return true;
   });
   renderAll(result);
 }
 
-/* ============================= UI wiring ============================= */
-document.getElementById('btnAddRule').addEventListener('click', () => {
+/* ── UI wiring ── */
+document.getElementById('btnAddRule').addEventListener('click', ()=> {
   document.getElementById('rules').appendChild(ruleRow());
 });
 document.getElementById('btnApply').addEventListener('click', applyFilters);
-document.getElementById('btnClear').addEventListener('click', () => {
-  document.getElementById('qOwner').value = '';
-  document.getElementById('qStatus').value = '';
-  document.getElementById('qSearch').value = '';
-  document.getElementById('rules').innerHTML = '';
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  document.getElementById('qOwner').value='';
+  document.getElementById('qStatus').value='';
+  document.getElementById('qSearch').value='';
+  document.getElementById('rules').innerHTML='';
   renderAll(null);
 });
 document.getElementById('qOwner').addEventListener('change', applyFilters);
 document.getElementById('qStatus').addEventListener('change', applyFilters);
-document.getElementById('qSearch').addEventListener('input', () => {
-  clearTimeout(window.__qT); window.__qT = setTimeout(applyFilters, 220);
+document.getElementById('qSearch').addEventListener('input', ()=>{
+  clearTimeout(window.__qT); window.__qT=setTimeout(applyFilters,220);
 });
 
-document.getElementById('btnFit').addEventListener('click', () => {
-  if (STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15));
+document.getElementById('btnFit').addEventListener('click', ()=>{
+  if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15));
 });
-document.getElementById('btnToggleAreas').addEventListener('click', () => {
+document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   STATE.areasVisible = !STATE.areasVisible;
-  if (!STATE.areasVisible) {
-    for (const a of STATE.areas) {
+  if (!STATE.areasVisible){
+    for (const a of STATE.areas){
       a?.layer && map.removeLayer(a.layer);
       a?.glow  && map.removeLayer(a.glow);
       a?.label && map.removeLayer(a.label);
     }
-    STATE.areas = [];
+    STATE.areas=[];
   } else {
     renderAreas();
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-// manual refresh
+/* manual refresh */
 const btnRefresh = document.getElementById('btnRefresh');
 if (btnRefresh) {
-  btnRefresh.addEventListener('click', async () => {
-    try {
+  btnRefresh.addEventListener('click', async ()=>{
+    try{
       toast('Refreshing data…');
       const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
-      STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
+      STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
       renderAll(STATE.filtered);
-
-      requestAnimationFrame(() => {
+      requestAnimationFrame(()=>{
         map.invalidateSize();
-        if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
+        if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
       });
-
-      toast(`Data refreshed (${source}${shas.poles ? ` @ ${shas.poles.slice(0, 7)}…` : ''})`);
-    } catch (e) {
+      toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
+    }catch(e){
       console.error(e);
       toast('Refresh failed');
     }
   });
 }
 
-/* ============================= Insights wiring ============================= */
-document.getElementById('btnReport')?.addEventListener('click', () => {
+/* Insights (unchanged) */
+document.getElementById('btnReport')?.addEventListener('click', ()=>{
   const { poles, permits, byKey } = STATE;
-  const enriched = poles.map(p => ({ ...p, __hasPermit: (byKey.get(poleKey(p)) || []).length > 0 }));
-
+  const enriched = poles.map(p => ({ ...p, __hasPermit: (byKey.get(poleKey(p))||[]).length>0 }));
   const statusCounts = {
-    'Approved': 0, 'Submitted - Pending': 0, 'Created - NOT Submitted': 0,
-    'Not Approved - Cannot Attach': 0, 'Not Approved - PLA Issues': 0, 'Not Approved - MRE Issues': 0, 'Not Approved - Other Issues': 0,
-    'NONE': 0
+    'Approved':0,'Submitted - Pending':0,'Created - NOT Submitted':0,
+    'Not Approved - Cannot Attach':0,'Not Approved - PLA Issues':0,'Not Approved - MRE Issues':0,'Not Approved - Other Issues':0,
+    'NONE':0
   };
   const ownerCounts = {};
   const byJob = {};
   const naByJob = {};
-
-  for (const p of enriched) {
-    ownerCounts[p.owner] = (ownerCounts[p.owner] || 0) + 1;
-    byJob[p.job_name] = (byJob[p.job_name] || 0) + 1;
-
+  for(const p of enriched){
+    ownerCounts[p.owner] = (ownerCounts[p.owner]||0)+1;
+    byJob[p.job_name] = (byJob[p.job_name]||0)+1;
     const rel = byKey.get(poleKey(p)) || [];
-    if (!rel.length) { statusCounts['NONE']++; continue; }
-    const ss = rel.map(r => String(r.permit_status || ''));
+    if (!rel.length){ statusCounts['NONE']++; continue; }
+    const ss = rel.map(r => String(r.permit_status||''));
     const order = [
       s => s.startsWith('Not Approved - Cannot Attach'),
       s => s.startsWith('Not Approved - PLA Issues'),
@@ -209,44 +217,38 @@ document.getElementById('btnReport')?.addEventListener('click', () => {
       s => s === 'Approved'
     ];
     let chosen = 'Approved';
-    for (const pred of order) { const hit = ss.find(pred); if (hit) { chosen = hit; break; } }
-    statusCounts[chosen] = (statusCounts[chosen] || 0) + 1;
-    if (chosen.startsWith('Not Approved -')) naByJob[p.job_name] = (naByJob[p.job_name] || 0) + 1;
+    for(const pred of order){ const hit = ss.find(pred); if (hit){ chosen = hit; break; } }
+    statusCounts[chosen] = (statusCounts[chosen]||0)+1;
+    if (chosen.startsWith('Not Approved -')) naByJob[p.job_name] = (naByJob[p.job_name]||0)+1;
   }
-
-  const polesPerJob = Object.values(byJob).sort((a, b) => a - b);
-  const mid = Math.floor(polesPerJob.length / 2);
-  const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length % 2 ? polesPerJob[mid] : Math.round((polesPerJob[mid - 1] + polesPerJob[mid]) / 2)) : 0;
-
+  const polesPerJob = Object.values(byJob).sort((a,b)=>a-b);
+  const mid = Math.floor(polesPerJob.length/2);
+  const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length%2? polesPerJob[mid] : Math.round((polesPerJob[mid-1]+polesPerJob[mid])/2)) : 0;
   const counts = { jobs: Object.keys(byJob).length, polesPerJobMedian, byJob, naByJob };
-
   openReport({ poles: enriched, permits: STATE.permits, counts, ownerCounts, statusCounts });
 });
+document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeReport());
 
-document.getElementById('btnReportClose')?.addEventListener('click', () => closeReport());
-
-/* =============================== Boot =============================== */
-(async function () {
-  try {
+/* boot */
+(async function(){
+  try{
     toast('Loading poles & permits…');
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
-    STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
+    STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll(null);
-    toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles ? ` @ ${shas.poles.slice(0, 7)}…` : ''})`);
-
-    requestAnimationFrame(() => {
+    toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
+    requestAnimationFrame(()=>{
       map.invalidateSize();
-      if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate: false });
+      if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
     });
-
     if (watchForGithubUpdates !== undefined) {
-      STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas }) => {
-        STATE.poles = poles; STATE.permits = permits; STATE.byKey = byKey; STATE.shas = shas;
+      STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
+        STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll(STATE.filtered);
-        toast(`Auto-updated @ ${shas.poles.slice(0, 7)}…`);
+        toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
       }, 60000);
     }
-  } catch (e) {
+  }catch(e){
     console.error(e);
     toast('Error loading data. Place neo-map next to poles.json & permits.json', 4500);
   }
