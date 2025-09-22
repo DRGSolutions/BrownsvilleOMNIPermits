@@ -70,3 +70,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/
   .report-grid{grid-template-columns:1fr}
   .card.span-2{grid-column:span 1}
 }
+
+/* Area label pane & cursor */
+.leaflet-pane.areaLabelPane { pointer-events: auto; z-index: 650 !important; }
+.area-label { cursor: pointer; }
