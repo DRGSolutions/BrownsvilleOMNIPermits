@@ -2,10 +2,9 @@
 // Modes:
 //   'none'   → draw nothing (compute bounds only)
 //   'dots'   → ultra-fast Canvas dots (non-interactive)
-//   'shapes' → small Canvas circleMarkers (interactive popups), culled to viewport
+//   'shapes' → small Canvas circleMarkers (interactive), culled to viewport
 //
-// Fill color = dominant permit status for that pole.
-// Owner silhouettes are dropped for performance (all circles); we keep them tiny.
+// Fill color = dominant permit status for that pole (no white strokes).
 
 import { poleKey, statusColor } from './data.js';
 
@@ -25,11 +24,16 @@ function dominantStatusFor(permits){
   return ss[0] || 'NONE';
 }
 
-const CANVAS = L.canvas({ padding: 0.4 }); // shared renderer for everything
+const CANVAS = L.canvas({ padding: 0.4 }); // shared renderer
+
+function hasView(map){
+  // Leaflet sets _zoom once the map has a view (setView/fitBounds/etc.)
+  return map && typeof map._zoom === 'number';
+}
 
 export function buildMarkers(
   map,
-  layer,            // L.LayerGroup (will be cleared in 'dots'/'shapes')
+  layer,            // L.LayerGroup
   poles,
   byKey,
   popupHTML,
@@ -37,95 +41,93 @@ export function buildMarkers(
   opts = {}         // { dotRadius:number, shapePx:number }
 ){
   const dotR = Number(opts.dotRadius || 2.0);
-  const px   = Number(opts.shapePx || 16);
-  const z    = map.getZoom();
+  const px   = Number(opts.shapePx || 14);
 
-  // compute bounds always
+  // Always compute bounds, even if we don’t draw
   let llb = null;
   const addToBounds = (lat, lon) => {
     if (!llb) llb = L.latLngBounds([lat, lon], [lat, lon]); else llb.extend([lat, lon]);
   };
 
-  if (mode === 'none'){
-    for (const p of (poles||[])){
+  // If no poles, nothing to do
+  if (!poles || !poles.length) return null;
+
+  // When map has no view yet (first paint), just compute bounds and return.
+  if (!hasView(map) || mode === 'none'){
+    for (const p of poles){
       if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
       addToBounds(p.lat, p.lon);
     }
-    return llb || null;
+    // Do NOT add layers until a view exists (avoids "Set map center and zoom first")
+    return llb;
   }
 
-  // Clear target layer before drawing this mode
+  // From here on, a view exists — safe to draw
   if (layer && layer.clearLayers) layer.clearLayers();
 
-  // FAST DOTS (non-interactive, single Canvas pass)
   if (mode === 'dots'){
-    // Draw visible poles as cheap canvas circleMarkers (no stroke, no events)
-    for (const p of (poles||[])){
+    for (const p of poles){
       const lat = p.lat, lon = p.lon;
       if (typeof lat !== 'number' || typeof lon !== 'number') continue;
 
       const rel = byKey.get(poleKey(p)) || [];
-      const status = dominantStatusFor(rel);
-      const fill = statusColor(status);
+      const fill = statusColor(dominantStatusFor(rel));
 
       const dot = L.circleMarker([lat, lon], {
         renderer: CANVAS,
-        radius: dotR,       // small
-        stroke: false,      // ← no white outline
-        fill: true,
-        fillOpacity: 0.95,
-        fillColor: fill,
-        interactive: false, // fastest
-        bubblingMouseEvents: false
+        radius: dotR,
+        stroke: false,
+        fill: true, fillOpacity: 0.95, fillColor: fill,
+        interactive: false, bubblingMouseEvents: false
       });
-
-      if (layer) layer.addLayer(dot); else dot.addTo(map);
+      layer.addLayer(dot);
       addToBounds(lat, lon);
     }
-    return llb || null;
+    return llb;
   }
 
-  // INTERACTIVE CANVAS CIRCLES (still tiny, but clickable with lazy popups)
-  // Only create shapes for what’s on screen (viewport culling) to keep count low.
-  const pad = 256; // 1 tile padding for smooth panning
-  const pb  = map.getPixelBounds();
-  const min = pb.min.subtract([pad,pad]);
-  const max = pb.max.add([pad,pad]);
-
+  // mode === 'shapes'  (interactive tiny circles, culled to viewport)
+  const z = map.getZoom();
+  const pad = 256; // pad by one tile to avoid pop-in at edges
+  let pb;
+  try { pb = map.getPixelBounds(); }
+  catch { // ultra-defensive: if anything goes wrong, skip culling
+    pb = { min:{x:-Infinity,y:-Infinity}, max:{x:Infinity,y:Infinity} };
+  }
+  const min = pb.min ? pb.min.subtract([pad,pad]) : { x:-Infinity, y:-Infinity };
+  const max = pb.max ? pb.max.add([pad,pad])     : { x: Infinity, y: Infinity };
   const inView = (lat, lon) => {
     const pt = map.project([lat, lon], z);
     return pt.x >= min.x && pt.x <= max.x && pt.y >= min.y && pt.y <= max.y;
   };
 
-  const radiusPx = Math.max(2, Math.round(px / 2.2)); // compact, readable
-  for (const p of (poles||[])){
+  const radiusPx = Math.max(2, Math.round(px / 2.2));
+  for (const p of poles){
     const lat = p.lat, lon = p.lon;
     if (typeof lat !== 'number' || typeof lon !== 'number') continue;
-    if (!inView(lat, lon)) { addToBounds(lat, lon); continue; }
 
-    const rel = byKey.get(poleKey(p)) || [];
-    const status = dominantStatusFor(rel);
-    const fill = statusColor(status);
+    // Only instantiate interactive markers that are actually in/near the viewport
+    if (inView(lat, lon)){
+      const rel = byKey.get(poleKey(p)) || [];
+      const fill = statusColor(dominantStatusFor(rel));
 
-    const m = L.circleMarker([lat, lon], {
-      renderer: CANVAS,
-      radius: radiusPx,
-      stroke: false,            // ← no outline (big perf win)
-      fill: true,
-      fillOpacity: 0.95,
-      fillColor: fill,
-      interactive: true,
-      bubblingMouseEvents: false
-    });
+      const m = L.circleMarker([lat, lon], {
+        renderer: CANVAS,
+        radius: radiusPx,
+        stroke: false,
+        fill: true, fillOpacity: 0.95, fillColor: fill,
+        interactive: true, bubblingMouseEvents: false
+      });
 
-    // Lazy popup (created only when needed)
-    if (typeof popupHTML === 'function'){
-      m.on('click', () => { m.bindPopup(popupHTML(p, rel)).openPopup(); });
+      if (typeof popupHTML === 'function'){
+        m.on('click', () => m.bindPopup(popupHTML(p, rel)).openPopup());
+      }
+
+      layer.addLayer(m);
     }
 
-    if (layer) layer.addLayer(m); else m.addTo(map);
     addToBounds(lat, lon);
   }
 
-  return llb || null;
+  return llb;
 }
