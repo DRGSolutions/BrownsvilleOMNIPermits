@@ -148,7 +148,7 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   } else {
     /*STATE.areas = buildJobAreas(map, STATE.poles); */
     STATE.areas = buildJobAreas(map, STATE.poles, STATE.byKey);
-    STATE.badges = buildAreaBadges(map, STATE.poles, STATE.byKey);
+    /* STATE.badges = buildAreaBadges(map, STATE.poles, STATE.byKey); */
   }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
