@@ -1,13 +1,26 @@
 import { CONFIG } from './config.js';
 
 /*
-This module loads poles/permits JSON with cache-proof, immutable URLs, and
-hot-watches for updates.
+CONFIG supports BOTH local paths and GitHub-by-SHA.
 
-Key change:
-- We now resolve the *commit SHA* that last changed each file via the
-  Commits API, instead of the blob SHA from the Contents API. Raw GitHub
-  URLs accept a branch/tag/commit SHA (tree-ish), not a blob SHA.
+If you set (e.g. in index.html before modules load):
+  <script>
+    window.APP_CONFIG = {
+      OWNER: 'DRGSolutions',
+      REPO: 'BrownsvilleOMNIPermits',
+      DEFAULT_BRANCH: 'main',
+      DATA_DIR: 'data'
+    };
+  </script>
+
+…then we’ll fetch:
+  1) SHA via GitHub API:
+     https://api.github.com/repos/OWNER/REPO/contents/DATA_DIR/poles.json?ref=DEFAULT_BRANCH
+  2) Raw by immutable SHA:
+     https://raw.githubusercontent.com/OWNER/REPO/SHA/DATA_DIR/poles.json
+
+Fallbacks (if GH API fails or not configured):
+  - Try CONFIG.DATA_PATHS locally (same-origin)
 */
 
 const GH = (() => {
@@ -27,25 +40,16 @@ async function fetchJSON(url, headers = {}) {
   return res.json();
 }
 
-/**
- * Return the latest *commit* SHA that touched the given file on GH.BRANCH.
- * We use this SHA in raw.githubusercontent.com URLs (immutable & cache-safe).
- */
 async function getFileSHA(file) {
-  if (!GH) throw new Error('GitHub config not set');
-  const path = `${GH.DIR}/${file}`.replace(/^\/+/, '');
-  const url =
-    `https://api.github.com/repos/${GH.OWNER}/${GH.REPO}/commits` +
-    `?path=${encodeURIComponent(path)}&sha=${encodeURIComponent(GH.BRANCH)}&per_page=1`;
-  const list = await fetchJSON(url, { 'Accept': 'application/vnd.github+json' });
-  const sha = Array.isArray(list) && list[0]?.sha;
-  if (!sha) throw new Error(`No commit SHA for ${file}`);
-  return sha; // commit/tree-ish SHA (works with raw.githubusercontent.com)
+  // GitHub Contents API returns blob SHA for a path at a ref (branch)
+  // Example:
+  //  https://api.github.com/repos/OWNER/REPO/contents/data/poles.json?ref=main
+  const url = `https://api.github.com/repos/${GH.OWNER}/${GH.REPO}/contents/${GH.DIR}/${file}?ref=${encodeURIComponent(GH.BRANCH)}`;
+  const j = await fetchJSON(url, { 'Accept': 'application/vnd.github+json' });
+  if (!j || !j.sha) throw new Error(`No SHA for ${file}`);
+  return j.sha;
 }
 
-/**
- * Load {file} *as of commit {sha}* from raw.githubusercontent.com
- */
 async function loadBySHA(file, sha) {
   const raw = `https://raw.githubusercontent.com/${GH.OWNER}/${GH.REPO}/${sha}/${GH.DIR}/${file}`;
   return fetchJSON(raw);
@@ -59,28 +63,18 @@ async function tryLocal(paths, file) {
   throw new Error(`Could not load ${file} from ${paths.join(', ')}`);
 }
 
-/**
- * Public: load both JSONs.
- * - Prefers GitHub commit-based fetch (immutable, cache-proof).
- * - Falls back to CONFIG.DATA_PATHS (same-origin) when GH not configured/unavailable.
- */
+// Public: load both JSONs (prefers GitHub SHA when configured)
 export async function loadPolesAndPermits() {
   let poles, permits, shas = { poles:null, permits:null };
 
   if (GH) {
     try {
-      const [shaPoles, shaPermits] = await Promise.all([
-        getFileSHA('poles.json'),
-        getFileSHA('permits.json')
-      ]);
+      const [shaPoles, shaPermits] = await Promise.all([ getFileSHA('poles.json'), getFileSHA('permits.json') ]);
       shas = { poles: shaPoles, permits: shaPermits };
-      [poles, permits] = await Promise.all([
-        loadBySHA('poles.json', shaPoles),
-        loadBySHA('permits.json', shaPermits)
-      ]);
-      return finalize({ poles, permits, shas, source: 'github-commit' });
+      [poles, permits] = await Promise.all([ loadBySHA('poles.json', shaPoles), loadBySHA('permits.json', shaPermits) ]);
+      return finalize({ poles, permits, shas, source: 'github-sha' });
     } catch (e) {
-      console.warn('[neo-map] GitHub load failed, falling back to local paths:', e?.message);
+      console.warn('[neo-map] GH SHA load failed, falling back to local paths:', e?.message);
     }
   }
 
@@ -110,8 +104,8 @@ function buildPermitIndex(permits) {
 /* -----------------------
    SHA Watcher (hot load)
    -----------------------
-   Polls GitHub for the file *commit* SHAs at interval; when either changes,
-   re-loads both files via commit SHA and invokes onChange with the fresh data.
+   Polls GitHub for the file SHAs at interval; when either changes,
+   re-loads both files via SHA and invokes onChange with the fresh data.
 */
 export function watchForGithubUpdates(onChange, intervalMs = 60000) {
   if (!GH) return () => {}; // no-op if not configured
@@ -122,21 +116,12 @@ export function watchForGithubUpdates(onChange, intervalMs = 60000) {
   async function tick() {
     if (!alive) return;
     try {
-      const [shaPoles, shaPermits] = await Promise.all([
-        getFileSHA('poles.json'),
-        getFileSHA('permits.json')
-      ]);
-      const changed =
-        (last.poles && last.poles !== shaPoles) ||
-        (last.permits && last.permits !== shaPermits) ||
-        (!last.poles && !last.permits);
+      const [shaPoles, shaPermits] = await Promise.all([ getFileSHA('poles.json'), getFileSHA('permits.json') ]);
+      const changed = (last.poles && last.poles !== shaPoles) || (last.permits && last.permits !== shaPermits) || (!last.poles && !last.permits);
       last = { poles: shaPoles, permits: shaPermits };
       if (changed) {
-        const [poles, permits] = await Promise.all([
-          loadBySHA('poles.json', shaPoles),
-          loadBySHA('permits.json', shaPermits)
-        ]);
-        onChange(finalize({ poles, permits, shas: last, source: 'github-commit' }));
+        const [poles, permits] = await Promise.all([ loadBySHA('poles.json', shaPoles), loadBySHA('permits.json', shaPermits) ]);
+        onChange(finalize({ poles, permits, shas: last, source: 'github-sha' }));
       }
     } catch (e) {
       // silent; next tick will retry
