@@ -9,7 +9,7 @@ const STATE = {
   poles: [],
   permits: [],
   byKey: new Map(),
-  cluster: null,
+  markerLayer: null,     // ← no clustering; simple layer group
   areas: [],
   areasVisible: true,
   bounds: null,
@@ -20,68 +20,28 @@ const STATE = {
 const map = L.map('map', { zoomControl: false, preferCanvas: true });
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-/* ── Base tiles: DARK (no labels) + labels-only overlay in a higher pane ── */
+/* Base tiles: DARK (no labels) + labels-only overlay above overlays */
 const labelsPane = map.createPane('labels');
-labelsPane.style.zIndex = '650';              // above polygons/overlays
-labelsPane.style.pointerEvents = 'none';      // labels must not eat clicks
+labelsPane.style.zIndex = '650';
+labelsPane.style.pointerEvents = 'none';
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
   attribution: '© OpenStreetMap © CARTO'
 }).addTo(map);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
   pane: 'labels'
 }).addTo(map);
 
-/* ========= Cluster coloring by dominant permit status (worst → best) ========= */
-const STATUS_ORDER = [
-  s => String(s || '').startsWith('Not Approved -'),
-  s => s === 'Submitted - Pending',
-  s => s === 'Created - NOT Submitted',
-  s => s === 'Approved',
-  s => s === 'NONE'
-];
-
-function pickDominantStatus(markers) {
-  const all = markers.map(m => m.options.__status || 'NONE');
-  const buckets = new Map();
-  for (const s of all) {
-    const key = String(s || '').startsWith('Not Approved -') ? 'Not Approved - *' : s;
-    buckets.set(key, (buckets.get(key) || 0) + 1);
-  }
-  for (const pred of STATUS_ORDER) {
-    let bestKey = null, bestCount = -1;
-    for (const [k, c] of buckets.entries()) {
-      if (pred(k) && c > bestCount) { bestKey = k; bestCount = c; }
-    }
-    if (bestKey) return bestKey === 'Not Approved - *' ? 'Not Approved - Other Issues' : bestKey;
-  }
-  return 'NONE';
-}
-
-// cluster instance
-STATE.cluster = L.markerClusterGroup({
-  disableClusteringAtZoom: 18,
-  spiderfyOnMaxZoom: true,
-  iconCreateFunction: (cluster) => {
-    const markers = cluster.getAllChildMarkers();
-    const domStatus = pickDominantStatus(markers);
-    const col = statusColor(domStatus);
-    const count = cluster.getChildCount();
-    const html = `
-      <div class="cluster-ring" style="background:${col};">
-        <div class="cluster-core">${count}</div>
-      </div>`;
-    return L.divIcon({ html, className: 'cluster neon', iconSize: [44, 44] });
-  }
-});
-map.addLayer(STATE.cluster);
+/* Simple marker layer (no clustering) */
+STATE.markerLayer = L.layerGroup().addTo(map);
 
 /* ============================= Rendering ============================= */
 function renderAll(filtered = null) {
-  STATE.bounds = buildMarkers(map, STATE.cluster, filtered || STATE.poles, STATE.byKey, popupHTML);
+  // markers
+  STATE.bounds = buildMarkers(map, STATE.markerLayer, filtered || STATE.poles, STATE.byKey, popupHTML);
 
+  // clear old areas
   if (STATE.areas.length) {
     for (const a of STATE.areas) {
       if (a.layer) map.removeLayer(a.layer);
@@ -91,6 +51,7 @@ function renderAll(filtered = null) {
     STATE.areas = [];
   }
 
+  // rebuild areas
   if (STATE.areasVisible) {
     const inView = filtered || STATE.poles;
     STATE.areas = buildJobAreas(map, inView, STATE.byKey);

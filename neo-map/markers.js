@@ -1,14 +1,13 @@
-// neo-map/markers.js
+// Build per-pole markers (no clustering) and return bounds.
 // Shapes by owner: BPUB = circle, AEP = triangle, MVEC = square.
-// Marker FILL color now reflects the pole's dominant PERMIT STATUS color.
+// Marker FILL = dominant PERMIT STATUS color for that pole (so max zoom reads right).
 
 import { poleKey, statusColor } from './data.js';
 
-/* Choose the "dominant" permit status for a pole (used for color) */
 function dominantStatusFor(permits){
   if(!permits || !permits.length) return 'NONE';
   const ss = permits.map(r => String(r.permit_status||'').trim());
-  const priority = [
+  const order = [
     s => s.startsWith('Not Approved - Cannot Attach'),
     s => s.startsWith('Not Approved - PLA Issues'),
     s => s.startsWith('Not Approved - MRE Issues'),
@@ -17,17 +16,13 @@ function dominantStatusFor(permits){
     s => s === 'Created - NOT Submitted',
     s => s === 'Approved'
   ];
-  for (const pred of priority){
-    const hit = ss.find(pred);
-    if (hit) return hit;
-  }
+  for (const pred of order){ const hit = ss.find(pred); if (hit) return hit; }
   return ss[0] || 'NONE';
 }
 
-/* Inline SVG icons (crisp at small sizes) */
 const NS = 'http://www.w3.org/2000/svg';
 const ICON_PX  = 22;
-const STROKE   = 'rgba(255,255,255,0.92)';   // white-ish outline
+const STROKE   = 'rgba(255,255,255,0.92)';
 const STROKE_W = 3;
 
 function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
@@ -36,18 +31,15 @@ function iconSVG(owner, fillColor){
   const u = String(owner || '').toUpperCase();
   const root = svg('svg', { viewBox:'0 0 24 24' });
   let shape;
-
   if (u === 'BPUB'){
     shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'AEP'){
     shape = svg('polygon', { points:'12,3 21,21 3,21', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else if (u === 'MVEC'){
-    // SQUARE (rounded corners)
     shape = svg('rect', { x:'4', y:'4', width:'16', height:'16', rx:'4', ry:'4', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   } else {
     shape = svg('circle', { cx:'12', cy:'12', r:'8', fill:fillColor, stroke:STROKE, 'stroke-width':String(STROKE_W) });
   }
-
   root.appendChild(shape);
   root.style.width  = ICON_PX + 'px';
   root.style.height = ICON_PX + 'px';
@@ -56,7 +48,7 @@ function iconSVG(owner, fillColor){
 }
 
 function makeIcon(owner, status){
-  const fill = statusColor(status); // ← use the same mapping as clusters/legend
+  const fill = statusColor(status);
   return L.divIcon({
     className: 'pole-icon',
     html: iconSVG(owner, fill),
@@ -66,27 +58,23 @@ function makeIcon(owner, status){
   });
 }
 
-export function buildMarkers(map, cluster, poles, byKey, popupHTML){
-  cluster.clearLayers();
-
+export function buildMarkers(map, layer, poles, byKey, popupHTML){
+  if (layer && layer.clearLayers) layer.clearLayers();
   let bounds = null, llb = null;
 
-  for (const p of (poles || [])){
+  for (const p of (poles||[])){
     if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
 
     const rel = byKey.get(poleKey(p)) || [];
     const status = dominantStatusFor(rel);
 
-    const marker = L.marker([p.lat, p.lon], {
+    const m = L.marker([p.lat, p.lon], {
       icon: makeIcon(p.owner, status),
-      __status: status   // used by app.js cluster coloring
+      alt: `${p.job_name || ''} ${p.tag || ''} ${p.SCID || ''}`
     });
 
-    if (typeof popupHTML === 'function') {
-      marker.bindPopup(popupHTML(p, rel));
-    }
-
-    cluster.addLayer(marker);
+    if (typeof popupHTML === 'function') m.bindPopup(popupHTML(p, rel));
+    if (layer) layer.addLayer(m); else m.addTo(map);
 
     if (!llb) llb = L.latLngBounds([p.lat, p.lon], [p.lat, p.lon]); else llb.extend([p.lat, p.lon]);
   }
