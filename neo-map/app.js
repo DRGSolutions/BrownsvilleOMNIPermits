@@ -24,7 +24,8 @@ function shapePxForZoom(z){ if (z>=18) return 20; if (z>=16) return 16; return 1
 const STATE = {
   poles: [], permits: [], byKey: new Map(),
   markerLayer: null, areas: [], areasVisible: true,
-  bounds: null, filtered: null, shas: { poles:null, permits:null }, watcherStop: null
+  bounds: null, filtered: null, shas: { poles:null, permits:null }, watcherStop: null,
+  pickerWired: false
 };
 
 const map = L.map('map', { zoomControl:false, preferCanvas:true });
@@ -34,19 +35,46 @@ L.control.zoom({ position:'bottomright' }).addTo(map);
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = '650';
 labelsPane.style.pointerEvents = 'none';
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-  attribution:'© OpenStreetMap © CARTO'
-}).addTo(map);
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-  pane:'labels'
-}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO' }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { pane:'labels' }).addTo(map);
 
 /* marker container (no clustering) */
 STATE.markerLayer = L.layerGroup().addTo(map);
 
-/* ── rendering ── */
+/* ---------- map-level click picker for DOT mode (full popup on click) ---------- */
+function wireDotPickerOnce(){
+  if (STATE.pickerWired) return;
+  STATE.pickerWired = true;
+
+  map.on('click', (e) => {
+    // Only handle in DOT mode; in SHAPES mode, markers have their own click
+    if (markerMode(map.getZoom()) !== 'dots') return;
+
+    const data = STATE.filtered || STATE.poles;
+    if (!data || !data.length) return;
+
+    const clickPt = map.latLngToLayerPoint(e.latlng);
+    const z = map.getZoom();
+    const maxPx = 18; // tolerance to select nearest dot
+    let best = null, bestD2 = Infinity;
+
+    for (const p of data){
+      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
+      const pt = map.latLngToLayerPoint([p.lat, p.lon]);
+      const dx = pt.x - clickPt.x, dy = pt.y - clickPt.y;
+      const d2 = dx*dx + dy*dy;
+      if (d2 < bestD2){ bestD2 = d2; best = p; }
+    }
+
+    if (!best || Math.sqrt(bestD2) > maxPx) return;
+
+    const rel = STATE.byKey.get(poleKey(best)) || [];
+    const html = typeof popupHTML === 'function' ? popupHTML(best, rel) : '';
+    L.popup({ autoPan: true }).setLatLng([best.lat, best.lon]).setContent(html).openOn(map);
+  });
+}
+
+/* ============================= Rendering ============================= */
 function renderMarkers(){
   const z = map.getZoom();
   const mode = markerMode(z);
@@ -113,8 +141,8 @@ document.getElementById('btnClear').addEventListener('click', ()=>{
   document.getElementById('qOwner').value=''; document.getElementById('qStatus').value=''; document.getElementById('qSearch').value='';
   document.getElementById('rules').innerHTML=''; renderAll(null);
 });
-document.getElementById('btnOwner')?.addEventListener('change', applyFilters);
-document.getElementById('btnStatus')?.addEventListener('change', applyFilters);
+document.getElementById('qOwner').addEventListener('change', applyFilters);
+document.getElementById('qStatus').addEventListener('change', applyFilters);
 document.getElementById('qSearch').addEventListener('input', ()=>{ clearTimeout(window.__qT); window.__qT=setTimeout(applyFilters,220); });
 
 document.getElementById('btnFit').addEventListener('click', ()=>{ if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15)); });
@@ -139,12 +167,10 @@ document.getElementById('btnRefresh')?.addEventListener('click', async ()=>{
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll(STATE.filtered);
 
-    // If we just set the view, re-render markers once movement settles
     if (STATE.bounds && STATE.bounds.isValid()){
       map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
-      map.once('moveend', renderMarkers); // ← ensure markers draw after view exists
+      map.once('moveend', renderMarkers);
     }
-
     toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
   }catch(e){ console.error(e); toast('Refresh failed'); }
 });
@@ -199,11 +225,13 @@ document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeR
     // First render: compute bounds (markers may choose not to draw yet)
     renderAll(null);
 
-    // Now give the map a view, then draw markers once the view exists
+    // Give the map a view, then draw markers once the view exists
     if (STATE.bounds && STATE.bounds.isValid()){
       map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
-      map.once('moveend', renderMarkers);  // ← guarantees no "Set map center..." error
+      map.once('moveend', renderMarkers);
     }
+
+    wireDotPickerOnce(); // ← enable popups in DOT mode
 
     toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
 

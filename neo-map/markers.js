@@ -4,7 +4,7 @@
 //   'dots'   → ultra-fast Canvas dots (non-interactive)
 //   'shapes' → small Canvas circleMarkers (interactive), culled to viewport
 //
-// Fill color = dominant permit status for that pole (no white strokes).
+// Fill color = dominant permit status for that pole.
 
 import { poleKey, statusColor } from './data.js';
 
@@ -49,7 +49,6 @@ export function buildMarkers(
     if (!llb) llb = L.latLngBounds([lat, lon], [lat, lon]); else llb.extend([lat, lon]);
   };
 
-  // If no poles, nothing to do
   if (!poles || !poles.length) return null;
 
   // When map has no view yet (first paint), just compute bounds and return.
@@ -58,7 +57,6 @@ export function buildMarkers(
       if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
       addToBounds(p.lat, p.lon);
     }
-    // Do NOT add layers until a view exists (avoids "Set map center and zoom first")
     return llb;
   }
 
@@ -66,6 +64,7 @@ export function buildMarkers(
   if (layer && layer.clearLayers) layer.clearLayers();
 
   if (mode === 'dots'){
+    // ultra-fast, non-interactive dots drawn on Canvas
     for (const p of poles){
       const lat = p.lat, lon = p.lon;
       if (typeof lat !== 'number' || typeof lon !== 'number') continue;
@@ -91,9 +90,7 @@ export function buildMarkers(
   const pad = 256; // pad by one tile to avoid pop-in at edges
   let pb;
   try { pb = map.getPixelBounds(); }
-  catch { // ultra-defensive: if anything goes wrong, skip culling
-    pb = { min:{x:-Infinity,y:-Infinity}, max:{x:Infinity,y:Infinity} };
-  }
+  catch { pb = { min:{x:-Infinity,y:-Infinity}, max:{x:Infinity,y:Infinity} }; }
   const min = pb.min ? pb.min.subtract([pad,pad]) : { x:-Infinity, y:-Infinity };
   const max = pb.max ? pb.max.add([pad,pad])     : { x: Infinity, y: Infinity };
   const inView = (lat, lon) => {
@@ -106,7 +103,6 @@ export function buildMarkers(
     const lat = p.lat, lon = p.lon;
     if (typeof lat !== 'number' || typeof lon !== 'number') continue;
 
-    // Only instantiate interactive markers that are actually in/near the viewport
     if (inView(lat, lon)){
       const rel = byKey.get(poleKey(p)) || [];
       const fill = statusColor(dominantStatusFor(rel));
@@ -119,6 +115,7 @@ export function buildMarkers(
         interactive: true, bubblingMouseEvents: false
       });
 
+      // Lazy popup (created only when needed)
       if (typeof popupHTML === 'function'){
         m.on('click', () => m.bindPopup(popupHTML(p, rel)).openPopup());
       }
