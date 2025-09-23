@@ -5,9 +5,8 @@
 //   BPUB = circle (status color)
 //   AEP  = triangle (status color)
 //   MVEC = square (status color)
-//   OTHER = gray star
-//   UNKNOWN / UNSET = flashing white plus
-//
+//   OTHER   = gray star
+//   UNKNOWN = gray plus (+)
 // Poles render in markerPane (above hulls), so they’re always clickable.
 
 import { poleKey, statusColor } from './data.js';
@@ -42,7 +41,7 @@ function normOwner(o){
 const CANVAS_MARKERS = L.canvas({ padding: 0.4, pane: 'markerPane' });
 function hasView(map){ return map && typeof map._zoom === 'number'; }
 
-// Generate a tiny inline SVG for the *normalized* owner code (do not renormalize here)
+// ownerNorm is already normalized by normOwner()
 function svgForNorm(ownerNorm, statusFill, px){
   const w = px, h = px;
   if (ownerNorm === 'AEP'){  // triangle
@@ -54,10 +53,10 @@ function svgForNorm(ownerNorm, statusFill, px){
   if (ownerNorm === 'OTHER'){ // gray star
     return `<svg viewBox="0 0 24 24" width="${w}" height="${h}"><polygon points="12,2 15,9 22,10 17,14 18.8,21 12,17.5 5.2,21 7,14 2,10 9,9" fill="#9ca3af"/></svg>`;
   }
-  if (ownerNorm === 'UNKNOWN'){ // flashing + (white)
-    return `<svg class="blink-plus" viewBox="0 0 24 24" width="${w}" height="${h}">
-              <rect x="10.5" y="3" width="3" height="18" fill="#ffffff"/>
-              <rect x="3" y="10.5" width="18" height="3" fill="#ffffff"/>
+  if (ownerNorm === 'UNKNOWN'){ // gray plus
+    return `<svg viewBox="0 0 24 24" width="${w}" height="${h}">
+              <rect x="10.5" y="3" width="3" height="18" fill="#9ca3af"/>
+              <rect x="3" y="10.5" width="18" height="3" fill="#9ca3af"/>
             </svg>`;
   }
   // BPUB/default: circle with status fill
@@ -85,7 +84,10 @@ export function buildMarkers(map, layer, poles, byKey, popupHTML, mode='shapes',
       if (!Number.isFinite(p.lat)||!Number.isFinite(p.lon)) continue;
       const owner = normOwner(p.owner);
       const rel = byKey.get(poleKey(p)) || [];
-      const fill = (owner==='OTHER') ? '#9ca3af' : (owner==='UNKNOWN' ? '#ffffff' : statusColor(dominantStatusFor(rel)));
+      // OTHER → gray; UNKNOWN → gray; known owners → status color
+      const fill = (owner==='OTHER' || owner==='UNKNOWN')
+        ? '#9ca3af'
+        : statusColor(dominantStatusFor(rel));
       const dot = L.circleMarker([p.lat, p.lon], {
         renderer: CANVAS_MARKERS, pane:'markerPane',
         radius: dotR, stroke:false, fill:true, fillOpacity:0.95, fillColor:fill,
@@ -109,7 +111,9 @@ export function buildMarkers(map, layer, poles, byKey, popupHTML, mode='shapes',
     if (inView(p.lat, p.lon)){
       const ownerN = normOwner(p.owner);
       const rel = byKey.get(poleKey(p)) || [];
-      const statusFill = (ownerN==='OTHER') ? '#9ca3af' : (ownerN==='UNKNOWN' ? '#ffffff' : statusColor(dominantStatusFor(rel)));
+      const statusFill = (ownerN==='OTHER' || ownerN==='UNKNOWN')
+        ? '#9ca3af'
+        : statusColor(dominantStatusFor(rel));
       const html = svgForNorm(ownerN, statusFill, px);
 
       const m = L.marker([p.lat, p.lon], {
