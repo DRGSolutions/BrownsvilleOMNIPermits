@@ -1,105 +1,119 @@
-import { statusColor } from './data.js';
+// neo-map/report.js
+// Overall "Open Insights" report — same format as area report, but global.
+// Uses the current poles + byKey (dominant status per pole) and groups by utility,
+// including OTHER and UNKNOWN.
 
-let charts = {};
+import { poleKey, statusColor } from './data.js';
 
-function destroyCharts(){
-  for(const k of Object.keys(charts)){
-    try{ charts[k].destroy(); }catch{}
-    delete charts[k];
+const STATUS_BUCKETS = [
+  'Approved','Submitted - Pending','Created - NOT Submitted',
+  'Not Approved - Cannot Attach','Not Approved - Other Issues','NONE'
+];
+function bucketStatus(s){
+  const t = String(s||'').trim();
+  if (t === 'Approved') return 'Approved';
+  if (t === 'Submitted - Pending') return 'Submitted - Pending';
+  if (t === 'Created - NOT Submitted') return 'Created - NOT Submitted';
+  if (t.startsWith('Not Approved - Cannot Attach')) return 'Not Approved - Cannot Attach';
+  if (t.startsWith('Not Approved -')) return 'Not Approved - Other Issues';
+  return 'NONE';
+}
+const DOM_PRIORITY = [
+  s => s.startsWith('Not Approved - Cannot Attach'),
+  s => s.startsWith('Not Approved - PLA Issues'),
+  s => s.startsWith('Not Approved - MRE Issues'),
+  s => s.startsWith('Not Approved - Other Issues'),
+  s => s === 'Submitted - Pending',
+  s => s === 'Created - NOT Submitted',
+  s => s === 'Approved'
+];
+function dominantBucket(rel){
+  if (!rel || !rel.length) return 'NONE';
+  const ss = rel.map(r => String(r.permit_status||'').trim());
+  for (const pred of DOM_PRIORITY){ const hit = ss.find(pred); if (hit) return bucketStatus(hit); }
+  return bucketStatus(ss[0] || 'NONE');
+}
+function normOwner(o){
+  const s = String(o||'').trim().toUpperCase();
+  if (!s) return 'UNKNOWN';
+  if (s.includes('BPUB') || s.includes('BROWNSVILLE')) return 'BPUB';
+  if (s.includes('AEP')) return 'AEP';
+  if (s.includes('MVEC')) return 'MVEC';
+  return 'OTHER';
+}
+
+function computeOverall(poles, byKey){
+  const owners = ['BPUB','AEP','MVEC','OTHER','UNKNOWN'];
+  const stats = {
+    owners: Object.fromEntries(owners.map(o => [o, { poles:0, byStatus:Object.fromEntries(STATUS_BUCKETS.map(s=>[s,0])) }])),
+    all:   { poles:0, byStatus:Object.fromEntries(STATUS_BUCKETS.map(s=>[s,0])) }
+  };
+  for (const p of (poles||[])){
+    const rel = byKey?.get(poleKey(p)) || [];
+    const b   = dominantBucket(rel);
+    const o   = normOwner(p.owner);
+    stats.all.poles += 1;
+    stats.all.byStatus[b] += 1;
+    stats.owners[o].poles += 1;
+    stats.owners[o].byStatus[b] += 1;
   }
+  return stats;
 }
 
-function fmt(n){ return n.toLocaleString(); }
-function pct(n,d){ return d? Math.round(n*1000/d)/10 : 0; }
-
-function paletteForStatuses(labels){
-  return labels.map(s => statusColor(s));
-}
-
-function topN(obj, n=10){
-  return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
-}
-
-function monthKey(mdy){
-  const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(mdy||'').trim());
-  if(!m) return null;
-  return `${m[3]}-${m[1]}`; // YYYY-MM
-}
-
-export function openReport({ poles, permits, counts, ownerCounts, statusCounts }){
-  destroyCharts();
-
-  // KPIs
-  const kpis = document.getElementById('kpiCards');
-  const polesWithPermits = poles.filter(p => p.__hasPermit).length;
-  const naTotal = (statusCounts['Not Approved - Cannot Attach']||0) + (statusCounts['Not Approved - PLA Issues']||0) + (statusCounts['Not Approved - MRE Issues']||0) + (statusCounts['Not Approved - Other Issues']||0);
-  const pend = statusCounts['Submitted - Pending']||0;
-  const appr = statusCounts['Approved']||0;
-
-  kpis.innerHTML = `
-    <div class="kpi"><div class="lbl">Total Poles</div><div class="val">${fmt(poles.length)}</div><div class="sub">${fmt(polesWithPermits)} with permits (${pct(polesWithPermits,poles.length)}%)</div></div>
-    <div class="kpi"><div class="lbl">Total Permits</div><div class="val">${fmt(permits.length)}</div><div class="sub">Avg ${fmt(Math.round(permits.length / Math.max(1,polesWithPermits)))} per permitted pole</div></div>
-    <div class="kpi"><div class="lbl">Not Approved</div><div class="val">${fmt(naTotal)}</div><div class="sub">Pending ${fmt(pend)} · Approved ${fmt(appr)}</div></div>
-    <div class="kpi"><div class="lbl">Jobs</div><div class="val">${fmt(counts.jobs)}</div><div class="sub">Median/job: ${fmt(Math.round(counts.polesPerJobMedian||0))} poles</div></div>
-  `;
-
-  // Status chart
-  const statusLabels = ['Approved','Submitted - Pending','Created - NOT Submitted','Not Approved - Cannot Attach','Not Approved - PLA Issues','Not Approved - MRE Issues','Not Approved - Other Issues','NONE'];
-  const statusData = statusLabels.map(k => statusCounts[k]||0);
-  charts.status = new Chart(document.getElementById('chStatus'), {
-    type:'bar',
-    data:{ labels: statusLabels, datasets:[{ label:'Poles', data: statusData, backgroundColor: paletteForStatuses(statusLabels) }]},
-    options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{beginAtZero:true}} }
-  });
-
-  // Owner chart
-  const ownerLabels = Object.keys(ownerCounts);
-  const ownerData = ownerLabels.map(k => ownerCounts[k]||0);
-  charts.owner = new Chart(document.getElementById('chOwner'), {
-    type:'doughnut',
-    data:{ labels:ownerLabels, datasets:[{ data: ownerData, backgroundColor:['#7dd3fc','#c4b5fd','#fda4af','#fde68a','#bbf7d0','#a7f3d0'] }]},
-    options:{ plugins:{legend:{position:'bottom'}} }
-  });
-
-  // Top jobs
-  const jobCounts = counts.byJob;
-  const topJobs = topN(jobCounts, 12);
-  charts.jobs = new Chart(document.getElementById('chJobs'), {
-    type:'bar',
-    data:{ labels: topJobs.map(r=>r[0]), datasets:[{ label:'Poles', data: topJobs.map(r=>r[1]), backgroundColor:'#60a5fa' }] },
-    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}, y:{grid:{display:false}}} }
-  });
-
-  // Timeline (permits by month)
-  const byMonth = {};
-  for(const r of permits){
-    const k = monthKey(r.submitted_at);
-    if(!k) continue;
-    byMonth[k] = (byMonth[k]||0)+1;
+function tableHTML(title, stats){
+  const statuses = STATUS_BUCKETS;
+  function row(label, rec){
+    const n = rec.poles || 0;
+    const cells = statuses.map(s=>{
+      const c = rec.byStatus[s]||0, pct = n? Math.round((c*1000)/n)/10 : 0;
+      return `<td style="text-align:right; white-space:nowrap;">
+                <span style="color:${statusColor(s)}">${c}</span>
+                <span class="muted small"> (${pct}%)</span>
+              </td>`;
+    }).join('');
+    return `<tr>
+      <th style="text-align:left; padding-right:8px">${label}</th>
+      <td style="text-align:right; font-weight:700; padding-right:8px">${n}</td>
+      ${cells}
+    </tr>`;
   }
-  const months = Object.keys(byMonth).sort();
-  charts.timeline = new Chart(document.getElementById('chTimeline'), {
-    type:'line',
-    data:{ labels: months, datasets:[{ label:'Permits', data: months.map(m=>byMonth[m]), borderWidth:2, tension:.25 }] },
-    options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{beginAtZero:true}} }
-  });
 
-  // Observations
-  const notes = [];
-  if (naTotal > appr) notes.push(`More Not-Approved than Approved poles → prioritize remediation on NA categories.`);
-  if (pend > appr) notes.push(`High Pending vs Approved → follow-ups with authorities could accelerate approvals.`);
-  const worstJob = Object.entries(counts.naByJob||{}).sort((a,b)=> (b[1]||0)-(a[1]||0))[0];
-  if (worstJob && worstJob[1] > 0) notes.push(`Job “${worstJob[0]}” has the most Not-Approved poles (${worstJob[1]}).`);
-  if ((counts.polesPerJobMedian||0) > 0) notes.push(`Median ${Math.round(counts.polesPerJobMedian)} poles per job; consider splitting workstreams above 2× median.`);
-  if (!notes.length) notes.push('Overall mix looks healthy. Keep pushing submissions and close the remaining pendings.');
+  return `
+    <div class="card span-2">
+      <div class="card-title">${title}</div>
+      <div style="overflow-x:auto;">
+        <table class="small" style="border-collapse:separate; border-spacing:6px 3px; width:max-content;">
+          <thead>
+            <tr>
+              <th></th>
+              <th style="text-align:right; padding-right:8px">Poles</th>
+              ${statuses.map(s=>`<th class="muted small" style="text-align:right; white-space:nowrap">${s}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${row('BPUB',     stats.owners.BPUB)}
+            ${row('AEP',      stats.owners.AEP)}
+            ${row('MVEC',     stats.owners.MVEC)}
+            ${row('Other',    stats.owners.OTHER)}
+            ${row('Unknown',  stats.owners.UNKNOWN)}
+            <tr><td colspan="${2+statuses.length}"><div class="pp-sep"></div></td></tr>
+            ${row('<span style="font-weight:700">All utilities</span>', stats.all)}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
 
-  document.getElementById('observations').innerHTML = notes.map(n=>`<div class="note">${n}</div>`).join('');
+export function openReport({ poles, byKey }){
+  const el = document.getElementById('report');
+  const body = document.getElementById('reportBody');
+  if (!el || !body) return;
 
-  // Show panel
-  document.getElementById('report').classList.remove('hidden');
+  const stats = computeOverall(poles, byKey);
+  body.innerHTML = tableHTML('Overall Utility × Permit Status', stats);
+  el.classList.remove('hidden');
 }
 
 export function closeReport(){
-  destroyCharts();
-  document.getElementById('report').classList.add('hidden');
+  document.getElementById('report')?.classList.add('hidden');
 }
