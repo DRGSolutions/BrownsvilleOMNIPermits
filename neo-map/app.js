@@ -1,3 +1,6 @@
+// neo-map/app.js
+// Map wiring with LOD + fast markers. Job labels open area reports.
+
 import { loadPolesAndPermits, poleKey, statusColor, watchForGithubUpdates } from './data.js';
 import { buildMarkers } from './markers.js';
 import { buildJobAreas } from './areas.js';
@@ -9,23 +12,25 @@ import { openReport, closeReport } from './report.js';
    Poles:
      z < 11  → none
      11–14   → tiny Canvas dots (non-interactive)
-     ≥ 15    → small Canvas circles (interactive, no outlines)
-   Areas:
-     z < 13  → coarse (convex+smooth)
-     ≥ 13    → fine (concave+smooth)
+     ≥ 15    → small owner-shaped markers (interactive, no outlines)
 */
-export const LOD = { DOT_MIN: 11, SHAPE_MIN: 15, HULL_FINE_MIN: 13 };
+const LOD = { DOT_MIN: 11, SHAPE_MIN: 15 };
 
 function markerMode(z){ return z < LOD.DOT_MIN ? 'none' : z < LOD.SHAPE_MIN ? 'dots' : 'shapes'; }
-function hullMode(z){ return z < LOD.HULL_FINE_MIN ? 'coarse' : 'fine'; }
 function dotRadiusForZoom(z){ if (z<=11) return 1.6; if (z===12) return 1.9; if (z===13) return 2.2; return 2.5; }
 function shapePxForZoom(z){ if (z>=18) return 20; if (z>=16) return 16; return 14; }
 
 const STATE = {
-  poles: [], permits: [], byKey: new Map(),
-  markerLayer: null, areas: [], areasVisible: true,
-  bounds: null, filtered: null, shas: { poles:null, permits:null }, watcherStop: null,
-  pickerWired: false
+  poles: [],
+  permits: [],
+  byKey: new Map(),
+  markerLayer: null,
+  areas: [],
+  areasVisible: true,
+  bounds: null,
+  filtered: null,
+  shas: { poles:null, permits:null },
+  watcherStop: null
 };
 
 const map = L.map('map', { zoomControl:false, preferCanvas:true });
@@ -35,46 +40,19 @@ L.control.zoom({ position:'bottomright' }).addTo(map);
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = '650';
 labelsPane.style.pointerEvents = 'none';
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO' }).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { pane:'labels' }).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO'
+}).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+  pane:'labels'
+}).addTo(map);
 
 /* marker container (no clustering) */
 STATE.markerLayer = L.layerGroup().addTo(map);
 
-/* ---------- map-level click picker for DOT mode (full popup on click) ---------- */
-function wireDotPickerOnce(){
-  if (STATE.pickerWired) return;
-  STATE.pickerWired = true;
-
-  map.on('click', (e) => {
-    // Only handle in DOT mode; in SHAPES mode, markers have their own click
-    if (markerMode(map.getZoom()) !== 'dots') return;
-
-    const data = STATE.filtered || STATE.poles;
-    if (!data || !data.length) return;
-
-    const clickPt = map.latLngToLayerPoint(e.latlng);
-    const z = map.getZoom();
-    const maxPx = 18; // tolerance to select nearest dot
-    let best = null, bestD2 = Infinity;
-
-    for (const p of data){
-      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-      const pt = map.latLngToLayerPoint([p.lat, p.lon]);
-      const dx = pt.x - clickPt.x, dy = pt.y - clickPt.y;
-      const d2 = dx*dx + dy*dy;
-      if (d2 < bestD2){ bestD2 = d2; best = p; }
-    }
-
-    if (!best || Math.sqrt(bestD2) > maxPx) return;
-
-    const rel = STATE.byKey.get(poleKey(best)) || [];
-    const html = typeof popupHTML === 'function' ? popupHTML(best, rel) : '';
-    L.popup({ autoPan: true }).setLatLng([best.lat, best.lon]).setContent(html).openOn(map);
-  });
-}
-
-/* ============================= Rendering ============================= */
+/* ── rendering ── */
 function renderMarkers(){
   const z = map.getZoom();
   const mode = markerMode(z);
@@ -95,8 +73,7 @@ function renderAreas(){
   if (!STATE.areasVisible) return;
 
   const data = STATE.filtered || STATE.poles;
-  const mode = hullMode(map.getZoom());
-  STATE.areas = buildJobAreas(map, data, STATE.byKey, { mode });
+  STATE.areas = buildJobAreas(map, data, STATE.byKey);
 }
 
 function renderAll(filtered=null){
@@ -107,34 +84,17 @@ function renderAll(filtered=null){
 
 /* LOD: cheap redraw on zoom; when panning in 'shapes' mode, redraw markers only */
 let lodT = null;
-map.on('zoomend', ()=>{ clearTimeout(lodT); lodT = setTimeout(()=>{ renderMarkers(); renderAreas(); }, 80); });
+map.on('zoomend', ()=>{ clearTimeout(lodT); lodT = setTimeout(()=>{ renderMarkers(); /* areas static */ }, 80); });
 map.on('moveend', ()=>{ if (markerMode(map.getZoom()) === 'shapes') renderMarkers(); });
 
-/* filters */
+/* ============================= Filters ============================= */
 function applyFilters(){
   const spec = readRules();
-  const result = STATE.poles.filter(p=>{
-    const rel = STATE.byKey.get(poleKey(p)) || [];
-    const q = spec.q;
+  const q = spec.q;
 
+  // 1) Start from all poles; apply owner + search + rule logic (but NOT status yet)
+  let base = STATE.poles.filter(p=>{
     if (q.owner && String(p.owner||'') !== String(q.owner)) return false;
-
-    if (q.status){
-      const want = String(q.status).trim();
-      if (want === 'NONE'){
-        if (rel.length !== 0) return false;
-      } else {
-        const ok = rel.some(r => {
-          const s = String(r.permit_status||'').trim();
-          if (want === 'Not Approved - Other Issues'){
-            // “other issues” umbrella: any NA-* EXCEPT Cannot Attach
-            return s.startsWith('Not Approved -') && !s.startsWith('Not Approved - Cannot Attach');
-          }
-          return s === want; // exact match for all other statuses
-        });
-        if (!ok) return false;
-      }
-    }
 
     if (q.search){
       const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
@@ -142,26 +102,69 @@ function applyFilters(){
     }
 
     if (spec.rules.length){
-      const hits = spec.rules.map(r => matchRule(p,r,rel));
-      return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
+      const rel = STATE.byKey.get(poleKey(p)) || [];
+      const hits = spec.rules.map(r=> matchRule(p, r, rel));
+      if (spec.logic==='AND' ? !hits.every(Boolean) : !hits.some(Boolean)) return false;
     }
     return true;
   });
-  renderAll(result);
+
+  // 2) If a status is selected BUT none of the current poles have it, ignore the status filter
+  let want = (q.status||'').trim();
+  if (want){
+    const existsInBase = base.some(p=>{
+      const rel = STATE.byKey.get(poleKey(p)) || [];
+      if (want === 'NONE') return rel.length === 0;
+      if (want === 'Not Approved - Other Issues'){
+        return rel.some(r => {
+          const s = String(r.permit_status||'').trim();
+          return s.startsWith('Not Approved -') && !s.startsWith('Not Approved - Cannot Attach');
+        });
+      }
+      return rel.some(r => String(r.permit_status||'').trim() === want);
+    });
+    if (!existsInBase) want = ''; // default to All
+  }
+
+  // 3) Apply status filter (if any)
+  if (want){
+    base = base.filter(p=>{
+      const rel = STATE.byKey.get(poleKey(p)) || [];
+      if (want === 'NONE') return rel.length === 0;
+      if (want === 'Not Approved - Other Issues'){
+        return rel.some(r => {
+          const s = String(r.permit_status||'').trim();
+          return s.startsWith('Not Approved -') && !s.startsWith('Not Approved - Cannot Attach');
+        });
+      }
+      return rel.some(r => String(r.permit_status||'').trim() === want);
+    });
+  }
+
+  renderAll(base);
 }
 
-/* UI wiring */
-document.getElementById('btnAddRule').addEventListener('click', ()=>{ document.getElementById('rules').appendChild(ruleRow()); });
+/* ============================= UI wiring ============================= */
+document.getElementById('btnAddRule').addEventListener('click', ()=> {
+  document.getElementById('rules').appendChild(ruleRow());
+});
 document.getElementById('btnApply').addEventListener('click', applyFilters);
 document.getElementById('btnClear').addEventListener('click', ()=>{
-  document.getElementById('qOwner').value=''; document.getElementById('qStatus').value=''; document.getElementById('qSearch').value='';
-  document.getElementById('rules').innerHTML=''; renderAll(null);
+  document.getElementById('qOwner').value='';
+  document.getElementById('qStatus').value='';
+  document.getElementById('qSearch').value='';
+  document.getElementById('rules').innerHTML='';
+  renderAll(null);
 });
 document.getElementById('qOwner').addEventListener('change', applyFilters);
 document.getElementById('qStatus').addEventListener('change', applyFilters);
-document.getElementById('qSearch').addEventListener('input', ()=>{ clearTimeout(window.__qT); window.__qT=setTimeout(applyFilters,220); });
+document.getElementById('qSearch').addEventListener('input', ()=>{
+  clearTimeout(window.__qT); window.__qT=setTimeout(applyFilters,220);
+});
 
-document.getElementById('btnFit').addEventListener('click', ()=>{ if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15)); });
+document.getElementById('btnFit').addEventListener('click', ()=>{
+  if(STATE.bounds) map.fitBounds(STATE.bounds.pad(0.15));
+});
 document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
   STATE.areasVisible = !STATE.areasVisible;
   if (!STATE.areasVisible){
@@ -171,30 +174,32 @@ document.getElementById('btnToggleAreas').addEventListener('click', ()=>{
       a?.label && map.removeLayer(a.label);
     }
     STATE.areas=[];
-  } else { renderAreas(); }
+  } else {
+    renderAreas();
+  }
   toast(STATE.areasVisible ? 'Job areas ON' : 'Job areas OFF', 900);
 });
 
-/* manual refresh */
+// manual refresh
 document.getElementById('btnRefresh')?.addEventListener('click', async ()=>{
   try{
     toast('Refreshing data…');
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
     renderAll(STATE.filtered);
-
-    if (STATE.bounds && STATE.bounds.isValid()){
-      map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
-      map.once('moveend', renderMarkers);
-    }
+    requestAnimationFrame(()=>{
+      map.invalidateSize();
+      if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
+    });
     toast(`Data refreshed (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
   }catch(e){ console.error(e); toast('Refresh failed'); }
 });
 
-/* Insights (unchanged) */
+/* ============================= Insights wiring ============================= */
 document.getElementById('btnReport')?.addEventListener('click', ()=>{
   const { poles, permits, byKey } = STATE;
   const enriched = poles.map(p => ({ ...p, __hasPermit: (byKey.get(poleKey(p))||[]).length>0 }));
+
   const statusCounts = {
     'Approved':0,'Submitted - Pending':0,'Created - NOT Submitted':0,
     'Not Approved - Cannot Attach':0,'Not Approved - PLA Issues':0,'Not Approved - MRE Issues':0,'Not Approved - Other Issues':0,
@@ -203,9 +208,11 @@ document.getElementById('btnReport')?.addEventListener('click', ()=>{
   const ownerCounts = {};
   const byJob = {};
   const naByJob = {};
+
   for(const p of enriched){
     ownerCounts[p.owner] = (ownerCounts[p.owner]||0)+1;
     byJob[p.job_name] = (byJob[p.job_name]||0)+1;
+
     const rel = byKey.get(poleKey(p)) || [];
     if (!rel.length){ statusCounts['NONE']++; continue; }
     const ss = rel.map(r => String(r.permit_status||''));
@@ -223,42 +230,35 @@ document.getElementById('btnReport')?.addEventListener('click', ()=>{
     statusCounts[chosen] = (statusCounts[chosen]||0)+1;
     if (chosen.startsWith('Not Approved -')) naByJob[p.job_name] = (naByJob[p.job_name]||0)+1;
   }
+
   const polesPerJob = Object.values(byJob).sort((a,b)=>a-b);
   const mid = Math.floor(polesPerJob.length/2);
   const polesPerJobMedian = polesPerJob.length ? (polesPerJob.length%2? polesPerJob[mid] : Math.round((polesPerJob[mid-1]+polesPerJob[mid])/2)) : 0;
+
   const counts = { jobs: Object.keys(byJob).length, polesPerJobMedian, byJob, naByJob };
+
   openReport({ poles: enriched, permits: STATE.permits, counts, ownerCounts, statusCounts });
 });
+
 document.getElementById('btnReportClose')?.addEventListener('click', ()=> closeReport());
 
-/* boot */
+/* =============================== Boot =============================== */
 (async function(){
   try{
     toast('Loading poles & permits…');
     const { poles, permits, byKey, shas, source } = await loadPolesAndPermits();
     STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
 
-    // First render: compute bounds (markers may choose not to draw yet)
     renderAll(null);
-
-    // Give the map a view, then draw markers once the view exists
-    if (STATE.bounds && STATE.bounds.isValid()){
-      map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
-      map.once('moveend', renderMarkers);
-    }
-
-    wireDotPickerOnce(); // ← enable popups in DOT mode
-
-    toast(`Loaded ${poles.length} poles, ${permits.length} permits (${source}${shas.poles?` @ ${shas.poles.slice(0,7)}…`:''})`);
+    requestAnimationFrame(()=>{
+      map.invalidateSize();
+      if (STATE.bounds && STATE.bounds.isValid()) map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
+    });
 
     if (watchForGithubUpdates !== undefined) {
       STATE.watcherStop = watchForGithubUpdates(({ poles, permits, byKey, shas })=>{
         STATE.poles=poles; STATE.permits=permits; STATE.byKey=byKey; STATE.shas=shas;
         renderAll(STATE.filtered);
-        if (STATE.bounds && STATE.bounds.isValid()){
-          map.fitBounds(STATE.bounds.pad(0.15), { animate:false });
-          map.once('moveend', renderMarkers);
-        }
         toast(`Auto-updated @ ${shas.poles.slice(0,7)}…`);
       }, 60000);
     }
