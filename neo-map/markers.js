@@ -1,9 +1,7 @@
-// High-performance pole rendering with LOD and no outlines.
-// Modes:
-//   'none'   → draw nothing (compute bounds only)
-//   'dots'   → ultra-fast Canvas dots (non-interactive)
-//   'shapes' → small Canvas circleMarkers (interactive), culled to viewport
-//
+// neo-map/markers.js
+// High-performance pole rendering with LOD.
+// mode: 'none' | 'dots' | 'shapes'
+// Shapes by utility: BPUB=circle, AEP=triangle, MVEC=square
 // Fill color = dominant permit status for that pole.
 
 import { poleKey, statusColor } from './data.js';
@@ -24,106 +22,99 @@ function dominantStatusFor(permits){
   return ss[0] || 'NONE';
 }
 
-const CANVAS = L.canvas({ padding: 0.4 }); // shared renderer
+// One shared Canvas renderer that draws ABOVE polygons (pane: 'markerPane')
+const CANVAS_MARKERS = L.canvas({ padding: 0.4, pane: 'markerPane' });
 
-function hasView(map){
-  // Leaflet sets _zoom once the map has a view (setView/fitBounds/etc.)
-  return map && typeof map._zoom === 'number';
+// Minimal inline SVG for each utility (no stroke → faster)
+function svgFor(owner, fill, px){
+  const u = String(owner||'').toUpperCase();
+  const w = px, h = px;
+  if (u === 'AEP'){ // triangle
+    return `<svg viewBox="0 0 24 24" width="${w}" height="${h}" aria-hidden="true">
+      <polygon points="12,3 21,21 3,21" fill="${fill}"/></svg>`;
+  }
+  if (u === 'MVEC'){ // square (slight radius)
+    return `<svg viewBox="0 0 24 24" width="${w}" height="${h}" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="4" ry="4" fill="${fill}"/></svg>`;
+  }
+  // BPUB/default: circle
+  return `<svg viewBox="0 0 24 24" width="${w}" height="${h}" aria-hidden="true">
+    <circle cx="12" cy="12" r="8" fill="${fill}"/></svg>`;
 }
 
-export function buildMarkers(
-  map,
-  layer,            // L.LayerGroup
-  poles,
-  byKey,
-  popupHTML,
-  mode = 'shapes',  // 'none' | 'dots' | 'shapes'
-  opts = {}         // { dotRadius:number, shapePx:number }
-){
+// Safe check: do we have a view yet?
+function hasView(map){ return map && typeof map._zoom === 'number'; }
+
+export function buildMarkers(map, layer, poles, byKey, popupHTML, mode='shapes', opts={}){
   const dotR = Number(opts.dotRadius || 2.0);
   const px   = Number(opts.shapePx || 14);
 
-  // Always compute bounds, even if we don’t draw
+  // Always compute bounds so caller can fit
   let llb = null;
-  const addToBounds = (lat, lon) => {
-    if (!llb) llb = L.latLngBounds([lat, lon], [lat, lon]); else llb.extend([lat, lon]);
-  };
+  const addB = (lat, lon) => { llb ? llb.extend([lat,lon]) : (llb = L.latLngBounds([lat,lon],[lat,lon])); };
 
   if (!poles || !poles.length) return null;
 
-  // When map has no view yet (first paint), just compute bounds and return.
+  // First paint before setView/fitBounds: just compute bounds, do not draw
   if (!hasView(map) || mode === 'none'){
-    for (const p of poles){
-      if (typeof p.lat !== 'number' || typeof p.lon !== 'number') continue;
-      addToBounds(p.lat, p.lon);
-    }
+    for (const p of poles){ if (Number.isFinite(p.lat) && Number.isFinite(p.lon)) addB(p.lat, p.lon); }
     return llb;
   }
 
-  // From here on, a view exists — safe to draw
-  if (layer && layer.clearLayers) layer.clearLayers();
+  // Clear target layer before re-drawing
+  layer?.clearLayers();
 
   if (mode === 'dots'){
-    // ultra-fast, non-interactive dots drawn on Canvas
     for (const p of poles){
-      const lat = p.lat, lon = p.lon;
-      if (typeof lat !== 'number' || typeof lon !== 'number') continue;
-
+      if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
       const rel = byKey.get(poleKey(p)) || [];
       const fill = statusColor(dominantStatusFor(rel));
-
-      const dot = L.circleMarker([lat, lon], {
-        renderer: CANVAS,
+      const dot = L.circleMarker([p.lat, p.lon], {
+        renderer: CANVAS_MARKERS,
+        pane: 'markerPane',
         radius: dotR,
         stroke: false,
         fill: true, fillOpacity: 0.95, fillColor: fill,
         interactive: false, bubblingMouseEvents: false
       });
       layer.addLayer(dot);
-      addToBounds(lat, lon);
+      addB(p.lat, p.lon);
     }
     return llb;
   }
 
-  // mode === 'shapes'  (interactive tiny circles, culled to viewport)
+  // mode === 'shapes' (interactive tiny icons, culled to viewport)
   const z = map.getZoom();
-  const pad = 256; // pad by one tile to avoid pop-in at edges
+  const pad = 256;
   let pb;
-  try { pb = map.getPixelBounds(); }
-  catch { pb = { min:{x:-Infinity,y:-Infinity}, max:{x:Infinity,y:Infinity} }; }
-  const min = pb.min ? pb.min.subtract([pad,pad]) : { x:-Infinity, y:-Infinity };
-  const max = pb.max ? pb.max.add([pad,pad])     : { x: Infinity, y: Infinity };
+  try { pb = map.getPixelBounds(); } catch { pb = {min:{x:-1e9,y:-1e9}, max:{x:1e9,y:1e9}}; }
+  const min = L.point(pb.min.x - pad, pb.min.y - pad);
+  const max = L.point(pb.max.x + pad, pb.max.y + pad);
   const inView = (lat, lon) => {
     const pt = map.project([lat, lon], z);
-    return pt.x >= min.x && pt.x <= max.x && pt.y >= min.y && pt.y <= max.y;
+    return (pt.x>=min.x && pt.x<=max.x && pt.y>=min.y && pt.y<=max.y);
   };
 
-  const radiusPx = Math.max(2, Math.round(px / 2.2));
   for (const p of poles){
-    const lat = p.lat, lon = p.lon;
-    if (typeof lat !== 'number' || typeof lon !== 'number') continue;
-
+    if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
+    const lat=p.lat, lon=p.lon;
     if (inView(lat, lon)){
       const rel = byKey.get(poleKey(p)) || [];
       const fill = statusColor(dominantStatusFor(rel));
+      const html = svgFor(p.owner, fill, px);
 
-      const m = L.circleMarker([lat, lon], {
-        renderer: CANVAS,
-        radius: radiusPx,
-        stroke: false,
-        fill: true, fillOpacity: 0.95, fillColor: fill,
-        interactive: true, bubblingMouseEvents: false
+      const m = L.marker([lat, lon], {
+        pane: 'markerPane', // sits ABOVE hull polygons
+        icon: L.divIcon({ className:'pole-icon', html, iconSize:[px,px], iconAnchor:[px/2, px/2] }),
+        interactive: true
       });
 
-      // Lazy popup (created only when needed)
       if (typeof popupHTML === 'function'){
         m.on('click', () => m.bindPopup(popupHTML(p, rel)).openPopup());
       }
-
       layer.addLayer(m);
     }
-
-    addToBounds(lat, lon);
+    addB(lat, lon);
   }
 
   return llb;

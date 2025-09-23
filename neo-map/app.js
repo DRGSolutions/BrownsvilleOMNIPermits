@@ -116,17 +116,33 @@ function applyFilters(){
   const result = STATE.poles.filter(p=>{
     const rel = STATE.byKey.get(poleKey(p)) || [];
     const q = spec.q;
-    if (q.owner && p.owner!==q.owner) return false;
+
+    if (q.owner && String(p.owner||'') !== String(q.owner)) return false;
+
     if (q.status){
-      if (q.status==='NONE'){ if (rel.length!==0) return false; }
-      else if (!rel.some(r=>r.permit_status===q.status)) return false;
+      const want = String(q.status).trim();
+      if (want === 'NONE'){
+        if (rel.length !== 0) return false;
+      } else {
+        const ok = rel.some(r => {
+          const s = String(r.permit_status||'').trim();
+          if (want === 'Not Approved - Other Issues'){
+            // “other issues” umbrella: any NA-* EXCEPT Cannot Attach
+            return s.startsWith('Not Approved -') && !s.startsWith('Not Approved - Cannot Attach');
+          }
+          return s === want; // exact match for all other statuses
+        });
+        if (!ok) return false;
+      }
     }
+
     if (q.search){
       const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
-      if (!hay.includes(q.search)) return false;
+      if (!hay.includes(String(q.search).toLowerCase())) return false;
     }
+
     if (spec.rules.length){
-      const hits = spec.rules.map(r=> matchRule(p,r,rel));
+      const hits = spec.rules.map(r => matchRule(p,r,rel));
       return spec.logic==='AND' ? hits.every(Boolean) : hits.some(Boolean);
     }
     return true;
