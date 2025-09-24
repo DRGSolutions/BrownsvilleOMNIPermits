@@ -2660,364 +2660,724 @@
     "notes": ""
   },
   {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG1_001",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "88699",
+    "SCID": "001",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_002",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21247",
     "SCID": "002",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_003",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21248",
     "SCID": "003",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_004",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60906",
     "SCID": "004",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_005",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT",
     "SCID": "005",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_006",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60904",
     "SCID": "006",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_007",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60903",
     "SCID": "007",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_008",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60902",
     "SCID": "008",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_009",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60901",
     "SCID": "009",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_010",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "80184",
     "SCID": "010",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_011",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60640",
     "SCID": "011",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_012",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60639",
     "SCID": "012",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_013",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60638",
     "SCID": "013",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_014",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60637",
     "SCID": "014",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG1_015",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60636",
     "SCID": "015",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_016",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60635",
     "SCID": "016",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_017",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21250",
     "SCID": "017",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_018",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "30286",
     "SCID": "018",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_019",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60910",
     "SCID": "019",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_020",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "64933",
     "SCID": "020",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_021",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60912",
     "SCID": "021",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_022",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "72765",
     "SCID": "022",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_023",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60914",
     "SCID": "023",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_024",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "88008",
     "SCID": "024",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_025",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60813",
     "SCID": "025",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_026",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60916",
     "SCID": "026",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_027",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60917",
     "SCID": "027",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_028",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT",
     "SCID": "028",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_029",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "60919",
     "SCID": "029",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG2_030",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21665",
     "SCID": "030",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_031",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "91986",
     "SCID": "031",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_032",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21669",
     "SCID": "032",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_033",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "21714",
     "SCID": "033",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_034",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT",
     "SCID": "034",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_035",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT12",
     "SCID": "035",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO NT12\n**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO NT12"
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_036",
-    "job_name": "BTX-Wild-North-PT8",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT13",
     "SCID": "036",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO NT13\n**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT8"
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO NT13"
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_037",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT1",
+    "SCID": "037",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_038",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT2",
+    "SCID": "038",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
   },
   {
     "permit_id": "R1B-WILD1-BRN01-F300_SEG3_040",
-    "job_name": "BTX-Wild-North-PT4",
+    "job_name": "BRN01-F300 PLA",
     "tag": "NT3",
     "SCID": "040",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/19/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** JOB_NAME CHANGED FROM BRN01-F300 PLA TO BTX-Wild-North-PT4"
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_041",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT4",
+    "SCID": "041",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO NT4"
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_044",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT5",
+    "SCID": "044",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_045",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "14155",
+    "SCID": "045",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG3_080",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "60325",
+    "SCID": "080",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_061",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54270",
+    "SCID": "061",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_062",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54256",
+    "SCID": "062",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_063",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT10",
+    "SCID": "063",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_064",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "21252",
+    "SCID": "064",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_065",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "21253",
+    "SCID": "065",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_066",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "34859",
+    "SCID": "066",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_067",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT",
+    "SCID": "067",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_068",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "21256",
+    "SCID": "068",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_069",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "30473",
+    "SCID": "069",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_070",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "21257",
+    "SCID": "070",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_072",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "12825",
+    "SCID": "072",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_073",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "13423",
+    "SCID": "073",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_074",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "73999",
+    "SCID": "074",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "R1B-WILD1-BRN01-F300_SEG5_075",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "13424",
+    "SCID": "075",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_046",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "70693",
+    "SCID": "046",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_047",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "96570",
+    "SCID": "047",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_048",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "20487",
+    "SCID": "048",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_049",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT6",
+    "SCID": "049",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_050",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "72717",
+    "SCID": "050",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_051",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "33770",
+    "SCID": "051",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_052",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT7",
+    "SCID": "052",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_053",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "33769",
+    "SCID": "053",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_054",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54253",
+    "SCID": "054",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_055",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "81126",
+    "SCID": "055",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_056",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54254",
+    "SCID": "056",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_057",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "96571",
+    "SCID": "057",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_058",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54257",
+    "SCID": "058",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_059",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "54259",
+    "SCID": "059",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "SMC-R1B-WILD1-BRN01-F300_SEG4_060",
+    "job_name": "BRN01-F300 PLA",
+    "tag": "NT9",
+    "SCID": "060",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "09/19/2025",
+    "notes": ""
   },
   {
     "permit_id": "TEST_2_123_004",
