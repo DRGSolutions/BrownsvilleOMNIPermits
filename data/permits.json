@@ -2660,6 +2660,16 @@
     "notes": ""
   },
   {
+    "permit_id": "PERM-BTX-Wild-North-PT4-NT3-040",
+    "job_name": "BTX-Wild-North-PT4",
+    "tag": "NT3",
+    "SCID": "040",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/25/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "TEST_2_123_004",
     "job_name": "BRN01-F161",
     "tag": "52874",
