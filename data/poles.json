@@ -106282,17 +106282,6 @@
     "mr_level": "OK to Attach"
   },
   {
-    "job_name": "BTX-Wild-North-PT4",
-    "tag": null,
-    "SCID": "087",
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.938778618283713,
-    "lon": -97.5029958061119,
-    "mr_level": null
-  },
-  {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14135",
     "SCID": "042",
