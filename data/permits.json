@@ -60,6 +60,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Wild-North-PT4_SEG1_001",
+    "job_name": "BTX-Wild-North-PT4",
+    "tag": "NT3",
+    "SCID": "001",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F33_BRN02-F11_SEG1_001",
     "job_name": "BRN02-F11 PLA",
     "tag": "80399",
