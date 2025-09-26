@@ -104293,7 +104293,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "22951",
-    "SCID": "037",
+    "SCID": "056",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104326,7 +104326,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "22950",
-    "SCID": "039",
+    "SCID": "058",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104524,7 +104524,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23124",
-    "SCID": "031",
+    "SCID": "050",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104557,7 +104557,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23116",
-    "SCID": "038",
+    "SCID": "057",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104568,7 +104568,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "96574",
-    "SCID": "036",
+    "SCID": "055",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -104579,7 +104579,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23113",
-    "SCID": "034",
+    "SCID": "053",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104623,7 +104623,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23122",
-    "SCID": "035",
+    "SCID": "054",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104634,7 +104634,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23117",
-    "SCID": "040",
+    "SCID": "059",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104645,7 +104645,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23114",
-    "SCID": "033",
+    "SCID": "052",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -104656,7 +104656,7 @@
   {
     "job_name": "BTX-Alice-PT3",
     "tag": "23123",
-    "SCID": "032",
+    "SCID": "051",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104722,7 +104722,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21233",
-    "SCID": "071",
+    "SCID": "063",
     "owner": "BPUB",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": null,
@@ -104733,7 +104733,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT",
-    "SCID": "070",
+    "SCID": "062",
     "owner": "BPUB",
     "pole_spec": "50-3 Southern Pine",
     "proposed_spec": "55-3 SOUTHERN PINE",
@@ -104744,7 +104744,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21669",
-    "SCID": "004",
+    "SCID": "032",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104755,7 +104755,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT",
-    "SCID": "003",
+    "SCID": "034",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104766,7 +104766,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT12",
-    "SCID": "002",
+    "SCID": "035",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104777,7 +104777,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "91986",
-    "SCID": "006",
+    "SCID": "031",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104788,7 +104788,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60904",
-    "SCID": "31",
+    "SCID": "006",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104799,7 +104799,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "80184",
-    "SCID": "027",
+    "SCID": "010",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104810,7 +104810,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT",
-    "SCID": "32",
+    "SCID": "005",
     "owner": "BPUB",
     "pole_spec": "45-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104821,7 +104821,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60914",
-    "SCID": "014",
+    "SCID": "023",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -104832,7 +104832,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "30286",
-    "SCID": "019",
+    "SCID": "018",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104843,7 +104843,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60637",
-    "SCID": "023",
+    "SCID": "014",
     "owner": "BPUB",
     "pole_spec": "35-5 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104854,7 +104854,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60902",
-    "SCID": "029",
+    "SCID": "008",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104865,7 +104865,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60901",
-    "SCID": "028",
+    "SCID": "009",
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104876,7 +104876,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60640",
-    "SCID": "026",
+    "SCID": "011",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104887,7 +104887,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60639",
-    "SCID": "025",
+    "SCID": "012",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104898,7 +104898,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60638",
-    "SCID": "024",
+    "SCID": "013",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104909,7 +104909,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21250",
-    "SCID": "020",
+    "SCID": "017",
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": "40-4 SOUTHERN PINE",
@@ -104920,7 +104920,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60910",
-    "SCID": "018",
+    "SCID": "019",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104931,7 +104931,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60636",
-    "SCID": "022",
+    "SCID": "015",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104942,7 +104942,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21247",
-    "SCID": "34",
+    "SCID": "002",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104953,18 +104953,18 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21248",
-    "SCID": "35",
+    "SCID": "003",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.926107733098558,
+    "lat": 25.926107733098533,
     "lon": -97.51271231260105,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60635",
-    "SCID": "021",
+    "SCID": "016",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104975,7 +104975,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "64933",
-    "SCID": "017",
+    "SCID": "020",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104986,7 +104986,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "72765",
-    "SCID": "015",
+    "SCID": "022",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -104997,7 +104997,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "88008",
-    "SCID": "13",
+    "SCID": "024",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105008,7 +105008,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60813",
-    "SCID": "012",
+    "SCID": "025",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105019,7 +105019,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60916",
-    "SCID": "011",
+    "SCID": "026",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105030,7 +105030,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT",
-    "SCID": "009",
+    "SCID": "028",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105041,7 +105041,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60917",
-    "SCID": "010",
+    "SCID": "027",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105052,7 +105052,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21665",
-    "SCID": "007",
+    "SCID": "030",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105063,7 +105063,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT13",
-    "SCID": "001",
+    "SCID": "036",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105074,7 +105074,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60919",
-    "SCID": "008",
+    "SCID": "029",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105085,7 +105085,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21714",
-    "SCID": "005",
+    "SCID": "033",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105096,7 +105096,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60912",
-    "SCID": "016",
+    "SCID": "021",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105107,7 +105107,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60906",
-    "SCID": "33",
+    "SCID": "004",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105118,7 +105118,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51235",
-    "SCID": "052",
+    "SCID": "065",
     "owner": "BPUB",
     "pole_spec": "50-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105129,7 +105129,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51248",
-    "SCID": "057",
+    "SCID": "070",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105140,7 +105140,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51247",
-    "SCID": "056",
+    "SCID": "069",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105151,7 +105151,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51246",
-    "SCID": "055",
+    "SCID": "068",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -105162,7 +105162,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51239",
-    "SCID": "053",
+    "SCID": "066",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105173,7 +105173,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51206",
-    "SCID": "42-11",
+    "SCID": "011",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105184,7 +105184,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51209",
-    "SCID": "40-13",
+    "SCID": "013",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105195,7 +105195,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "80180",
-    "SCID": "39-14",
+    "SCID": "014",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105206,7 +105206,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51212",
-    "SCID": "38-15",
+    "SCID": "015",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -105217,7 +105217,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51214",
-    "SCID": "37-16",
+    "SCID": "016",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -105228,7 +105228,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51204",
-    "SCID": "44-9",
+    "SCID": "009",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105239,7 +105239,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51201",
-    "SCID": "045",
+    "SCID": "008",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105250,7 +105250,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51205",
-    "SCID": "43-10",
+    "SCID": "010",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105261,7 +105261,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51208",
-    "SCID": "41-12",
+    "SCID": "012",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -105272,7 +105272,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "NT3",
-    "SCID": "065",
+    "SCID": "079",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105283,7 +105283,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51256",
-    "SCID": "063",
+    "SCID": "077",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105294,7 +105294,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51255",
-    "SCID": "062",
+    "SCID": "076",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105305,7 +105305,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51231",
-    "SCID": "049",
+    "SCID": "062",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105316,7 +105316,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51263",
-    "SCID": "066",
+    "SCID": "080",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105327,7 +105327,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51264",
-    "SCID": "067",
+    "SCID": "081",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105338,7 +105338,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51234",
-    "SCID": "051",
+    "SCID": "064",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105349,7 +105349,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51257",
-    "SCID": "064",
+    "SCID": "078",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105360,7 +105360,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51252",
-    "SCID": "060",
+    "SCID": "074",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105371,7 +105371,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51251",
-    "SCID": "059",
+    "SCID": "073",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105382,7 +105382,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51225",
-    "SCID": "047",
+    "SCID": "060",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105393,7 +105393,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51253",
-    "SCID": "061",
+    "SCID": "075",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105404,7 +105404,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51226",
-    "SCID": "048",
+    "SCID": "061",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105415,7 +105415,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51233",
-    "SCID": "050",
+    "SCID": "063",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105426,7 +105426,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51238",
-    "SCID": "058",
+    "SCID": "072",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105437,7 +105437,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51241",
-    "SCID": "054",
+    "SCID": "067",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105448,7 +105448,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51268",
-    "SCID": "36-17",
+    "SCID": "017",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105459,7 +105459,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": null,
-    "SCID": "068",
+    "SCID": "043",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -105470,7 +105470,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": null,
-    "SCID": "069",
+    "SCID": "082",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -105481,7 +105481,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51218",
-    "SCID": "046",
+    "SCID": "059",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105492,7 +105492,7 @@
   {
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60903",
-    "SCID": "030",
+    "SCID": "007",
     "owner": "BPUB",
     "pole_spec": "30-5 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105503,7 +105503,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13738",
-    "SCID": "012",
+    "SCID": "036",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105547,7 +105547,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13800",
-    "SCID": "006",
+    "SCID": "007",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105558,7 +105558,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "51220",
-    "SCID": "005",
+    "SCID": "006",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105569,7 +105569,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "NT1",
-    "SCID": "009",
+    "SCID": "025",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105580,7 +105580,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13751",
-    "SCID": "010",
+    "SCID": "026",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105591,7 +105591,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13777",
-    "SCID": "008",
+    "SCID": "019",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105602,18 +105602,18 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13799",
-    "SCID": "007",
+    "SCID": "018",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.92861789,
-    "lon": -97.51793466990516,
+    "lon": -97.517937054,
     "mr_level": "Simple"
   },
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13741",
-    "SCID": "011",
+    "SCID": "035",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105624,7 +105624,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13737",
-    "SCID": "013",
+    "SCID": "037",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105635,7 +105635,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "63070",
-    "SCID": "014",
+    "SCID": "038",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105646,7 +105646,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "63069",
-    "SCID": "015",
+    "SCID": "039",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105657,7 +105657,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13727",
-    "SCID": "016",
+    "SCID": "040",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105668,7 +105668,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "13726",
-    "SCID": "017",
+    "SCID": "041",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105690,7 +105690,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "21550",
-    "SCID": "018",
+    "SCID": "042",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105701,7 +105701,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": "51224",
-    "SCID": "019",
+    "SCID": "005",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105712,7 +105712,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": null,
-    "SCID": "020",
+    "SCID": "043",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -105723,7 +105723,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13768",
-    "SCID": "009",
+    "SCID": "031",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105734,7 +105734,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13769",
-    "SCID": "010",
+    "SCID": "032",
     "owner": "BPUB",
     "pole_spec": "45-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105745,7 +105745,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13771",
-    "SCID": "012",
+    "SCID": "034",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105756,7 +105756,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "80177",
-    "SCID": "007",
+    "SCID": "029",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105767,7 +105767,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13765",
-    "SCID": "006",
+    "SCID": "028",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105778,29 +105778,29 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13767",
-    "SCID": "008",
+    "SCID": "030",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.929968378055197,
+    "lat": 25.92996934295282,
     "lon": -97.51874953925409,
     "mr_level": "Simple Power"
   },
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13783",
-    "SCID": "002",
+    "SCID": "021",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.929102964566056,
-    "lon": -97.51822907874227,
+    "lat": 25.92910344700002,
+    "lon": -97.518229347,
     "mr_level": "OK to Attach"
   },
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13786",
-    "SCID": "005",
+    "SCID": "024",
     "owner": "BPUB",
     "pole_spec": "35-3 SOUTHERN PINE",
     "proposed_spec": "40-3 SOUTHERN PINE",
@@ -105811,7 +105811,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13782",
-    "SCID": "001",
+    "SCID": "020",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105822,7 +105822,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "73420",
-    "SCID": "003",
+    "SCID": "022",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105833,7 +105833,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13770",
-    "SCID": "011",
+    "SCID": "033",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105844,7 +105844,7 @@
   {
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13785",
-    "SCID": "004",
+    "SCID": "023",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105855,18 +105855,18 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "NT3",
-    "SCID": "012",
+    "SCID": "020",
     "owner": "AEP",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.939504116002272,
-    "lon": -97.51681082621364,
+    "lon": -97.51681297194811,
     "mr_level": "Simple Power"
   },
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "NT2",
-    "SCID": "011",
+    "SCID": "019",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105877,7 +105877,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13951",
-    "SCID": "023",
+    "SCID": "034",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-1 SOUTHERN PINE",
@@ -105888,7 +105888,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13945",
-    "SCID": "022",
+    "SCID": "033",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105899,7 +105899,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13928",
-    "SCID": "017",
+    "SCID": "028",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -105910,7 +105910,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13926",
-    "SCID": "016",
+    "SCID": "027",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -105921,7 +105921,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13925",
-    "SCID": "015",
+    "SCID": "026",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -105932,7 +105932,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "81948",
-    "SCID": "014",
+    "SCID": "025",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105943,7 +105943,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "62894",
-    "SCID": "003",
+    "SCID": "012",
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -105953,52 +105953,30 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "76120",
-    "SCID": "034",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939541126574174,
-    "lon": -97.51112096372502,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "20312",
-    "SCID": "031",
+    "SCID": "040",
     "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
+    "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.939646179995414,
-    "lon": -97.51220636310451,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
-    "tag": "20316",
-    "SCID": "028",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939748673986216,
-    "lon": -97.51317499072978,
+    "lon": -97.51220338294503,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "86351",
-    "SCID": "029",
+    "SCID": "042",
     "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939696384009213,
-    "lon": -97.51270566445805,
+    "pole_spec": "40-3 SOUTHERN PINE",
+    "proposed_spec": "45-3 SOUTHERN PINE",
+    "lat": 25.93969263201188,
+    "lon": -97.51270626050223,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "S-7066",
-    "SCID": "026",
+    "SCID": "036",
     "owner": "BPUB",
     "pole_spec": "60-2 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106008,30 +105986,8 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "81663",
-    "SCID": "030",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939677843967523,
-    "lon": -97.51249890244019,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
-    "tag": "20309",
-    "SCID": "033",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939577761941568,
-    "lon": -97.51149569199998,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "20315",
-    "SCID": "024",
+    "SCID": "038",
     "owner": "BPUB",
     "pole_spec": "35-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106042,7 +105998,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13936",
-    "SCID": "019",
+    "SCID": "030",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106053,7 +106009,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "NT",
-    "SCID": "018",
+    "SCID": "029",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -106064,7 +106020,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13921",
-    "SCID": "013",
+    "SCID": "024",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -106075,7 +106031,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13914",
-    "SCID": "008",
+    "SCID": "017",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106086,7 +106042,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "14195",
-    "SCID": "004",
+    "SCID": "013",
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106097,7 +106053,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "93228",
-    "SCID": "010",
+    "SCID": "018.1",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106108,7 +106064,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "NT1",
-    "SCID": "009",
+    "SCID": "018",
     "owner": "BPUB",
     "pole_spec": "45-2 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106119,7 +106075,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13912",
-    "SCID": "007",
+    "SCID": "016",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106130,7 +106086,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13911",
-    "SCID": "006",
+    "SCID": "015",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106141,7 +106097,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "14196",
-    "SCID": "005",
+    "SCID": "014",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106152,7 +106108,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "14194",
-    "SCID": "001",
+    "SCID": "010",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106162,19 +106118,8 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "76121",
-    "SCID": "035",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": "45-3 SOUTHERN PINE",
-    "lat": 25.939521576000008,
-    "lon": -97.51090712499999,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "13942",
-    "SCID": "021",
+    "SCID": "032",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-4 SOUTHERN PINE",
@@ -106185,7 +106130,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "1-9",
-    "SCID": "027",
+    "SCID": "039",
     "owner": "BPUB",
     "pole_spec": "60-2 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106196,7 +106141,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "13938",
-    "SCID": "020",
+    "SCID": "031",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106207,7 +106152,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "86333",
-    "SCID": "025",
+    "SCID": "037",
     "owner": "BPUB",
     "pole_spec": "60-2 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106218,7 +106163,7 @@
   {
     "job_name": "BTX-Wild-North-PT2",
     "tag": "14197",
-    "SCID": "002",
+    "SCID": "011",
     "owner": "BPUB",
     "pole_spec": "35-4 SOUTHERN PINE",
     "proposed_spec": "40-4 SOUTHERN PINE",
@@ -106228,19 +106173,8 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "88787",
-    "SCID": "032",
-    "owner": "BPUB",
-    "pole_spec": "40-3 Southern Pine",
-    "proposed_spec": null,
-    "lat": 25.939604172157626,
-    "lon": -97.5117706213045,
-    "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "NT",
-    "SCID": "010.A",
+    "SCID": "018.A",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
@@ -106255,14 +106189,25 @@
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
-    "lat": 25.939427111515247,
-    "lon": -97.50997205809406,
+    "lat": 25.939599422610435,
+    "lon": -97.51176563568511,
+    "mr_level": null
+  },
+  {
+    "job_name": "BTX-Wild-North-PT2",
+    "tag": null,
+    "SCID": null,
+    "owner": null,
+    "pole_spec": null,
+    "proposed_spec": null,
+    "lat": 25.93973761618646,
+    "lon": -97.51318057581204,
     "mr_level": null
   },
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "51249",
-    "SCID": "005",
+    "SCID": "071",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -106273,7 +106218,7 @@
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13754",
-    "SCID": "006",
+    "SCID": "027",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106284,7 +106229,7 @@
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "NT5",
-    "SCID": "002",
+    "SCID": "022",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": "45-3 SOUTHERN PINE",
@@ -106295,7 +106240,7 @@
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "NT4",
-    "SCID": "003",
+    "SCID": "021",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": "45-1 SOUTHERN PINE",
@@ -106306,7 +106251,7 @@
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "34056",
-    "SCID": "001",
+    "SCID": "023",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106317,7 +106262,7 @@
   {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13952",
-    "SCID": "004",
+    "SCID": "035",
     "owner": "BPUB",
     "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106328,7 +106273,7 @@
   {
     "job_name": "BTX-Wild-North-PT4",
     "tag": "NT3",
-    "SCID": "001",
+    "SCID": "040",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106339,7 +106284,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14135",
-    "SCID": "001",
+    "SCID": "042",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106350,7 +106295,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14136",
-    "SCID": "002",
+    "SCID": "043",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106361,7 +106306,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14192",
-    "SCID": "011",
+    "SCID": "009",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": "50-3 SOUTHERN PINE",
@@ -106372,7 +106317,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "38322",
-    "SCID": "006",
+    "SCID": "004",
     "owner": "BPUB",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106383,7 +106328,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14162",
-    "SCID": "005",
+    "SCID": "003",
     "owner": "BPUB",
     "pole_spec": "30-4 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106394,7 +106339,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14159",
-    "SCID": "003",
+    "SCID": "001",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": "50-3 SOUTHERN PINE",
@@ -106405,7 +106350,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14165",
-    "SCID": "007",
+    "SCID": "005",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106416,7 +106361,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14177",
-    "SCID": "010",
+    "SCID": "008",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106427,7 +106372,7 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14160",
-    "SCID": "004",
+    "SCID": "002",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
@@ -106438,23 +106383,12 @@
   {
     "job_name": "BTX-Wild-North-PT5",
     "tag": "14168",
-    "SCID": "008",
+    "SCID": "006",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.935498043000006,
-    "lon": -97.51711993448289,
-    "mr_level": "Simple"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT5",
-    "tag": "14175",
-    "SCID": "009",
-    "owner": "BPUB",
-    "pole_spec": "45-3 SOUTHERN PINE",
-    "proposed_spec": null,
-    "lat": 25.93580409700001,
-    "lon": -97.51708604399998,
+    "lon": -97.517124703,
     "mr_level": "Simple"
   },
   {
@@ -106464,7 +106398,7 @@
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
-    "lat": 25.907500266702947,
+    "lat": 25.907502679351502,
     "lon": -97.49666310300002,
     "mr_level": "Simple"
   },
@@ -106735,7 +106669,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12339",
-    "SCID": "22-045",
+    "SCID": "045",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
     "proposed_spec": "40-4 Southern Pine",
@@ -106746,7 +106680,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10917",
-    "SCID": "17-040",
+    "SCID": "040",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": null,
@@ -106779,7 +106713,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33899",
-    "SCID": "28-051",
+    "SCID": "051",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
@@ -106801,7 +106735,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10927",
-    "SCID": "29-052",
+    "SCID": "052",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
@@ -106823,7 +106757,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "73289",
-    "SCID": "30-053",
+    "SCID": "053",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
@@ -106856,7 +106790,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10916",
-    "SCID": "16-039",
+    "SCID": "039",
     "owner": "BPUB",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": "45-4 Southern Pine",
@@ -106922,7 +106856,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "64992",
-    "SCID": "19-042",
+    "SCID": "042",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
     "proposed_spec": null,
@@ -106955,7 +106889,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "64956",
-    "SCID": "20-043",
+    "SCID": "043",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": null,
@@ -106977,7 +106911,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12345",
-    "SCID": "27-050",
+    "SCID": "050",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": null,
@@ -106988,7 +106922,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "81036",
-    "SCID": "26-049",
+    "SCID": "049",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": "45-3 Southern Pine",
@@ -106999,7 +106933,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "50137",
-    "SCID": "25-048",
+    "SCID": "048",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": null,
@@ -107010,7 +106944,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "NT",
-    "SCID": "24-047",
+    "SCID": "047",
     "owner": "BPUB",
     "pole_spec": "30-3 Southern Pine",
     "proposed_spec": "35-3 Southern Pine",
@@ -107021,7 +106955,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10918",
-    "SCID": "18-041",
+    "SCID": "041",
     "owner": "BPUB",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": null,
@@ -107076,7 +107010,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12340",
-    "SCID": "23-046",
+    "SCID": "046",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
     "proposed_spec": "45-4 Southern Pine",
@@ -107087,7 +107021,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "73096",
-    "SCID": "21-044",
+    "SCID": "044",
     "owner": "BPUB",
     "pole_spec": "35-4 Southern Pine",
     "proposed_spec": null,
