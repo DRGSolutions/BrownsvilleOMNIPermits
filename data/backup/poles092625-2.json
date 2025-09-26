@@ -105628,8 +105628,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
-    "lat": 25.9314010397087,
-    "lon": -97.51761411495308,
+    "lat": 25.931403719884905,
+    "lon": -97.51762789851809,
     "mr_level": "Simple"
   },
   {
@@ -105689,6 +105689,17 @@
   },
   {
     "job_name": "BTX-Wild-North-PT1",
+    "tag": "21550",
+    "SCID": "018",
+    "owner": "BPUB",
+    "pole_spec": "50-3 SOUTHERN PINE",
+    "proposed_spec": null,
+    "lat": 25.92645139038406,
+    "lon": -97.51819481894798,
+    "mr_level": "ATTACHED / NOT ON PERMIT"
+  },
+  {
+    "job_name": "BTX-Wild-North-PT1",
     "tag": "51224",
     "SCID": "019",
     "owner": "BPUB",
@@ -105701,7 +105712,7 @@
   {
     "job_name": "BTX-Wild-North-PT1",
     "tag": null,
-    "SCID": null,
+    "SCID": "020",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -106333,7 +106344,7 @@
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.93334939852485,
-    "lon": -97.51734160289739,
+    "lon": -97.517370214,
     "mr_level": "Simple"
   },
   {
@@ -106746,7 +106757,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "81035",
-    "SCID": "014",
+    "SCID": "037",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": "50-2 Southern Pine",
@@ -106757,7 +106768,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33897",
-    "SCID": "013",
+    "SCID": "036",
     "owner": "BPUB",
     "pole_spec": "45-2 Southern Pine",
     "proposed_spec": null,
@@ -106779,7 +106790,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16086",
-    "SCID": "002",
+    "SCID": "025",
     "owner": "BPUB",
     "pole_spec": "45-2 Southern Pine",
     "proposed_spec": null,
@@ -106801,7 +106812,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16092",
-    "SCID": "003",
+    "SCID": "026",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106823,7 +106834,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10931",
-    "SCID": "31-054",
+    "SCID": "054",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": "45-4 Southern Pine",
@@ -106834,7 +106845,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "NT",
-    "SCID": "011",
+    "SCID": "034",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106856,7 +106867,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10915",
-    "SCID": "015",
+    "SCID": "038",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": "45-3 Southern Pine",
@@ -106867,7 +106878,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33894",
-    "SCID": "009",
+    "SCID": "032",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106878,7 +106889,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33895",
-    "SCID": "008",
+    "SCID": "031",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106889,7 +106900,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "39362",
-    "SCID": "005",
+    "SCID": "028",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106900,7 +106911,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "39363",
-    "SCID": "004",
+    "SCID": "027",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106922,7 +106933,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12310",
-    "SCID": "006",
+    "SCID": "029",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106933,7 +106944,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "NT",
-    "SCID": "007",
+    "SCID": "030",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -106955,7 +106966,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33891",
-    "SCID": "012",
+    "SCID": "035",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -107021,7 +107032,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33893",
-    "SCID": "010",
+    "SCID": "033",
     "owner": "BPUB",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": null,
@@ -107032,7 +107043,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10932",
-    "SCID": "32-055",
+    "SCID": "055",
     "owner": "BPUB",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": null,
@@ -107043,7 +107054,7 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "85155",
-    "SCID": "33-056",
+    "SCID": "056",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
@@ -107054,12 +107065,12 @@
   {
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16085",
-    "SCID": "001",
+    "SCID": "024",
     "owner": "BPUB",
     "pole_spec": null,
     "proposed_spec": null,
     "lat": 25.90928952199999,
-    "lon": -97.49462166325856,
+    "lon": -97.494619279,
     "mr_level": "Simple"
   },
   {
