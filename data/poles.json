@@ -106216,17 +106216,6 @@
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
-    "job_name": "BTX-Wild-North-PT2",
-    "tag": null,
-    "SCID": null,
-    "owner": null,
-    "pole_spec": null,
-    "proposed_spec": null,
-    "lat": 25.939427111515247,
-    "lon": -97.50997205809406,
-    "mr_level": null
-  },
-  {
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "51249",
     "SCID": "005",
