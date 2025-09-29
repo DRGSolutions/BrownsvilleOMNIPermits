@@ -105975,17 +105975,6 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "S-7066",
-    "SCID": "026",
-    "owner": "BPUB",
-    "pole_spec": "60-2 SOUTHERN PINE",
-    "proposed_spec": null,
-    "lat": 25.939704199000044,
-    "lon": -97.51446022541803,
-    "mr_level": "Cannot Attach"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "81663",
     "SCID": "030",
     "owner": "BPUB",
@@ -106005,17 +105994,6 @@
     "lat": 25.939577761941568,
     "lon": -97.51149569199998,
     "mr_level": "ATTACHED / NOT ON PERMIT"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
-    "tag": "20315",
-    "SCID": "024",
-    "owner": "BPUB",
-    "pole_spec": "35-3 SOUTHERN PINE",
-    "proposed_spec": null,
-    "lat": 25.93955632292667,
-    "lon": -97.51273108151733,
-    "mr_level": "Cannot Attach"
   },
   {
     "job_name": "BTX-Wild-North-PT2",
@@ -106162,17 +106140,6 @@
   },
   {
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "1-9",
-    "SCID": "027",
-    "owner": "BPUB",
-    "pole_spec": "60-2 SOUTHERN PINE",
-    "proposed_spec": null,
-    "lat": 25.93951581733195,
-    "lon": -97.512462743,
-    "mr_level": "Cannot Attach"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
     "tag": "13938",
     "SCID": "020",
     "owner": "BPUB",
@@ -106181,17 +106148,6 @@
     "lat": 25.939297522014094,
     "lon": -97.51930462314323,
     "mr_level": "OK to Attach"
-  },
-  {
-    "job_name": "BTX-Wild-North-PT2",
-    "tag": "86333",
-    "SCID": "025",
-    "owner": "BPUB",
-    "pole_spec": "60-2 SOUTHERN PINE",
-    "proposed_spec": null,
-    "lat": 25.93960514601273,
-    "lon": -97.51337987423874,
-    "mr_level": "Cannot Attach"
   },
   {
     "job_name": "BTX-Wild-North-PT2",
