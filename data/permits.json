@@ -1720,6 +1720,26 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Wild-North-PT8_SEG5_070",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "NT",
+    "SCID": "070",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT8_SEG5_071",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "21233",
+    "SCID": "071",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/01/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT9_SEG1_001",
     "job_name": "BTX-Wild-North-PT9",
     "tag": "13782",
