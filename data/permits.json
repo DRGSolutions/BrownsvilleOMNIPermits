@@ -1,5 +1,15 @@
 [
   {
+    "permit_id": "BTX-Alice-PT2_Seg1_001",
+    "job_name": "BTX-Alice-PT2",
+    "tag": "18107",
+    "SCID": "001",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/01/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Alice-PT3_Seg1_001",
     "job_name": "BTX-Alice-PT3",
     "tag": "11724",
