@@ -1,5 +1,85 @@
 [
   {
+    "permit_id": "BTX-Alice-PT1_Seg2_016",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "14458",
+    "SCID": "016",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_017",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "14461",
+    "SCID": "017",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_018",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "14462",
+    "SCID": "018",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_019",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "14463",
+    "SCID": "019",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_020",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "12300",
+    "SCID": "020",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_021",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "18101",
+    "SCID": "021",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_022",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "18102",
+    "SCID": "022",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT1_Seg2_023",
+    "job_name": "BTX-Alice-PT1",
+    "tag": "18103",
+    "SCID": "023",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/02/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Alice-PT2_Seg1_001",
     "job_name": "BTX-Alice-PT2",
     "tag": "18107",
