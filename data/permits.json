@@ -2970,6 +2970,96 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_019",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85393",
+    "SCID": "019",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_020",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85391",
+    "SCID": "020",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_021",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85397",
+    "SCID": "021",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_022",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85398",
+    "SCID": "022",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_033",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "NT33",
+    "SCID": "033",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_034",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85603",
+    "SCID": "034",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_074",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85390",
+    "SCID": "074",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_075",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85334",
+    "SCID": "075",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG2_076",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "85335",
+    "SCID": "076",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F35_BRN02-F01_SEG3_033",
     "job_name": "BRN02-F01 PLA",
     "tag": "GPCAN 12071 Tag 85383",
