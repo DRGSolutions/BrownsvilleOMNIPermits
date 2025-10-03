@@ -3030,6 +3030,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F34_BRN02-F02_SEG7_035",
+    "job_name": "BRN02-F02 PLA",
+    "tag": "61973",
+    "SCID": "035",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F34_BRN02-F02_SEG7_074",
     "job_name": "BRN02-F02 PLA",
     "tag": "85390",
