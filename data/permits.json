@@ -1,245 +1,5 @@
 [
   {
-    "permit_id": "BTX-Alice-PT1_Seg1_001",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "81785",
-    "SCID": "001",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_002",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14443",
-    "SCID": "002",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_003",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14445",
-    "SCID": "003",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_004",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "98001",
-    "SCID": "004",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_005",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14447",
-    "SCID": "005",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_006",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14448",
-    "SCID": "006",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_007",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "85825",
-    "SCID": "007",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_008",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14450",
-    "SCID": "008",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_009",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14451",
-    "SCID": "009",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_010",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14452",
-    "SCID": "010",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_011",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14453",
-    "SCID": "011",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_012",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14454",
-    "SCID": "012",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_013",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14455",
-    "SCID": "013",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_014",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14456",
-    "SCID": "014",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg1_015",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14457",
-    "SCID": "015",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_016",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14458",
-    "SCID": "016",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_017",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14461",
-    "SCID": "017",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_018",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14462",
-    "SCID": "018",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_019",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "14463",
-    "SCID": "019",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_020",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "12300",
-    "SCID": "020",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_021",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "18101",
-    "SCID": "021",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_022",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "18102",
-    "SCID": "022",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT1_Seg2_023",
-    "job_name": "BTX-Alice-PT1",
-    "tag": "18103",
-    "SCID": "023",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/02/2025",
-    "notes": "OMNI DEFERRED ALL OF THESE POLES ON 10/07/25"
-  },
-  {
-    "permit_id": "BTX-Alice-PT2_Seg1_001",
-    "job_name": "BTX-Alice-PT2",
-    "tag": "18107",
-    "SCID": "001",
-    "permit_status": "Not Approved - Other Issues",
-    "submitted_by": "ZK",
-    "submitted_at": "10/01/2025",
-    "notes": "OMNI DEFFERED THIS POLE ON 10/07/25"
-  },
-  {
     "permit_id": "BTX-Alice-PT3_Seg1_001",
     "job_name": "BTX-Alice-PT3",
     "tag": "11724",
@@ -810,7 +570,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-ALICE-PT7B_Seg2_018.1",
+    "permit_id": "BTX-ALICE-PT7B_Seg2_018.181",
     "job_name": "BTX-ALICE-PT7B",
     "tag": "16079",
     "SCID": "018.1",
@@ -1050,7 +810,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_022",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_002",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13962",
     "SCID": "002",
@@ -1060,7 +820,7 @@
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=NT5 | SCID=022 TO BTX-Wild-North-PT10D | TAG=NT5 | SCID=002\n**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT5 TO 13962"
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_023",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_001",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "34056",
     "SCID": "001",
@@ -1070,7 +830,7 @@
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=34056 | SCID=023 TO BTX-Wild-North-PT10D | TAG=34056 | SCID=001"
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_027",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_006",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13754",
     "SCID": "006",
@@ -1080,7 +840,7 @@
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=13754 | SCID=027 TO BTX-Wild-North-PT10D | TAG=13754 | SCID=006"
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_035",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_004",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13952",
     "SCID": "004",
@@ -1090,7 +850,7 @@
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=13952 | SCID=035 TO BTX-Wild-North-PT10D | TAG=13952 | SCID=004"
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_071",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_005",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "51249",
     "SCID": "005",
@@ -5410,7 +5170,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX02-F36_BRN02-F05_SEG5_050.1",
+    "permit_id": "BTX02-F36_BRN02-F05_SEG5_050.501",
     "job_name": "BRN02-F05 PLA",
     "tag": "75403",
     "SCID": "050.1",
@@ -5958,15 +5718,5 @@
     "submitted_by": "ZK",
     "submitted_at": "08/01/2025",
     "notes": ""
-  },
-  {
-    "permit_id": "TEST_2_123_004",
-    "job_name": "BRN01-F161",
-    "tag": "52874",
-    "SCID": "004",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "09/12/2025",
-    "notes": "TESTING"
   }
 ]
