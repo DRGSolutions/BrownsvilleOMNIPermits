@@ -630,6 +630,36 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-ALICE-PT7C_Seg3_31",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "10931",
+    "SCID": "31",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg3_32",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "10932",
+    "SCID": "32",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg3_33",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "85155",
+    "SCID": "33",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/16/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT1_SEG1_001",
     "job_name": "BTX-Wild-North-PT1",
     "tag": "21549",
@@ -810,16 +840,6 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_002",
-    "job_name": "BTX-Wild-North-PT10D",
-    "tag": "13962",
-    "SCID": "002",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "09/26/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=NT5 | SCID=022 TO BTX-Wild-North-PT10D | TAG=NT5 | SCID=002\n**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT5 TO 13962"
-  },
-  {
     "permit_id": "BTX-Wild-North-PT10D_SEG1_001",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "34056",
@@ -830,14 +850,14 @@
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=34056 | SCID=023 TO BTX-Wild-North-PT10D | TAG=34056 | SCID=001"
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_006",
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_002",
     "job_name": "BTX-Wild-North-PT10D",
-    "tag": "13754",
-    "SCID": "006",
+    "tag": "13962",
+    "SCID": "002",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "09/26/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=13754 | SCID=027 TO BTX-Wild-North-PT10D | TAG=13754 | SCID=006"
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=NT5 | SCID=022 TO BTX-Wild-North-PT10D | TAG=NT5 | SCID=002\n**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT5 TO 13962"
   },
   {
     "permit_id": "BTX-Wild-North-PT10D_SEG1_004",
@@ -858,6 +878,16 @@
     "submitted_by": "ZK",
     "submitted_at": "09/26/2025",
     "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=51249 | SCID=071 TO BTX-Wild-North-PT10D | TAG=51249 | SCID=005"
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT10D_SEG1_006",
+    "job_name": "BTX-Wild-North-PT10D",
+    "tag": "13754",
+    "SCID": "006",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "09/26/2025",
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=13754 | SCID=027 TO BTX-Wild-North-PT10D | TAG=13754 | SCID=006"
   },
   {
     "permit_id": "BTX-Wild-North-PT2_SEG1_001",
