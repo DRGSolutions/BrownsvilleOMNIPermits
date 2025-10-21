@@ -862,12 +862,12 @@
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_24",
     "job_name": "BTX-ALICE-PT7C",
-    "tag": "12343",
+    "tag": "NT",
     "SCID": "24",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/16/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT TO 12343"
+    "notes": ""
   },
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_25",
@@ -882,12 +882,12 @@
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_26",
     "job_name": "BTX-ALICE-PT7C",
-    "tag": "12344",
+    "tag": "81036",
     "SCID": "26",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/16/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM 81036 TO 12344"
+    "notes": ""
   },
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_27",
@@ -1672,12 +1672,12 @@
   {
     "permit_id": "BTX-Wild-North-PT2_SEG1_009",
     "job_name": "BTX-Wild-North-PT2",
-    "tag": "13919",
+    "tag": "14192",
     "SCID": "009",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "09/29/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT1 TO 14192\n**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT2 | TAG=14192 | SCID=009 TO BTX-Wild-North-PT2 | TAG=13919 | SCID=009"
+    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** TAG CHANGED FROM NT1 TO 14192"
   },
   {
     "permit_id": "BTX-Wild-North-PT2_SEG1_010",
