@@ -1540,16 +1540,6 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT10D_SEG1_001",
-    "job_name": "BTX-Wild-North-PT10D",
-    "tag": "34056",
-    "SCID": "001",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "09/26/2025",
-    "notes": "**********ORIGINAL INFORMATION HAS CHANGED********** MANUAL PERMIT REASSIGNMENT FROM BTX-Wild-North-PT10D | TAG=34056 | SCID=023 TO BTX-Wild-North-PT10D | TAG=34056 | SCID=001"
-  },
-  {
     "permit_id": "BTX-Wild-North-PT10D_SEG1_002",
     "job_name": "BTX-Wild-North-PT10D",
     "tag": "13962",
