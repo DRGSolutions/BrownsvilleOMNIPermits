@@ -8740,6 +8740,26 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG8_121",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "80639",
+    "SCID": "121",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG8_122",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "76034",
+    "SCID": "122",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F40_BRN02-F14_SEG8_123",
     "job_name": "BRN02-F14 PLA",
     "tag": "10499",
