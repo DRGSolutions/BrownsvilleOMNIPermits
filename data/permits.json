@@ -7830,6 +7830,66 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_151",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "NT",
+    "SCID": "151",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_152",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "10730",
+    "SCID": "152",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_153",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "10731",
+    "SCID": "153",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_154",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "10732",
+    "SCID": "154",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_155",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "NT",
+    "SCID": "155",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F40_BRN02-F14_SEG10_156",
+    "job_name": "BRN02-F14 PLA",
+    "tag": "10734",
+    "SCID": "156",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "10/27/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F40_BRN02-F14_SEG2_015",
     "job_name": "BRN02-F14 PLA",
     "tag": "80691",
