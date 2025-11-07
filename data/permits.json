@@ -5390,7 +5390,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX02-F40_BRN02-F14_SEG1_001.1",
+    "permit_id": "BTX02-F40_BRN02-F14_SEG1_001.011",
     "job_name": "BRN02-F14 PLA",
     "tag": "80688",
     "SCID": "001.1",
@@ -5532,12 +5532,12 @@
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_151",
     "job_name": "BRN02-F14 PLA",
-    "tag": "NT",
+    "tag": "10729",
     "SCID": "151",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/27/2025",
-    "notes": ""
+    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 10729"
   },
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_152",
@@ -5592,12 +5592,12 @@
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_157",
     "job_name": "BRN02-F14 PLA",
-    "tag": "NT",
+    "tag": "00881",
     "SCID": "157",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/27/2025",
-    "notes": ""
+    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 00881"
   },
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_158",
@@ -5632,22 +5632,22 @@
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_161",
     "job_name": "BRN02-F14 PLA",
-    "tag": "NT",
+    "tag": "80642",
     "SCID": "161",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/27/2025",
-    "notes": ""
+    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 80642"
   },
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG10_162",
     "job_name": "BRN02-F14 PLA",
-    "tag": "807??",
+    "tag": "80719",
     "SCID": "162",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "ZK",
     "submitted_at": "10/27/2025",
-    "notes": ""
+    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 807?? TO 80719"
   },
   {
     "permit_id": "BTX02-F40_BRN02-F14_SEG2_015",
@@ -6050,7 +6050,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX02-F40_BRN02-F14_SEG5_060.1",
+    "permit_id": "BTX02-F40_BRN02-F14_SEG5_060.601",
     "job_name": "BRN02-F14 PLA",
     "tag": "11541",
     "SCID": "060.1",
@@ -6130,7 +6130,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX02-F40_BRN02-F14_SEG5_067.1",
+    "permit_id": "BTX02-F40_BRN02-F14_SEG5_067.671",
     "job_name": "BRN02-F14 PLA",
     "tag": "85286",
     "SCID": "067.1",
