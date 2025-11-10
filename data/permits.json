@@ -1,6 +1,6 @@
 [
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_001",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_001",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "75202",
     "SCID": "001",
@@ -10,7 +10,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_002",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_002",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21671",
     "SCID": "002",
@@ -20,7 +20,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_003",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_003",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21670",
     "SCID": "003",
@@ -30,7 +30,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_004",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_004",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21669",
     "SCID": "004",
@@ -40,7 +40,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_005",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_005",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21714",
     "SCID": "005",
@@ -50,7 +50,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_006",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_006",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21666",
     "SCID": "006",
@@ -60,7 +60,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_007",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_007",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21665",
     "SCID": "007",
@@ -70,7 +70,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_008",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_008",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60919",
     "SCID": "008",
@@ -80,7 +80,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_009",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_009",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60918",
     "SCID": "009",
@@ -90,7 +90,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_010",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_010",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60917",
     "SCID": "010",
@@ -100,7 +100,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_011",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_011",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60915",
     "SCID": "011",
@@ -110,7 +110,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_012",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_012",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60813",
     "SCID": "012",
@@ -120,7 +120,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_013",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_013",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "88008",
     "SCID": "013",
@@ -130,7 +130,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_014",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_014",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60914",
     "SCID": "014",
@@ -140,7 +140,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_015",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_015",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "72765",
     "SCID": "015",
@@ -150,7 +150,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_016",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_016",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60912",
     "SCID": "016",
@@ -160,7 +160,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_017",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_017",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "64933",
     "SCID": "017",
@@ -170,7 +170,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_018",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_018",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "60910",
     "SCID": "018",
@@ -180,7 +180,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_019",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_019",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "30286",
     "SCID": "019",
@@ -190,7 +190,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_020",
+    "permit_id": "BTX-Wild-North-PT8_SEG1_020",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "21250",
     "SCID": "020",
