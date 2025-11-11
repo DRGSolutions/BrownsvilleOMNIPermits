@@ -48489,6 +48489,17 @@
   },
   {
     "job_name": "BTX-Wild-North-PT9",
+    "tag": "13754",
+    "SCID": "013",
+    "owner": "BPUB",
+    "pole_spec": "40-3 SOUTHERN PINE",
+    "proposed_spec": null,
+    "lat": 25.9298973790542,
+    "lon": -97.51802575873923,
+    "mr_level": "ATTACHED / NOT ON PERMIT"
+  },
+  {
+    "job_name": "BTX-Wild-North-PT9",
     "tag": "13767",
     "SCID": "008",
     "owner": "BPUB",
