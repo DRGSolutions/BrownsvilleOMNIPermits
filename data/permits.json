@@ -4510,6 +4510,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F38_BRN02-F10_SEG2_016",
+    "job_name": "BRN02-F10 PLA",
+    "tag": "08715",
+    "SCID": "016",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "11/12/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F38_BRN02-F10_SEG2_017",
     "job_name": "BRN02-F10 PLA",
     "tag": "81280",
