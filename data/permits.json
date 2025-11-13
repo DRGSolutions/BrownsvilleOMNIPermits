@@ -390,6 +390,86 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Alice-PT3_Seg3_041",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "85826",
+    "SCID": "041",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_042",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "23118",
+    "SCID": "042",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_043",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "23130",
+    "SCID": "043",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_044",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "11730",
+    "SCID": "044",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_045",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "11731",
+    "SCID": "045",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_046",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "11732",
+    "SCID": "046",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_047",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "12294",
+    "SCID": "047",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Alice-PT3_Seg3_048",
+    "job_name": "BTX-Alice-PT3",
+    "tag": "23119",
+    "SCID": "048",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/13/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT8_SEG1_001",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "75202",
