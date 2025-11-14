@@ -700,6 +700,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Wild-North-PT4_Seg1_001",
+    "job_name": "BTX-Wild-North-PT4",
+    "tag": "20451",
+    "SCID": "001",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/14/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT8_SEG1_001",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "75202",
