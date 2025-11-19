@@ -1170,6 +1170,136 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_21",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "73096",
+    "SCID": "21",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_22",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "12339",
+    "SCID": "22",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_23",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "12340",
+    "SCID": "23",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_24",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "12343",
+    "SCID": "24",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_25",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "50137",
+    "SCID": "25",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_26",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "12344",
+    "SCID": "26",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_27",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "12345",
+    "SCID": "27",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_28-051",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "33899",
+    "SCID": "28-051",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_29",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "10927",
+    "SCID": "29",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_30",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "73289",
+    "SCID": "30",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_31",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "10931",
+    "SCID": "31",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_32",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "10932",
+    "SCID": "32",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-ALICE-PT7C_Seg2_33",
+    "job_name": "BTX-ALICE-PT7C",
+    "tag": "85155",
+    "SCID": "33",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-ALICE-PT7D_Seg1_001",
     "job_name": "BTX-ALICE-PT7D",
     "tag": "10939",
