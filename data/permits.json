@@ -11380,6 +11380,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX07-F130_BRN01-F176_Seg2_033",
+    "job_name": "BRN01-F176 PLA",
+    "tag": "NT",
+    "SCID": "033",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "JN",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX07-F130_BRN01-F176_Seg2_034",
     "job_name": "BRN01-F176 PLA",
     "tag": "07850",
