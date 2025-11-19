@@ -2810,6 +2810,46 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX02-F126_BRN01-F170_Seg5_050",
+    "job_name": "BRN01-F170 PLA",
+    "tag": "09058",
+    "SCID": "050",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "TM",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F126_BRN01-F170_Seg5_051",
+    "job_name": "BRN01-F170 PLA",
+    "tag": "08830",
+    "SCID": "051",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "TM",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F126_BRN01-F170_Seg5_070",
+    "job_name": "BRN01-F170 PLA",
+    "tag": "85570",
+    "SCID": "070",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "TM",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX02-F126_BRN01-F170_Seg5_071",
+    "job_name": "BRN01-F170 PLA",
+    "tag": "87373",
+    "SCID": "071",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "TM",
+    "submitted_at": "11/19/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX02-F33_BRN02-F11_SEG1_001",
     "job_name": "BRN02-F11 PLA",
     "tag": "80399",
