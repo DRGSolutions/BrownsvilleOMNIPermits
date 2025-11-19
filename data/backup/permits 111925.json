@@ -1240,14 +1240,14 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-ALICE-PT7C_Seg2_28-028",
+    "permit_id": "BTX-ALICE-PT7C_Seg2_28-051",
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33899",
-    "SCID": "28",
+    "SCID": "28-051",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** SCID CHANGED FROM 28-051 TO 28"
+    "notes": ""
   },
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_29",
@@ -1442,12 +1442,12 @@
   {
     "permit_id": "BTX-ALICE-PT7D_Seg1_015",
     "job_name": "BTX-ALICE-PT7D",
-    "tag": "85969",
+    "tag": "10975",
     "SCID": "015",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 10975 TO 85969"
+    "notes": ""
   },
   {
     "permit_id": "BTX-ALICE-PT7D_Seg1_016",
@@ -3192,12 +3192,12 @@
   {
     "permit_id": "BTX02-F126_BRN01-F170_Seg4_060",
     "job_name": "BRN01-F170 PLA",
-    "tag": "08936",
+    "tag": "0893",
     "SCID": "060",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "TM",
     "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 0893 TO 08936"
+    "notes": ""
   },
   {
     "permit_id": "BTX02-F126_BRN01-F170_Seg4_061",
@@ -7792,12 +7792,12 @@
   {
     "permit_id": "BTX02-F38_BRN02-F10_Seg5_075",
     "job_name": "BRN02-F10 PLA",
-    "tag": "08589",
+    "tag": "NO TAG",
     "SCID": "075",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/17/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NO TAG TO 08589"
+    "notes": ""
   },
   {
     "permit_id": "BTX02-F38_BRN02-F10_Seg6_076",
@@ -7902,12 +7902,12 @@
   {
     "permit_id": "BTX02-F38_BRN02-F10_Seg6_086",
     "job_name": "BRN02-F10 PLA",
-    "tag": "08613",
+    "tag": "NO TAG",
     "SCID": "086",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/17/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NO TAG TO 08613"
+    "notes": ""
   },
   {
     "permit_id": "BTX02-F38_BRN02-F10_Seg6_087",
@@ -11432,22 +11432,22 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_002",
     "job_name": "BRN01-F176 PLA",
-    "tag": "19386",
+    "tag": "19385",
     "SCID": "002",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 19385 TO 19386"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_003",
     "job_name": "BRN01-F176 PLA",
-    "tag": "60016",
+    "tag": "NT3",
     "SCID": "003",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT3 TO 60016"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_004",
@@ -11482,12 +11482,12 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_007",
     "job_name": "BRN01-F176 PLA",
-    "tag": "19392",
+    "tag": "NT7",
     "SCID": "007",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT7 TO 19392"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_008",
@@ -11542,12 +11542,12 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_013",
     "job_name": "BRN01-F176 PLA",
-    "tag": "06331",
+    "tag": "NT15",
     "SCID": "013",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT15 TO 06331"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_014",
@@ -11562,22 +11562,22 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_015",
     "job_name": "BRN01-F176 PLA",
-    "tag": "07843",
+    "tag": "NT17",
     "SCID": "015",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT17 TO 07843"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_016",
     "job_name": "BRN01-F176 PLA",
-    "tag": "07845",
+    "tag": "NT19",
     "SCID": "016",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT19 TO 07845"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_017",
@@ -11612,22 +11612,22 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg1_020",
     "job_name": "BRN01-F176 PLA",
-    "tag": "91179",
+    "tag": "NT",
     "SCID": "020",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 91179"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg2_021",
     "job_name": "BRN01-F176 PLA",
-    "tag": "91179",
+    "tag": "NT",
     "SCID": "021",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 91179"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg2_022",
@@ -11712,12 +11712,12 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg2_033",
     "job_name": "BRN01-F176 PLA",
-    "tag": "07599",
+    "tag": "NT",
     "SCID": "033",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 07599"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg2_034",
@@ -11812,12 +11812,12 @@
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg3_047",
     "job_name": "BRN01-F176 PLA",
-    "tag": "76532",
+    "tag": "NT52",
     "SCID": "047",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT52 TO 76532"
+    "notes": ""
   },
   {
     "permit_id": "BTX07-F130_BRN01-F176_Seg3_048",
