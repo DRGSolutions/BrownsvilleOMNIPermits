@@ -3778,5 +3778,105 @@
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025",
     "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_008",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103288-4440177",
+    "SCID": "008",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_009",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "NT",
+    "SCID": "009",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_011",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103156-4439903",
+    "SCID": "011",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_012",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103233-4439724",
+    "SCID": "012",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_013",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103212-4439546",
+    "SCID": "013",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_014",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103190-4439546",
+    "SCID": "014",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_015",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103168-4439188",
+    "SCID": "015",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_016",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "5103168-4439188",
+    "SCID": "016",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_017",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "4103140-4439009",
+    "SCID": "017",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F154_BRN05-F50_SEG1_018",
+    "job_name": "BRN05-F50 PLA",
+    "tag": "510312-4438860",
+    "SCID": "018",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
   }
 ]
