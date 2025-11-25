@@ -3658,5 +3658,15 @@
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025",
     "notes": ""
+  },
+  {
+    "permit_id": "BTX08-F147_BRN05-F52_2_SEG1_033",
+    "job_name": "BRN05-F52_2",
+    "tag": "NT",
+    "SCID": "033",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/25/2025",
+    "notes": ""
   }
 ]
