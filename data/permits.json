@@ -3750,6 +3750,36 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F94_BRN02_F42_SEG3_066",
+    "job_name": "BRN02-F42",
+    "tag": "NT",
+    "SCID": "066",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "11/28/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F94_BRN02_F42_SEG3_074",
+    "job_name": "BRN02-F42",
+    "tag": "NT",
+    "SCID": "074",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "11/28/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F94_BRN02_F42_SEG3_075",
+    "job_name": "BRN02-F42",
+    "tag": "NT",
+    "SCID": "075",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "11/28/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_025",
     "job_name": "BRN05-F52_1",
     "tag": "51035304441359",
