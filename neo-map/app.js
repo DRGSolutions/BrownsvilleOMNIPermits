@@ -75,7 +75,7 @@ function applyFilters(){
     }
     // search
     if (q.search){
-      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level} ${p.notes}`.toLowerCase();
+      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
       if (!hay.includes(String(q.search).toLowerCase())) return false;
     }
     // extra rule rows
