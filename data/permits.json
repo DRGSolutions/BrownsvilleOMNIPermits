@@ -4052,7 +4052,7 @@
   {
     "permit_id": "BTX05-F92_BRN02-F60_SEG2AEP_176",
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "",
     "SCID": "176",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
