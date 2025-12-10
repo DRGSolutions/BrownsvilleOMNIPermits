@@ -7310,6 +7310,16 @@
     "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-006-4437-869 TO 51030064437869"
   },
   {
+    "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_101",
+    "job_name": "BRN05-F59_1 PLA",
+    "tag": "NT",
+    "SCID": "101",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "JN",
+    "submitted_at": "11/26/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_102",
     "job_name": "BRN05-F59_1 PLA",
     "tag": "51029664437118",
