@@ -4020,7 +4020,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX05-99_BRN02-F57_AEPSEG4_034.A",
+    "permit_id": "BTX05-99_BRN02-F57_AEPSEG4_034",
     "job_name": "BRN02-F57 PLA",
     "tag": "51524404413628",
     "SCID": "034.A",
@@ -7228,16 +7228,6 @@
     "submitted_by": "JN",
     "submitted_at": "11/26/2025",
     "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51027964436468"
-  },
-  {
-    "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_088",
-    "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
-    "SCID": "088",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": ""
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_093",
