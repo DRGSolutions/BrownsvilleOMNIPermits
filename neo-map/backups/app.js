@@ -74,21 +74,16 @@ function applyFilters(){
       if (normOwner(p.owner) !== want) return false;
     }
     // search
-    const rel = STATE.byKey.get(poleKey(p)) || [];
     if (q.search){
-      const notesHay = rel
-        .map(r => (r?.notes ?? r?.permit_notes ?? r?.Notes ?? r?.PermitNotes ?? r?.comments ?? '').toString())
-        .join(' ');
-      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level} ${notesHay}`.toLowerCase();
+      const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
       if (!hay.includes(String(q.search).toLowerCase())) return false;
     }
-
     // extra rule rows
     if (spec.rules.length){
+      const rel = STATE.byKey.get(poleKey(p)) || [];
       const hits = spec.rules.map(r=> matchRule(p, r, rel));
       if (spec.logic==='AND' ? !hits.every(Boolean) : !hits.some(Boolean)) return false;
     }
-
     return true;
   });
 
