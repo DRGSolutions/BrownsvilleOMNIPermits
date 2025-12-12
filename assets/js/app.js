@@ -109,35 +109,62 @@
   function msg(h){ const el=$('#msgPermit'); if(el) el.innerHTML=h||''; }
   function toMDY(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m? `${m[2]}/${m[3]}/${m[1]}` : (s||''); }
 
-    // -------- Proposal note normalization / propagation helpers --------
-  const PROPOSAL_RE = /\b(\d{4}-\d{2}-\d{4})\b/; // 10 digits, two dashes: 1234-56-7890
+  // -------- Proposal normalization / base-id propagation --------
+  const PROPOSAL_RE = /\b(\d{4}-\d{2}-\d{4})\b/; // 1234-56-7890
 
   function basePermitId(id){
-    return String(id || '').replace(/_\d+$/,''); // strips _001, _12, etc
+    // Base ID = everything except trailing _### (SCID suffix)
+    return String(id || '').replace(/_\d+$/,'');
   }
 
-  function normalizeProposalNotes(raw){
-    const t = String(raw ?? '').trim();
-    if (!t) return { notes: '', proposal: null };
-
+  function extractProposalNumber(notes){
+    const t = String(notes ?? '');
     const m = t.match(PROPOSAL_RE);
-    if (!m) return { notes: t, proposal: null };
-
-    const proposal = m[1];
-
-    // If the note already includes the word "proposal" anywhere, leave as-is.
-    if (/proposal/i.test(t)) return { notes: t, proposal };
-
-    // Otherwise, ensure the proposal number appears as "Proposal ####-##-####"
-    return { notes: t.replace(PROPOSAL_RE, `Proposal ${proposal}`), proposal };
+    return m ? m[1] : null;
   }
+
+  // Ensures that any 1234-56-7890 present is stored as "Proposal 1234-56-7890"
+  // If "proposal" already exists anywhere in the note, we do NOT force-add another "Proposal" word.
+  function normalizeProposalInNotes(raw){
+    const t = String(raw ?? '');
+    const num = extractProposalNumber(t);
+    if (!num) return { notes: t, proposal: null };
+
+    // If the note already includes "proposal" anywhere, keep text but still report the proposal number.
+    if (/proposal/i.test(t)) return { notes: t, proposal: num };
+
+    // Otherwise replace the number token with "Proposal <num>"
+    return { notes: t.replace(PROPOSAL_RE, `Proposal ${num}`), proposal: num };
+  }
+
+  // Updates (or injects) proposal number inside an existing note while preserving other text.
+  function applyProposalToExistingNotes(existingNotes, proposalNum){
+    const t = String(existingNotes ?? '');
+    if (!proposalNum) return t;
+
+    // If there is already a proposal-number token, normalize/replace it.
+    if (PROPOSAL_RE.test(t)) {
+      if (/proposal/i.test(t)) {
+        // Replace ONLY the numeric token, keep the user's wording.
+        return t.replace(PROPOSAL_RE, proposalNum);
+      }
+      // Replace token with "Proposal <num>"
+      return t.replace(PROPOSAL_RE, `Proposal ${proposalNum}`);
+    }
+
+    // No proposal number present: append on a new line (minimizes disruption).
+    const suffix = `Proposal ${proposalNum}`;
+    return t.trim() ? `${t.trim()}\n${suffix}` : suffix;
+  }
+
 
   async function onSavePermit(e){
     e && e.preventDefault();
     if (typeof window.UI_collectPermitForm!=='function'){ msg('<span class="err">Internal error.</span>'); return; }
     const f=window.UI_collectPermitForm();
-    const norm = normalizeProposalNotes(f.notes || '');
+    const norm = normalizeProposalInNotes(f.notes || '');
     f.notes = norm.notes;
+
 
     if(!f.job_name||!f.tag||!f.SCID){ msg('<span class="err">Missing pole keys.</span>'); return; }
     if(!f.permit_id){ msg('<span class="err">Permit ID is required.</span>'); return; }
@@ -147,7 +174,7 @@
 
     const exists = (window.STATE?.permits||[]).some(r=>String(r.permit_id)===String(f.permit_id));
 
-    const primaryChange = exists
+    const primary = exists
       ? { type:'update_permit', permit_id:f.permit_id, patch:{
             job_name:f.job_name, tag:f.tag, SCID:f.SCID,
             permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } }
@@ -155,31 +182,32 @@
             permit_id:f.permit_id, job_name:f.job_name, tag:f.tag, SCID:f.SCID,
             permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } };
 
-    // If the saved note contains a proposal number, propagate the normalized note to all permits with the same base id.
-    const extra = [];
+    // If there is a proposal number in this note, propagate it to every permit with the same base permit_id.
+    const changes = [primary];
+
     if (norm.proposal) {
       const base = basePermitId(f.permit_id);
       const all = (window.STATE?.permits || []).filter(r => basePermitId(r.permit_id) === base);
+
       for (const r of all) {
+        if (!r?.permit_id) continue;
         if (String(r.permit_id) === String(f.permit_id)) continue;
-        const theirNorm = normalizeProposalNotes(r.notes || '');
-        // Update if they don't match (this also supports "change proposal number on one permit; update the rest")
-        if (theirNorm.notes !== f.notes) {
-          extra.push({ type:'update_permit', permit_id:r.permit_id, patch:{ notes: f.notes } });
+
+        const nextNotes = applyProposalToExistingNotes(r.notes || '', norm.proposal);
+        if (String(nextNotes) !== String(r.notes || '')) {
+          changes.push({ type:'update_permit', permit_id:r.permit_id, patch:{ notes: nextNotes } });
         }
       }
     }
 
     try{
       msg('Submitting…');
-      const payload = extra.length
-        ? { actorName:'Website User', reason:`Permit ${f.permit_id} (propagate proposal)`, changes:[primaryChange, ...extra] }
-        : { actorName:'Website User', reason:`Permit ${f.permit_id}`, change: primaryChange };
-
-      const data = await callApi(payload);
+      // IMPORTANT: submit as `changes` so propagation actually reaches backend (same format Mass Apply uses)
+      const data = await callApi({ actorName:'Website User', reason:`Permit ${f.permit_id}`, changes });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
       window.dispatchEvent(new CustomEvent('watch:start'));
     }catch(err){ console.error(err); msg(`<span class="err">${err.message}</span>`); }
+
 
     const change = exists
       ? { type:'update_permit', permit_id:f.permit_id, patch:{
