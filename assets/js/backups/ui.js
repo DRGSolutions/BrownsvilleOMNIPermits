@@ -73,10 +73,7 @@
       }
 
       if (q) {
-        const notesHay = (rel || [])
-          .map(r => (r?.notes ?? r?.permit_notes ?? r?.Notes ?? r?.PermitNotes ?? r?.comments ?? '').toString())
-          .join(' ');
-        const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level} ${notesHay}`.toLowerCase();
+        const hay = `${p.job_name} ${p.tag} ${p.SCID} ${p.owner} ${p.mr_level}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
