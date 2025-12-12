@@ -144,7 +144,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "068",
     "owner": null,
     "pole_spec": null,
@@ -276,7 +276,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "053",
     "owner": null,
     "pole_spec": null,
@@ -287,7 +287,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "054",
     "owner": null,
     "pole_spec": null,
@@ -375,7 +375,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "041",
     "owner": null,
     "pole_spec": null,
@@ -386,7 +386,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "040",
     "owner": null,
     "pole_spec": null,
@@ -628,7 +628,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "013",
     "owner": "AEP",
     "pole_spec": "40-3 Southern Pine",
@@ -782,7 +782,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "073",
     "owner": null,
     "pole_spec": null,
@@ -793,7 +793,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "074",
     "owner": null,
     "pole_spec": null,
@@ -804,7 +804,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "075",
     "owner": null,
     "pole_spec": null,
@@ -815,7 +815,7 @@
   },
   {
     "job_name": "BRN02-F31",
-    "tag": null,
+    "tag": "NT",
     "SCID": "076",
     "owner": null,
     "pole_spec": null,
@@ -1112,7 +1112,7 @@
   },
   {
     "job_name": "BRN02-F42",
-    "tag": null,
+    "tag": "NT",
     "SCID": "107",
     "owner": null,
     "pole_spec": null,
@@ -1552,7 +1552,7 @@
   },
   {
     "job_name": "BRN02-F42",
-    "tag": null,
+    "tag": "NT",
     "SCID": "072",
     "owner": null,
     "pole_spec": null,
@@ -1783,7 +1783,7 @@
   },
   {
     "job_name": "BRN02-F42",
-    "tag": null,
+    "tag": "NT",
     "SCID": "055",
     "owner": null,
     "pole_spec": null,
@@ -2960,7 +2960,7 @@
   },
   {
     "job_name": "BRN02-F47_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "036",
     "owner": null,
     "pole_spec": null,
@@ -3136,7 +3136,7 @@
   },
   {
     "job_name": "BRN02-F47_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "020",
     "owner": null,
     "pole_spec": null,
@@ -3235,7 +3235,7 @@
   },
   {
     "job_name": "BRN02-F47_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "014",
     "owner": null,
     "pole_spec": null,
@@ -4027,7 +4027,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "099",
     "owner": "BPUB",
     "pole_spec": "40-3 Southern Pine",
@@ -4192,7 +4192,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "087",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -4203,7 +4203,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "088",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -4753,7 +4753,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "179",
     "owner": "MVEC",
     "pole_spec": null,
@@ -4786,7 +4786,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "176",
     "owner": "AEP",
     "pole_spec": null,
@@ -5281,7 +5281,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "143",
     "owner": "MVEC",
     "pole_spec": null,
@@ -5776,7 +5776,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "206",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -5842,7 +5842,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "200",
     "owner": "MVEC",
     "pole_spec": null,
@@ -6788,7 +6788,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "249",
     "owner": "MVEC",
     "pole_spec": null,
@@ -6810,7 +6810,7 @@
   },
   {
     "job_name": "BRN02-F60",
-    "tag": null,
+    "tag": "NT",
     "SCID": "248",
     "owner": "MVEC",
     "pole_spec": null,
@@ -7184,7 +7184,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "118",
     "owner": null,
     "pole_spec": null,
@@ -7228,7 +7228,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "105",
     "owner": null,
     "pole_spec": null,
@@ -8427,7 +8427,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "030",
     "owner": null,
     "pole_spec": null,
@@ -8889,7 +8889,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "039",
     "owner": null,
     "pole_spec": null,
@@ -8900,7 +8900,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "041",
     "owner": null,
     "pole_spec": null,
@@ -9021,7 +9021,7 @@
   },
   {
     "job_name": "BRN02-F30 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "119",
     "owner": null,
     "pole_spec": null,
@@ -9230,7 +9230,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "44",
     "owner": null,
     "pole_spec": null,
@@ -9318,7 +9318,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "56",
     "owner": null,
     "pole_spec": null,
@@ -9340,7 +9340,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "057",
     "owner": null,
     "pole_spec": null,
@@ -9461,7 +9461,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "69",
     "owner": null,
     "pole_spec": null,
@@ -9483,7 +9483,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "106",
     "owner": null,
     "pole_spec": null,
@@ -9945,7 +9945,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "82",
     "owner": null,
     "pole_spec": null,
@@ -10066,7 +10066,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "43",
     "owner": null,
     "pole_spec": null,
@@ -10110,7 +10110,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "027",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -10121,7 +10121,7 @@
   },
   {
     "job_name": "BRN02-F47_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "026",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -11947,7 +11947,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "196",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -11958,7 +11958,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "195",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -11969,7 +11969,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "194",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -11980,7 +11980,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "191",
     "owner": "MVEC",
     "pole_spec": "60-3 Southern Pine",
@@ -11991,7 +11991,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "001",
     "owner": "MVEC",
     "pole_spec": "45-1 Southern Pine",
@@ -12002,7 +12002,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "002",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12013,7 +12013,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "003",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12024,7 +12024,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "004",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12035,7 +12035,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "005",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12046,7 +12046,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "006",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12057,7 +12057,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "044",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12068,7 +12068,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "045",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12079,7 +12079,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "046",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12090,7 +12090,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "047",
     "owner": "MVEC",
     "pole_spec": "45-2 Southern Pine",
@@ -12101,7 +12101,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "048",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12112,7 +12112,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "049",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12123,7 +12123,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "050",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12134,7 +12134,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "051",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12145,7 +12145,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "052",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12156,7 +12156,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "053",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12167,7 +12167,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "054",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12178,7 +12178,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "055",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12189,7 +12189,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "065",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12200,7 +12200,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "066",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12211,7 +12211,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "081",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12222,7 +12222,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "082",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12233,7 +12233,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "083",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12244,7 +12244,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "084",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12255,7 +12255,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "086",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12266,7 +12266,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "085",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12277,7 +12277,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "087",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12288,7 +12288,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "088",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12299,7 +12299,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "089",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12310,7 +12310,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "090",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12321,7 +12321,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "091",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12332,7 +12332,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "092",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12343,7 +12343,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "093",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12354,7 +12354,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "094",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12376,7 +12376,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "107",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12387,7 +12387,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "108",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12398,7 +12398,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "111",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12409,7 +12409,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "110",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12420,7 +12420,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "109",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12431,7 +12431,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "112",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12442,7 +12442,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "113",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12453,7 +12453,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "115",
     "owner": "MVEC",
     "pole_spec": "45-2 Southern Pine",
@@ -12464,7 +12464,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "114",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12475,7 +12475,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "116",
     "owner": "MVEC",
     "pole_spec": "45-2 Southern Pine",
@@ -12486,7 +12486,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "164",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12497,7 +12497,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "163",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12508,7 +12508,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "161",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12519,7 +12519,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "162",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12530,7 +12530,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "160",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12541,7 +12541,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "159",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12552,7 +12552,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "139",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12563,7 +12563,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "140",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12574,7 +12574,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "142",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12585,7 +12585,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "143",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12596,7 +12596,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "144",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12607,7 +12607,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "145",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12618,7 +12618,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "146",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12629,7 +12629,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "147",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12640,7 +12640,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "148",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12651,7 +12651,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "149",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12662,7 +12662,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "150",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12673,7 +12673,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "151",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12684,7 +12684,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "152",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12695,7 +12695,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "153",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12706,7 +12706,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "156",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12717,7 +12717,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "157",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12728,7 +12728,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "158",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12739,7 +12739,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "165",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12750,7 +12750,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "166",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -12761,7 +12761,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "167",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12772,7 +12772,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "168",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12783,7 +12783,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "169",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12794,7 +12794,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "170",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -12805,7 +12805,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "171",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12816,7 +12816,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "172",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12827,7 +12827,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "173",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12838,7 +12838,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "174",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12849,7 +12849,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "175",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12860,7 +12860,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "176",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12871,7 +12871,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "177",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12882,7 +12882,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "178",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12893,7 +12893,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "179",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12904,7 +12904,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "180",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -12915,7 +12915,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "181",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12926,7 +12926,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "182",
     "owner": "MVEC",
     "pole_spec": "45-4 Southern Pine",
@@ -12937,7 +12937,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "183",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12948,7 +12948,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "184",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -12959,7 +12959,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "185",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12970,7 +12970,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "186",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12981,7 +12981,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "187",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -12992,7 +12992,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "188",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13003,7 +13003,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "190",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -13014,7 +13014,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "189",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13025,7 +13025,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "204",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13036,7 +13036,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "203",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13047,7 +13047,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "202",
     "owner": "MVEC",
     "pole_spec": "35-3 Southern Pine",
@@ -13058,7 +13058,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "200",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13069,7 +13069,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "197",
     "owner": "MVEC",
     "pole_spec": "70-1 Douglas Fir",
@@ -13080,7 +13080,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "199",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13091,7 +13091,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "201",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13102,7 +13102,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "205",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13113,7 +13113,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "206",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13124,7 +13124,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "208",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13135,7 +13135,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "209",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13146,7 +13146,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "210",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13157,7 +13157,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "211",
     "owner": "MVEC",
     "pole_spec": "45-5 Southern Pine",
@@ -13168,7 +13168,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "212",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13179,7 +13179,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "213",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13190,7 +13190,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "214",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13201,7 +13201,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "215",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13212,7 +13212,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "216",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13223,7 +13223,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "217",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13234,7 +13234,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "106",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13245,7 +13245,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "105",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13256,7 +13256,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "104",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13267,7 +13267,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "103",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13278,7 +13278,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "102",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13289,7 +13289,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "101",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13300,7 +13300,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "099",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13311,7 +13311,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "100",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13322,7 +13322,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "098",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13333,7 +13333,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "097",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13355,7 +13355,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "126",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13366,7 +13366,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "127",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13377,7 +13377,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "128",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13388,7 +13388,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "129",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -13399,7 +13399,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "130",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -13410,7 +13410,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "131",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -13421,7 +13421,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "132",
     "owner": "MVEC",
     "pole_spec": "50-3 Southern Pine",
@@ -13432,7 +13432,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "133",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13443,7 +13443,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "134",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13454,7 +13454,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "135",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13465,7 +13465,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "136",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13476,7 +13476,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "137",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13487,7 +13487,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "138",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13498,7 +13498,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "067",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13509,7 +13509,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "068",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13520,7 +13520,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "069",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13531,7 +13531,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "070",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13542,7 +13542,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "071",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13553,7 +13553,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "072",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13564,7 +13564,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "073",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13575,7 +13575,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "074",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13586,7 +13586,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "075",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13597,7 +13597,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "076",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13608,7 +13608,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "077",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13619,7 +13619,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "078",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13630,7 +13630,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "079",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13641,7 +13641,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "080",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13652,7 +13652,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "064",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13663,7 +13663,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "063",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13674,7 +13674,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "062",
     "owner": "MVEC",
     "pole_spec": "30-5 Southern Pine",
@@ -13685,7 +13685,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "061",
     "owner": "MVEC",
     "pole_spec": "30-5 Southern Pine",
@@ -13696,7 +13696,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "060",
     "owner": "MVEC",
     "pole_spec": "30-5 Southern Pine",
@@ -13707,7 +13707,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "059",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13718,7 +13718,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "058",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13729,7 +13729,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "057",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13740,7 +13740,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "056",
     "owner": "MVEC",
     "pole_spec": "40-6 Southern Pine",
@@ -13828,7 +13828,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "154",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13839,7 +13839,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "155",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -13850,7 +13850,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "192",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13861,7 +13861,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "193",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
@@ -13872,7 +13872,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "125",
     "owner": null,
     "pole_spec": null,
@@ -13883,7 +13883,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "043",
     "owner": null,
     "pole_spec": null,
@@ -13894,7 +13894,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "198",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13905,7 +13905,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "141",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -13916,7 +13916,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "207",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -13927,7 +13927,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "014",
     "owner": null,
     "pole_spec": null,
@@ -13938,7 +13938,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "016",
     "owner": null,
     "pole_spec": null,
@@ -13949,7 +13949,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "017",
     "owner": null,
     "pole_spec": null,
@@ -13960,7 +13960,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "018",
     "owner": null,
     "pole_spec": null,
@@ -13971,7 +13971,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "019",
     "owner": null,
     "pole_spec": null,
@@ -13982,7 +13982,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "020",
     "owner": null,
     "pole_spec": null,
@@ -13993,7 +13993,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "021",
     "owner": null,
     "pole_spec": null,
@@ -14004,7 +14004,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "022",
     "owner": null,
     "pole_spec": null,
@@ -14015,7 +14015,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "023",
     "owner": null,
     "pole_spec": null,
@@ -14026,7 +14026,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "024",
     "owner": null,
     "pole_spec": null,
@@ -14037,7 +14037,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "025",
     "owner": null,
     "pole_spec": null,
@@ -14048,7 +14048,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "026",
     "owner": null,
     "pole_spec": null,
@@ -14059,7 +14059,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "027",
     "owner": null,
     "pole_spec": null,
@@ -14070,7 +14070,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "028",
     "owner": null,
     "pole_spec": null,
@@ -14081,7 +14081,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "029",
     "owner": null,
     "pole_spec": null,
@@ -14092,7 +14092,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "030",
     "owner": null,
     "pole_spec": null,
@@ -14103,7 +14103,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "031",
     "owner": null,
     "pole_spec": null,
@@ -14114,7 +14114,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "032",
     "owner": null,
     "pole_spec": null,
@@ -14125,7 +14125,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "033",
     "owner": null,
     "pole_spec": null,
@@ -14136,7 +14136,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "034",
     "owner": null,
     "pole_spec": null,
@@ -14147,7 +14147,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "035",
     "owner": null,
     "pole_spec": null,
@@ -14158,7 +14158,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "036",
     "owner": null,
     "pole_spec": null,
@@ -14169,7 +14169,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "037",
     "owner": null,
     "pole_spec": null,
@@ -14180,7 +14180,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "038",
     "owner": null,
     "pole_spec": null,
@@ -14191,7 +14191,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "039",
     "owner": null,
     "pole_spec": null,
@@ -14202,7 +14202,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "040",
     "owner": null,
     "pole_spec": null,
@@ -14213,7 +14213,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "042",
     "owner": null,
     "pole_spec": null,
@@ -14224,7 +14224,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "124",
     "owner": null,
     "pole_spec": null,
@@ -14235,7 +14235,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "123",
     "owner": null,
     "pole_spec": null,
@@ -14246,7 +14246,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "122",
     "owner": null,
     "pole_spec": null,
@@ -14257,7 +14257,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "121",
     "owner": null,
     "pole_spec": null,
@@ -14268,7 +14268,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "120",
     "owner": null,
     "pole_spec": null,
@@ -14279,7 +14279,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "119",
     "owner": null,
     "pole_spec": null,
@@ -14290,7 +14290,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "118",
     "owner": null,
     "pole_spec": null,
@@ -14301,7 +14301,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "117",
     "owner": null,
     "pole_spec": null,
@@ -14312,7 +14312,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "015",
     "owner": null,
     "pole_spec": null,
@@ -14323,7 +14323,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "041",
     "owner": null,
     "pole_spec": null,
@@ -14411,7 +14411,7 @@
   },
   {
     "job_name": "BRN02-F54 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "080",
     "owner": null,
     "pole_spec": "40-5 Southern Pine",
@@ -16083,7 +16083,7 @@
   },
   {
     "job_name": "BRN02-F54 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "092",
     "owner": null,
     "pole_spec": "40-5 Southern Pine",
@@ -16369,7 +16369,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "094",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -16512,7 +16512,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "126",
     "owner": "MVEC",
     "pole_spec": null,
@@ -16523,7 +16523,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "125",
     "owner": "MVEC",
     "pole_spec": "30-5 Southern Pine",
@@ -16589,7 +16589,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "112",
     "owner": "MVEC",
     "pole_spec": "45-3 Southern Pine",
@@ -16952,7 +16952,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "082",
     "owner": "MVEC",
     "pole_spec": "40-4 Southern Pine",
@@ -17051,7 +17051,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "059",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -17073,7 +17073,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "067",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -17117,7 +17117,7 @@
   },
   {
     "job_name": "BRN02-F52 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "072",
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
@@ -17590,7 +17590,7 @@
   },
   {
     "job_name": "BRN02-F55 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "045",
     "owner": null,
     "pole_spec": "40-5 Southern Pine",
@@ -19933,7 +19933,7 @@
   },
   {
     "job_name": "BRN02-F45 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "049",
     "owner": null,
     "pole_spec": null,
@@ -20076,7 +20076,7 @@
   },
   {
     "job_name": "BRN02-F45 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "062",
     "owner": null,
     "pole_spec": null,
@@ -20098,7 +20098,7 @@
   },
   {
     "job_name": "BRN02-F45 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "063",
     "owner": null,
     "pole_spec": null,
@@ -20109,7 +20109,7 @@
   },
   {
     "job_name": "BRN02-F45 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "064",
     "owner": null,
     "pole_spec": null,
@@ -21088,7 +21088,7 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "092",
     "owner": null,
     "pole_spec": null,
@@ -21165,7 +21165,7 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "097",
     "owner": null,
     "pole_spec": null,
@@ -21825,7 +21825,7 @@
   },
   {
     "job_name": "BRN02-F49 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "042.A",
     "owner": null,
     "pole_spec": null,
@@ -21847,7 +21847,7 @@
   },
   {
     "job_name": "BRN02-F49 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "054",
     "owner": null,
     "pole_spec": null,
@@ -21858,7 +21858,7 @@
   },
   {
     "job_name": "BRN02-F49 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "055",
     "owner": null,
     "pole_spec": null,
@@ -24256,7 +24256,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "019",
     "owner": null,
     "pole_spec": null,
@@ -24267,7 +24267,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "037",
     "owner": null,
     "pole_spec": null,
@@ -24278,7 +24278,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "039",
     "owner": null,
     "pole_spec": null,
@@ -24289,7 +24289,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "036",
     "owner": null,
     "pole_spec": null,
@@ -24333,7 +24333,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "018",
     "owner": null,
     "pole_spec": null,
@@ -24355,7 +24355,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "038",
     "owner": null,
     "pole_spec": null,
@@ -24366,7 +24366,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "028",
     "owner": null,
     "pole_spec": null,
@@ -24388,7 +24388,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "023",
     "owner": null,
     "pole_spec": null,
@@ -24399,7 +24399,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "021",
     "owner": null,
     "pole_spec": null,
@@ -24410,7 +24410,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "020",
     "owner": null,
     "pole_spec": null,
@@ -24421,7 +24421,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "017",
     "owner": null,
     "pole_spec": null,
@@ -24432,7 +24432,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "016",
     "owner": null,
     "pole_spec": null,
@@ -24443,7 +24443,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "015",
     "owner": null,
     "pole_spec": null,
@@ -24454,7 +24454,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "014",
     "owner": null,
     "pole_spec": null,
@@ -24465,7 +24465,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "013",
     "owner": null,
     "pole_spec": null,
@@ -24476,7 +24476,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "012",
     "owner": null,
     "pole_spec": null,
@@ -24487,7 +24487,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "011",
     "owner": null,
     "pole_spec": null,
@@ -24498,7 +24498,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "010",
     "owner": null,
     "pole_spec": null,
@@ -24509,7 +24509,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "025",
     "owner": null,
     "pole_spec": null,
@@ -24520,7 +24520,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "026",
     "owner": null,
     "pole_spec": null,
@@ -24531,7 +24531,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "027",
     "owner": null,
     "pole_spec": null,
@@ -24542,7 +24542,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "029",
     "owner": null,
     "pole_spec": null,
@@ -24553,7 +24553,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "030",
     "owner": null,
     "pole_spec": null,
@@ -24564,7 +24564,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "031",
     "owner": null,
     "pole_spec": null,
@@ -24575,7 +24575,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "032",
     "owner": null,
     "pole_spec": null,
@@ -24586,7 +24586,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "033",
     "owner": null,
     "pole_spec": null,
@@ -24597,7 +24597,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "034",
     "owner": null,
     "pole_spec": null,
@@ -24608,7 +24608,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "035",
     "owner": null,
     "pole_spec": null,
@@ -24619,7 +24619,7 @@
   },
   {
     "job_name": "BRN02-F41 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "022",
     "owner": null,
     "pole_spec": null,
@@ -25026,7 +25026,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "105",
     "owner": null,
     "pole_spec": null,
@@ -25048,7 +25048,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "102",
     "owner": null,
     "pole_spec": null,
@@ -25059,7 +25059,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "101",
     "owner": null,
     "pole_spec": null,
@@ -25092,7 +25092,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "098",
     "owner": null,
     "pole_spec": null,
@@ -25114,7 +25114,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "096",
     "owner": null,
     "pole_spec": null,
@@ -25147,7 +25147,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "094",
     "owner": null,
     "pole_spec": null,
@@ -25180,7 +25180,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "086",
     "owner": null,
     "pole_spec": null,
@@ -25191,7 +25191,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "085",
     "owner": null,
     "pole_spec": null,
@@ -25213,7 +25213,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "082",
     "owner": null,
     "pole_spec": null,
@@ -25257,7 +25257,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "081",
     "owner": null,
     "pole_spec": null,
@@ -25268,7 +25268,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "080",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -25279,7 +25279,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "079",
     "owner": null,
     "pole_spec": null,
@@ -25290,7 +25290,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "078",
     "owner": null,
     "pole_spec": null,
@@ -25334,7 +25334,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "074",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -25389,7 +25389,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "068",
     "owner": null,
     "pole_spec": "40-4 Southern Pine",
@@ -25400,7 +25400,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "067",
     "owner": null,
     "pole_spec": "40-5 Southern Pine",
@@ -25422,7 +25422,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "065",
     "owner": null,
     "pole_spec": "40-6 Southern Pine",
@@ -25807,7 +25807,7 @@
   },
   {
     "job_name": "BRN02-F44 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "013",
     "owner": "MVEC",
     "pole_spec": "35-4 Southern Pine",
@@ -27050,7 +27050,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "136",
     "owner": null,
     "pole_spec": null,
@@ -27105,7 +27105,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "137",
     "owner": null,
     "pole_spec": null,
@@ -27215,7 +27215,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "138",
     "owner": null,
     "pole_spec": null,
@@ -27226,7 +27226,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "139",
     "owner": null,
     "pole_spec": null,
@@ -27237,7 +27237,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "140",
     "owner": null,
     "pole_spec": null,
@@ -27248,7 +27248,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "141",
     "owner": null,
     "pole_spec": null,
@@ -27259,7 +27259,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "142",
     "owner": null,
     "pole_spec": null,
@@ -27270,7 +27270,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "143",
     "owner": null,
     "pole_spec": null,
@@ -27281,7 +27281,7 @@
   },
   {
     "job_name": "BRN02-F46_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "144",
     "owner": null,
     "pole_spec": null,
@@ -34662,7 +34662,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": null,
+    "tag": "NT",
     "SCID": "015",
     "owner": null,
     "pole_spec": "35-5 Southern Pine",
@@ -35850,7 +35850,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": null,
+    "tag": "NT",
     "SCID": "011.1",
     "owner": null,
     "pole_spec": null,
@@ -35861,7 +35861,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": null,
+    "tag": "NT",
     "SCID": "010.1",
     "owner": null,
     "pole_spec": null,
@@ -35872,7 +35872,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": null,
+    "tag": "NT",
     "SCID": "009.1",
     "owner": null,
     "pole_spec": null,
@@ -37676,7 +37676,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "068",
     "owner": null,
     "pole_spec": null,
@@ -37687,7 +37687,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "069",
     "owner": null,
     "pole_spec": null,
@@ -38083,7 +38083,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "220",
     "owner": null,
     "pole_spec": null,
@@ -38116,7 +38116,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "223",
     "owner": null,
     "pole_spec": null,
@@ -38644,7 +38644,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "081",
     "owner": null,
     "pole_spec": null,
@@ -38710,7 +38710,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "087",
     "owner": null,
     "pole_spec": null,
@@ -38798,7 +38798,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "095",
     "owner": null,
     "pole_spec": null,
@@ -38886,7 +38886,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "137",
     "owner": null,
     "pole_spec": "40-2 Southern Pine",
@@ -38963,7 +38963,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "143",
     "owner": null,
     "pole_spec": null,
@@ -39018,7 +39018,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "148",
     "owner": null,
     "pole_spec": null,
@@ -39282,7 +39282,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "111",
     "owner": null,
     "pole_spec": null,
@@ -39370,7 +39370,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "120",
     "owner": null,
     "pole_spec": "40-3 Southern Pine",
@@ -39447,7 +39447,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "078",
     "owner": null,
     "pole_spec": null,
@@ -39535,7 +39535,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "191",
     "owner": null,
     "pole_spec": null,
@@ -39546,7 +39546,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "190",
     "owner": null,
     "pole_spec": null,
@@ -39557,7 +39557,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "189",
     "owner": null,
     "pole_spec": null,
@@ -39568,7 +39568,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "188",
     "owner": null,
     "pole_spec": null,
@@ -39579,7 +39579,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "187",
     "owner": null,
     "pole_spec": null,
@@ -39590,7 +39590,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "186",
     "owner": null,
     "pole_spec": null,
@@ -39601,7 +39601,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "185",
     "owner": null,
     "pole_spec": null,
@@ -39612,7 +39612,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "184",
     "owner": null,
     "pole_spec": null,
@@ -39623,7 +39623,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "183",
     "owner": null,
     "pole_spec": null,
@@ -39634,7 +39634,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "182",
     "owner": null,
     "pole_spec": null,
@@ -39645,7 +39645,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "181",
     "owner": null,
     "pole_spec": null,
@@ -39656,7 +39656,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "180",
     "owner": null,
     "pole_spec": null,
@@ -39667,7 +39667,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "179",
     "owner": null,
     "pole_spec": null,
@@ -39678,7 +39678,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "178",
     "owner": null,
     "pole_spec": null,
@@ -39689,7 +39689,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "177",
     "owner": null,
     "pole_spec": null,
@@ -39700,7 +39700,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "176",
     "owner": null,
     "pole_spec": null,
@@ -39711,7 +39711,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "175",
     "owner": null,
     "pole_spec": null,
@@ -39722,7 +39722,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "174",
     "owner": null,
     "pole_spec": null,
@@ -39733,7 +39733,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "173",
     "owner": null,
     "pole_spec": null,
@@ -39744,7 +39744,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "172",
     "owner": null,
     "pole_spec": null,
@@ -39755,7 +39755,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "171",
     "owner": null,
     "pole_spec": null,
@@ -39766,7 +39766,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "170",
     "owner": null,
     "pole_spec": null,
@@ -39777,7 +39777,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "169",
     "owner": null,
     "pole_spec": null,
@@ -39788,7 +39788,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "168",
     "owner": null,
     "pole_spec": null,
@@ -39799,7 +39799,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "167",
     "owner": null,
     "pole_spec": null,
@@ -39810,7 +39810,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "166",
     "owner": null,
     "pole_spec": null,
@@ -39821,7 +39821,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "165",
     "owner": null,
     "pole_spec": null,
@@ -39832,7 +39832,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "164",
     "owner": null,
     "pole_spec": null,
@@ -39843,7 +39843,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "163",
     "owner": null,
     "pole_spec": null,
@@ -39854,7 +39854,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "162",
     "owner": null,
     "pole_spec": null,
@@ -39865,7 +39865,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "161",
     "owner": null,
     "pole_spec": null,
@@ -39876,7 +39876,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "160",
     "owner": null,
     "pole_spec": null,
@@ -39887,7 +39887,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "159",
     "owner": null,
     "pole_spec": null,
@@ -39898,7 +39898,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "158",
     "owner": null,
     "pole_spec": null,
@@ -39909,7 +39909,7 @@
   },
   {
     "job_name": "BRN06-F01_1",
-    "tag": null,
+    "tag": "NT",
     "SCID": "157",
     "owner": null,
     "pole_spec": null,
@@ -42571,7 +42571,7 @@
   },
   {
     "job_name": "BRN06-F18_2",
-    "tag": null,
+    "tag": "NT",
     "SCID": "097",
     "owner": null,
     "pole_spec": "45-4 Southern Pine",
@@ -43297,7 +43297,7 @@
   },
   {
     "job_name": "BRN06-F18_1 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "133",
     "owner": null,
     "pole_spec": null,
@@ -43594,7 +43594,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "028",
     "owner": null,
     "pole_spec": null,
@@ -43660,7 +43660,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "97",
     "owner": null,
     "pole_spec": null,
@@ -43957,7 +43957,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "095",
     "owner": null,
     "pole_spec": null,
@@ -43990,7 +43990,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "031",
     "owner": null,
     "pole_spec": null,
@@ -44034,7 +44034,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "029",
     "owner": null,
     "pole_spec": null,
@@ -44089,7 +44089,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "039",
     "owner": null,
     "pole_spec": null,
@@ -44133,7 +44133,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "016",
     "owner": null,
     "pole_spec": null,
@@ -44144,7 +44144,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "015",
     "owner": null,
     "pole_spec": null,
@@ -44661,7 +44661,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "066",
     "owner": null,
     "pole_spec": null,
@@ -44672,7 +44672,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "075",
     "owner": null,
     "pole_spec": null,
@@ -44683,7 +44683,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "076",
     "owner": null,
     "pole_spec": null,
@@ -44694,7 +44694,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "077",
     "owner": null,
     "pole_spec": null,
@@ -44705,7 +44705,7 @@
   },
   {
     "job_name": "BRN02-F46_2 PLA",
-    "tag": null,
+    "tag": "NT",
     "SCID": "078",
     "owner": null,
     "pole_spec": null,
