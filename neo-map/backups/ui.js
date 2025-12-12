@@ -22,33 +22,14 @@ export function popupHTML(p, permits){
     : '—';
 
   const permitRows = (permits || []).map(r => {
-  const id  = esc(r.permit_id ?? r.permitId ?? r.id ?? '');
-  const st  = String(r.permit_status ?? r.status ?? 'UNKNOWN').trim();
-  const col = statusColor(st);
-
-  // submitted meta (with safe fallbacks)
-  const subBy = esc(r.submitted_by ?? r.submittedBy ?? r.submitted_user ?? r.submittedUser ?? '');
-  const subAt = esc(r.submitted_at ?? r.submittedAt ?? r.submitted_date ?? r.submittedDate ?? '');
-
-  // keep existing created meta as fallback only
-  const crBy  = esc(r.created_by ?? r.by ?? r.createdBy ?? '');
-  const crAt  = esc(r.created_date ?? r.date ?? '');
-
-  const notes = esc(r.notes ?? r.permit_notes ?? r.Notes ?? r.PermitNotes ?? r.comments ?? '');
-
-  // Prefer submitted_*; if not present, fall back to created_*
-  const who = subBy || crBy;
-  const dt  = subAt || crAt;
-
-  const parts = [id, st, who ? `by ${who}` : '', dt].filter(Boolean).join(' • ');
-
-  return `
-    <div class="permit-pill" style="color:${col}">
-      <div>${parts}</div>
-      ${notes ? `<div class="muted small" style="margin-top:4px; white-space:pre-wrap;">${notes}</div>` : ''}
-    </div>
-  `;
-});
+    const id  = esc(r.permit_id ?? r.permitId ?? r.id ?? '');
+    const st  = String(r.permit_status ?? r.status ?? 'UNKNOWN').trim();
+    const col = statusColor(st);
+    const who = esc(r.created_by ?? r.by ?? r.createdBy ?? '');
+    const dt  = esc(r.created_date ?? r.date ?? r.submitted_date ?? '');
+    const parts = [id, st, who ? `by ${who}` : '', dt].filter(Boolean).join(' • ');
+    return `<div class="permit-pill" style="color:${col}">${parts}</div>`;
+  });
 
   return `
   <div class="pp">
