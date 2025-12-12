@@ -20077,7 +20077,7 @@
   {
     "job_name": "BRN02-F45 PLA",
     "tag": null,
-    "SCID": "023.B",
+    "SCID": "062",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -20099,7 +20099,7 @@
   {
     "job_name": "BRN02-F45 PLA",
     "tag": null,
-    "SCID": null,
+    "SCID": "063",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -20110,7 +20110,7 @@
   {
     "job_name": "BRN02-F45 PLA",
     "tag": null,
-    "SCID": null,
+    "SCID": "064",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -21179,10 +21179,10 @@
     "tag": "07524",
     "SCID": "098",
     "owner": "MVEC",
-    "pole_spec": null,
+    "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": null,
     "lat": 25.929526241699918,
-    "lon": -97.41805994631258,
+    "lon": -97.41806598128287,
     "mr_level": null
   },
   {
@@ -21848,7 +21848,7 @@
   {
     "job_name": "BRN02-F49 PLA",
     "tag": null,
-    "SCID": null,
+    "SCID": "054",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -21859,7 +21859,7 @@
   {
     "job_name": "BRN02-F49 PLA",
     "tag": null,
-    "SCID": null,
+    "SCID": "055",
     "owner": null,
     "pole_spec": null,
     "proposed_spec": null,
@@ -35917,7 +35917,7 @@
   {
     "job_name": "BRN05-F48 PLA",
     "tag": "NT",
-    "SCID": null,
+    "SCID": "001",
     "owner": "BPUB",
     "pole_spec": "45-2 SOUTHERN PINE",
     "proposed_spec": null,
@@ -35928,7 +35928,7 @@
   {
     "job_name": "BRN05-F48 PLA",
     "tag": "T1588",
-    "SCID": null,
+    "SCID": "002",
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": null,
