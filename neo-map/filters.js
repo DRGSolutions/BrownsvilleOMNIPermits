@@ -1,5 +1,5 @@
 const FIELD_DEF = [
-  { key:'owner',      label:'Owner', type:'enum', options:['BPUB','AEP','MVEC'] },
+  { key:'owner',      label:'Owner', type:'enum', options:['BPUB','AEP','MVEC','Charter','AT&T'] },
   { key:'job_name',   label:'Job Name', type:'text' },
   { key:'tag',        label:'Tag', type:'text' },
   { key:'SCID',       label:'SCID', type:'text' },
