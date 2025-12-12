@@ -8278,15 +8278,5 @@
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025",
     "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=510312-4438860 | SCID=018 TO BRN05-F50 | TAG=51031104438711 | SCID=018"
-  },
-  {
-    "permit_id": "test",
-    "job_name": "BRN02-F31",
-    "tag": "51507034409016",
-    "SCID": "001",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "zk",
-    "submitted_at": "12/12/2025",
-    "notes": ""
   }
 ]
