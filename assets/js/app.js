@@ -283,7 +283,7 @@
 
     // --- NOTES mass-update (read + optional overwrite confirmation) ---
     const notesToApplyRaw = ($('#massNotes')?.value || '').trim();
-    const massNorm = normalizeProposalNotes(notesToApplyRaw);
+    const massNorm = normalizeProposalInNotes(notesToApplyRaw);
     const notesToApply = massNorm.notes;
     const wantNotes = !!notesToApplyRaw;
     let overwriteNotes = true;
