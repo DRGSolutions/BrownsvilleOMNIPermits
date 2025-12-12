@@ -109,36 +109,10 @@
   function msg(h){ const el=$('#msgPermit'); if(el) el.innerHTML=h||''; }
   function toMDY(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m? `${m[2]}/${m[3]}/${m[1]}` : (s||''); }
 
-    // -------- Proposal note normalization / propagation helpers --------
-  const PROPOSAL_RE = /\b(\d{4}-\d{2}-\d{4})\b/; // 10 digits, two dashes: 1234-56-7890
-
-  function basePermitId(id){
-    return String(id || '').replace(/_\d+$/,''); // strips _001, _12, etc
-  }
-
-  function normalizeProposalNotes(raw){
-    const t = String(raw ?? '').trim();
-    if (!t) return { notes: '', proposal: null };
-
-    const m = t.match(PROPOSAL_RE);
-    if (!m) return { notes: t, proposal: null };
-
-    const proposal = m[1];
-
-    // If the note already includes the word "proposal" anywhere, leave as-is.
-    if (/proposal/i.test(t)) return { notes: t, proposal };
-
-    // Otherwise, ensure the proposal number appears as "Proposal ####-##-####"
-    return { notes: t.replace(PROPOSAL_RE, `Proposal ${proposal}`), proposal };
-  }
-
   async function onSavePermit(e){
     e && e.preventDefault();
     if (typeof window.UI_collectPermitForm!=='function'){ msg('<span class="err">Internal error.</span>'); return; }
     const f=window.UI_collectPermitForm();
-    const norm = normalizeProposalNotes(f.notes || '');
-    f.notes = norm.notes;
-
     if(!f.job_name||!f.tag||!f.SCID){ msg('<span class="err">Missing pole keys.</span>'); return; }
     if(!f.permit_id){ msg('<span class="err">Permit ID is required.</span>'); return; }
     if(!f.permit_status){ msg('<span class="err">Permit Status is required.</span>'); return; }
@@ -146,41 +120,6 @@
     if(!f.submitted_at){ msg('<span class="err">Submitted At is required.</span>'); return; }
 
     const exists = (window.STATE?.permits||[]).some(r=>String(r.permit_id)===String(f.permit_id));
-
-    const primaryChange = exists
-      ? { type:'update_permit', permit_id:f.permit_id, patch:{
-            job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } }
-      : { type:'upsert_permit', permit:{
-            permit_id:f.permit_id, job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } };
-
-    // If the saved note contains a proposal number, propagate the normalized note to all permits with the same base id.
-    const extra = [];
-    if (norm.proposal) {
-      const base = basePermitId(f.permit_id);
-      const all = (window.STATE?.permits || []).filter(r => basePermitId(r.permit_id) === base);
-      for (const r of all) {
-        if (String(r.permit_id) === String(f.permit_id)) continue;
-        const theirNorm = normalizeProposalNotes(r.notes || '');
-        // Update if they don't match (this also supports "change proposal number on one permit; update the rest")
-        if (theirNorm.notes !== f.notes) {
-          extra.push({ type:'update_permit', permit_id:r.permit_id, patch:{ notes: f.notes } });
-        }
-      }
-    }
-
-    try{
-      msg('Submitting…');
-      const payload = extra.length
-        ? { actorName:'Website User', reason:`Permit ${f.permit_id} (propagate proposal)`, changes:[primaryChange, ...extra] }
-        : { actorName:'Website User', reason:`Permit ${f.permit_id}`, change: primaryChange };
-
-      const data = await callApi(payload);
-      msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
-      window.dispatchEvent(new CustomEvent('watch:start'));
-    }catch(err){ console.error(err); msg(`<span class="err">${err.message}</span>`); }
-
     const change = exists
       ? { type:'update_permit', permit_id:f.permit_id, patch:{
             job_name:f.job_name, tag:f.tag, SCID:f.SCID,
@@ -255,8 +194,6 @@
 
     // --- NOTES mass-update (read + optional overwrite confirmation) ---
     const notesToApplyRaw = ($('#massNotes')?.value || '').trim();
-    const massNorm = normalizeProposalNotes(notesToApplyRaw);
-    const notesToApply = massNorm.notes;
     const wantNotes = !!notesToApplyRaw;
     let overwriteNotes = true;
 
