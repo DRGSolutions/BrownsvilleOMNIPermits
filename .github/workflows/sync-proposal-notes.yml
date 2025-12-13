@@ -1,0 +1,43 @@
+name: Sync proposal notes
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'data/permits.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-proposals:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run proposal note synchronizer
+        run: python scripts/sync_proposal_notes.py
+
+      - name: Create synchronization pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/proposal-note-sync-${{ github.run_id }}
+          commit-message: "chore: sync proposal notes"
+          title: "Synchronize proposal notes"
+          body: |
+            Automatically propagate proposal numbers to every permit sharing the same base ID.
+            - Normalizes proposal identifiers in notes to be prefixed with "Proposal".
+            - Mirrors the proposal number across all permits that share a base identifier.
+          base: main
+          delete-branch: true
