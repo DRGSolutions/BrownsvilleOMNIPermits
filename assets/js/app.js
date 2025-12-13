@@ -96,12 +96,6 @@
   // -------- Proposal helpers --------
   const PROPOSAL_RE = /\b(\d{4}-\d{2}-\d{4})\b/;
 
-  function extractProposalNumber(noteRaw) {
-    const note = typeof noteRaw === 'string' ? noteRaw : String(noteRaw ?? '');
-    const match = note.match(PROPOSAL_RE);
-    return match ? match[1] : '';
-  }
-
   function basePermitId(permitId) {
     const raw = String(permitId ?? '').trim();
     if (!raw) return '';
@@ -111,7 +105,8 @@
 
   function normalizeProposalNote(noteRaw, forcedProposal) {
     const note = typeof noteRaw === 'string' ? noteRaw : String(noteRaw ?? '');
-    const proposal = forcedProposal || extractProposalNumber(note);
+    const match = note.match(PROPOSAL_RE);
+    const proposal = forcedProposal || (match ? match[1] : '');
     if (!proposal) return { normalizedNote: note, proposalNumber: '' };
 
     const normalizedProposal = `Proposal ${proposal}`;
@@ -129,17 +124,6 @@
     const trimmed = note.trim();
     if (!trimmed) return { normalizedNote: normalizedProposal, proposalNumber: proposal };
     return { normalizedNote: `${normalizedProposal} — ${trimmed}` , proposalNumber: proposal };
-  }
-
-  function findProposalForBase(baseId, permits, preferredProposal) {
-    if (!baseId) return '';
-    if (preferredProposal) return preferredProposal;
-    for (const permit of permits || []) {
-      if (basePermitId(permit.permit_id) !== baseId) continue;
-      const p = extractProposalNumber(permit.notes || '');
-      if (p) return p;
-    }
-    return '';
   }
 
   function syncProposalAcrossBase({
@@ -188,12 +172,8 @@
     if(!f.submitted_by){ msg('<span class="err">Submitted By is required.</span>'); return; }
     if(!f.submitted_at){ msg('<span class="err">Submitted At is required.</span>'); return; }
 
-    const existingPermits = window.STATE?.permits || [];
-    const baseId = basePermitId(f.permit_id);
-    const { proposalNumber: proposalFromForm } = normalizeProposalNote(f.notes || '');
-    const proposalNumber = findProposalForBase(baseId, existingPermits, proposalFromForm);
-    const normalizedNote = normalizeProposalNote(f.notes || '', proposalNumber).normalizedNote;
-    const exists = existingPermits.some(r=>String(r.permit_id)===String(f.permit_id));
+    const { normalizedNote, proposalNumber } = normalizeProposalNote(f.notes || '');
+    const exists = (window.STATE?.permits||[]).some(r=>String(r.permit_id)===String(f.permit_id));
     const changes = [];
 
     changes.push(exists
@@ -205,7 +185,8 @@
             permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes: normalizedNote } });
 
     if (proposalNumber) {
-      const related = existingPermits.filter(p => basePermitId(p.permit_id) === baseId);
+      const baseId = basePermitId(f.permit_id);
+      const related = (window.STATE?.permits || []).filter(p => basePermitId(p.permit_id) === baseId);
       const ignore = new Set([f.permit_id]);
       for (const permit of related) {
         if (ignore.has(permit.permit_id)) continue;
@@ -327,7 +308,7 @@
           : (proposalForBase ? normalizeProposalNote('', proposalForBase).normalizedNote : '');
         changes.push({ type:'upsert_permit', permit:{
           permit_id:`${baseId}_${p.SCID}`, job_name:p.job_name, tag:p.tag, SCID:p.SCID,
-          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: noteForPermit }});
+          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: wantNotes ? notesToApply : '' }});
       }
     }else{
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
@@ -337,40 +318,33 @@
             const hadNotes = !!((r.notes||'').trim());
             if (overwriteNotes || !hadNotes) patch.notes = notesToApply;
           }
-          const baseForPermit = normalizeBaseId(r.permit_id);
-          const proposalForBase = ensureBaseProposal(baseForPermit);
-          if (proposalForBase) {
-            const currentNote = patch.notes ?? r.notes || '';
-            const { normalizedNote: syncedNote } = normalizeProposalNote(currentNote, proposalForBase);
-            if (syncedNote !== currentNote) patch.notes = syncedNote;
-          }
           changes.push({ type:'update_permit', permit_id:r.permit_id, patch });
         }
       }
     }
 
-    const changeIds = new Set();
-    const baseIds = new Set();
+    if (wantNotes && proposalFromMass) {
+      const existingPermits = window.STATE?.permits || [];
+      const changeIds = new Set();
+      const baseIds = new Set();
 
-    for (const c of changes) {
-      const pid = c.type === 'upsert_permit' ? c.permit?.permit_id : c.permit_id;
-      if (!pid) continue;
-      changeIds.add(pid);
-      baseIds.add(basePermitId(pid));
-      ensureBaseProposal(pid);
-    }
-    if (mode === 'assign' && baseId) baseIds.add(basePermitId(baseId));
+      for (const c of changes) {
+        const pid = c.type === 'upsert_permit' ? c.permit?.permit_id : c.permit_id;
+        if (!pid) continue;
+        changeIds.add(pid);
+        baseIds.add(basePermitId(pid));
+      }
+      if (mode === 'assign' && baseId) baseIds.add(basePermitId(baseId));
 
-    for (const bId of baseIds) {
-      const proposal = ensureBaseProposal(bId);
-      if (!proposal) continue;
-      syncProposalAcrossBase({
-        baseId: bId,
-        proposalNumber: proposal,
-        existingPermits,
-        changes,
-        ignoreIds: changeIds,
-      });
+      for (const bId of baseIds) {
+        syncProposalAcrossBase({
+          baseId: bId,
+          proposalNumber: proposalFromMass,
+          existingPermits,
+          changes,
+          ignoreIds: changeIds,
+        });
+      }
     }
     if(changes.length===0){ setMassMsg(mode==='assign'
       ? '<span class="ok">Nothing to do (all poles in range already have permits).</span>'
