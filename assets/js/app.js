@@ -93,59 +93,6 @@
   }
   window.reloadData = loadData;
 
-  // -------- Proposal helpers --------
-  const PROPOSAL_RE = /\b(\d{4}-\d{2}-\d{4})\b/;
-
-  function basePermitId(permitId) {
-    const raw = String(permitId ?? '').trim();
-    if (!raw) return '';
-    const m = raw.match(/^(.*?)(?:_\d+)?$/);
-    return (m && m[1]) || raw;
-  }
-
-  function normalizeProposalNote(noteRaw, forcedProposal) {
-    const note = typeof noteRaw === 'string' ? noteRaw : String(noteRaw ?? '');
-    const match = note.match(PROPOSAL_RE);
-    const proposal = forcedProposal || (match ? match[1] : '');
-    if (!proposal) return { normalizedNote: note, proposalNumber: '' };
-
-    const normalizedProposal = `Proposal ${proposal}`;
-    const proposalPhrase = new RegExp(`proposal\\s+${proposal.replace(/[-/\\]/g, '\\$&')}`, 'i');
-    const proposalNumber = new RegExp(`\\b${proposal.replace(/[-/\\]/g, '\\$&')}\\b`, 'i');
-
-    if (proposalPhrase.test(note)) {
-      return { normalizedNote: note.replace(proposalPhrase, normalizedProposal), proposalNumber: proposal };
-    }
-
-    if (proposalNumber.test(note)) {
-      return { normalizedNote: note.replace(proposalNumber, normalizedProposal), proposalNumber: proposal };
-    }
-
-    const trimmed = note.trim();
-    if (!trimmed) return { normalizedNote: normalizedProposal, proposalNumber: proposal };
-    return { normalizedNote: `${normalizedProposal} — ${trimmed}` , proposalNumber: proposal };
-  }
-
-  function syncProposalAcrossBase({
-    baseId,
-    proposalNumber,
-    existingPermits,
-    changes,
-    ignoreIds,
-  }) {
-    if (!proposalNumber || !baseId) return;
-    const seen = new Set(ignoreIds || []);
-    for (const permit of existingPermits || []) {
-      if (basePermitId(permit.permit_id) !== baseId) continue;
-      if (seen.has(permit.permit_id)) continue;
-      const currentNotes = permit.notes || '';
-      const { normalizedNote } = normalizeProposalNote(currentNotes, proposalNumber);
-      if (normalizedNote === currentNotes) continue;
-      changes.push({ type: 'update_permit', permit_id: permit.permit_id, patch: { notes: normalizedNote } });
-      seen.add(permit.permit_id);
-    }
-  }
-
   // -------- API helper --------
   async function callApi(payload) {
     const res = await fetch(CFG.API_URL, {
@@ -172,37 +119,18 @@
     if(!f.submitted_by){ msg('<span class="err">Submitted By is required.</span>'); return; }
     if(!f.submitted_at){ msg('<span class="err">Submitted At is required.</span>'); return; }
 
-    const { normalizedNote, proposalNumber } = normalizeProposalNote(f.notes || '');
     const exists = (window.STATE?.permits||[]).some(r=>String(r.permit_id)===String(f.permit_id));
-    const changes = [];
-
-    changes.push(exists
+    const change = exists
       ? { type:'update_permit', permit_id:f.permit_id, patch:{
             job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes: normalizedNote } }
+            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } }
       : { type:'upsert_permit', permit:{
             permit_id:f.permit_id, job_name:f.job_name, tag:f.tag, SCID:f.SCID,
-            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes: normalizedNote } });
-
-    if (proposalNumber) {
-      const baseId = basePermitId(f.permit_id);
-      const related = (window.STATE?.permits || []).filter(p => basePermitId(p.permit_id) === baseId);
-      const ignore = new Set([f.permit_id]);
-      for (const permit of related) {
-        if (ignore.has(permit.permit_id)) continue;
-        const { normalizedNote: syncedNote } = normalizeProposalNote(permit.notes || '', proposalNumber);
-        if (syncedNote === permit.notes) continue;
-        changes.push({ type:'update_permit', permit_id: permit.permit_id, patch:{ notes: syncedNote } });
-        ignore.add(permit.permit_id);
-      }
-    }
+            permit_status:f.permit_status, submitted_by:f.submitted_by, submitted_at:f.submitted_at, notes:f.notes||'' } };
 
     try{
       msg('Submitting…');
-      const payload = changes.length === 1
-        ? { actorName:'Website User', reason:`Permit ${f.permit_id}`, change: changes[0] }
-        : { actorName:'Website User', reason:`Proposal sync for ${basePermitId(f.permit_id)}`, changes };
-      const data = await callApi(payload);
+      const data = await callApi({ actorName:'Website User', reason:`Permit ${f.permit_id}`, change });
       msg(`<span class="ok">Change submitted.</span> <a class="link" href="${data.pr_url}" target="_blank" rel="noopener">View PR</a>`);
       window.dispatchEvent(new CustomEvent('watch:start'));
     }catch(err){ console.error(err); msg(`<span class="err">${err.message}</span>`); }
@@ -259,27 +187,15 @@
       if(!by){ setMassMsg('<span class="err">Submitted By is required for Assign.</span>'); return; }
       if(!dateMDY){ setMassMsg('<span class="err">Submitted At (date) is required for Assign.</span>'); return; } }
 
-    const existingPermits = window.STATE?.permits || [];
     const poles=(window.STATE?.poles||[]).filter(p=>String(p.job_name)===String(job));
-    const byPole=indexPermitsByPole(existingPermits);
+    const byPole=indexPermitsByPole(window.STATE?.permits||[]);
     const targets=poles.filter(p=>scidBetween(p.SCID,fromId,toId));
     if(targets.length===0){ setMassMsg('<span class="err">No poles found in that SCID range for the selected Job.</span>'); return; }
 
     // --- NOTES mass-update (read + optional overwrite confirmation) ---
     const notesToApplyRaw = ($('#massNotes')?.value || '').trim();
-    const { normalizedNote: notesToApply, proposalNumber: proposalFromMass } = normalizeProposalNote(notesToApplyRaw);
     const wantNotes = !!notesToApplyRaw;
     let overwriteNotes = true;
-
-    const baseProposals = new Map();
-    const normalizeBaseId = (id) => basePermitId(id || '');
-    const ensureBaseProposal = (id) => {
-      const bId = normalizeBaseId(id);
-      if (!bId || baseProposals.has(bId)) return baseProposals.get(bId) || '';
-      const proposal = findProposalForBase(bId, existingPermits, proposalFromMass);
-      if (proposal) baseProposals.set(bId, proposal);
-      return proposal || '';
-    };
 
     if (wantNotes && mode!=='assign') {
       let total=0, withNotes=0;
@@ -302,13 +218,9 @@
     if(mode==='assign'){
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
         if(rel.length>0) continue;
-        const proposalForBase = ensureBaseProposal(baseId);
-        const noteForPermit = wantNotes
-          ? normalizeProposalNote(notesToApply, proposalForBase || proposalFromMass).normalizedNote
-          : (proposalForBase ? normalizeProposalNote('', proposalForBase).normalizedNote : '');
         changes.push({ type:'upsert_permit', permit:{
           permit_id:`${baseId}_${p.SCID}`, job_name:p.job_name, tag:p.tag, SCID:p.SCID,
-          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: wantNotes ? notesToApply : '' }});
+          permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: wantNotes ? notesToApplyRaw : '' }});
       }
     }else{
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
@@ -316,34 +228,10 @@
           const patch = { permit_status: status };
           if (wantNotes){
             const hadNotes = !!((r.notes||'').trim());
-            if (overwriteNotes || !hadNotes) patch.notes = notesToApply;
+            if (overwriteNotes || !hadNotes) patch.notes = notesToApplyRaw;
           }
           changes.push({ type:'update_permit', permit_id:r.permit_id, patch });
         }
-      }
-    }
-
-    if (wantNotes && proposalFromMass) {
-      const existingPermits = window.STATE?.permits || [];
-      const changeIds = new Set();
-      const baseIds = new Set();
-
-      for (const c of changes) {
-        const pid = c.type === 'upsert_permit' ? c.permit?.permit_id : c.permit_id;
-        if (!pid) continue;
-        changeIds.add(pid);
-        baseIds.add(basePermitId(pid));
-      }
-      if (mode === 'assign' && baseId) baseIds.add(basePermitId(baseId));
-
-      for (const bId of baseIds) {
-        syncProposalAcrossBase({
-          baseId: bId,
-          proposalNumber: proposalFromMass,
-          existingPermits,
-          changes,
-          ignoreIds: changeIds,
-        });
       }
     }
     if(changes.length===0){ setMassMsg(mode==='assign'
