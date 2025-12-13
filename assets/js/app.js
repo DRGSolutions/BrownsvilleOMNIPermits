@@ -259,8 +259,9 @@
       if(!by){ setMassMsg('<span class="err">Submitted By is required for Assign.</span>'); return; }
       if(!dateMDY){ setMassMsg('<span class="err">Submitted At (date) is required for Assign.</span>'); return; } }
 
+    const existingPermits = window.STATE?.permits || [];
     const poles=(window.STATE?.poles||[]).filter(p=>String(p.job_name)===String(job));
-    const byPole=indexPermitsByPole(window.STATE?.permits||[]);
+    const byPole=indexPermitsByPole(existingPermits);
     const targets=poles.filter(p=>scidBetween(p.SCID,fromId,toId));
     if(targets.length===0){ setMassMsg('<span class="err">No poles found in that SCID range for the selected Job.</span>'); return; }
 
@@ -269,6 +270,16 @@
     const { normalizedNote: notesToApply, proposalNumber: proposalFromMass } = normalizeProposalNote(notesToApplyRaw);
     const wantNotes = !!notesToApplyRaw;
     let overwriteNotes = true;
+
+    const baseProposals = new Map();
+    const normalizeBaseId = (id) => basePermitId(id || '');
+    const ensureBaseProposal = (id) => {
+      const bId = normalizeBaseId(id);
+      if (!bId || baseProposals.has(bId)) return baseProposals.get(bId) || '';
+      const proposal = findProposalForBase(bId, existingPermits, proposalFromMass);
+      if (proposal) baseProposals.set(bId, proposal);
+      return proposal || '';
+    };
 
     if (wantNotes && mode!=='assign') {
       let total=0, withNotes=0;
@@ -291,6 +302,10 @@
     if(mode==='assign'){
       for(const p of targets){ const key=`${p.job_name}::${p.tag}::${p.SCID}`; const rel=byPole.get(key)||[];
         if(rel.length>0) continue;
+        const proposalForBase = ensureBaseProposal(baseId);
+        const noteForPermit = wantNotes
+          ? normalizeProposalNote(notesToApply, proposalForBase || proposalFromMass).normalizedNote
+          : (proposalForBase ? normalizeProposalNote('', proposalForBase).normalizedNote : '');
         changes.push({ type:'upsert_permit', permit:{
           permit_id:`${baseId}_${p.SCID}`, job_name:p.job_name, tag:p.tag, SCID:p.SCID,
           permit_status:status, submitted_by:by, submitted_at:dateMDY, notes: wantNotes ? notesToApply : '' }});
