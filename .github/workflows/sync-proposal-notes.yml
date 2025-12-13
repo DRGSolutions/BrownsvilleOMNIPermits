@@ -2,17 +2,9 @@ name: Sync proposal notes
 
 on:
   push:
+    branches: [ main ]
     paths:
       - 'data/permits.json'
-    paths-ignore:
-      - 'data/backup/**'
-  pull_request:
-    paths:
-      - 'data/permits.json'
-    paths-ignore:
-      - 'data/backup/**'
-  schedule:
-    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -36,15 +28,7 @@ jobs:
       - name: Run proposal note synchronizer
         run: python scripts/sync_proposal_notes.py
 
-      - name: Commit updates back to PR branch
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: sync proposal notes"
-          file_pattern: data/permits.json
-
       - name: Create synchronization pull request
-        if: ${{ github.event_name != 'pull_request' }}
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

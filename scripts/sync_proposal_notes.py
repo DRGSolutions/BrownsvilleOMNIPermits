@@ -18,7 +18,7 @@ import re
 from typing import Dict, List, Tuple
 
 DATA_PATH = pathlib.Path("data/permits.json")
-PROPOSAL_PATTERN = re.compile(r"(?i)\b(?:proposal[^\d]{0,10})?(\d{4}-\d{2}-\d{4})\b")
+PROPOSAL_PATTERN = re.compile(r"(?i)\b(?:proposal\s*)?(\d{4}-\d{2}-\d{4})\b")
 
 
 def load_permits() -> List[dict]:
@@ -61,10 +61,9 @@ def ensure_proposal_in_note(note: str, proposal: str) -> str:
     return normalized_note
 
 
-def sync_proposals(permits: List[dict]) -> Tuple[bool, List[dict], List[Tuple[str, str]]]:
+def sync_proposals(permits: List[dict]) -> Tuple[bool, List[dict]]:
     proposals = collect_proposals(permits)
     changed = False
-    applied: List[Tuple[str, str]] = []
 
     for permit in permits:
         base_id = extract_base_id(permit["permit_id"])
@@ -77,27 +76,18 @@ def sync_proposals(permits: List[dict]) -> Tuple[bool, List[dict], List[Tuple[st
         if updated_note != note:
             permit["notes"] = updated_note
             changed = True
-            applied.append((permit["permit_id"], proposal))
 
-    return changed, permits, applied
+    return changed, permits
 
 
 def main() -> None:
     permits = load_permits()
-    changed, updated_permits, applied = sync_proposals(permits)
+    changed, updated_permits = sync_proposals(permits)
 
     if changed:
         with DATA_PATH.open("w", encoding="utf-8") as handle:
             json.dump(updated_permits, handle, indent=2)
             handle.write("\n")
-        touched_bases = sorted({extract_base_id(pid) for pid, _ in applied})
-        print("Updated proposal notes for:")
-        for permit_id, proposal in applied:
-            print(f"- {permit_id}: Proposal {proposal}")
-        if touched_bases:
-            print("Affected base IDs:")
-            for base_id in touched_bases:
-                print(f"- {base_id}")
     else:
         print("No proposal updates needed.")
 
