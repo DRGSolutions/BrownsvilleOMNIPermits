@@ -144,6 +144,17 @@
   },
   {
     "job_name": "BRN02-F31",
+    "tag": "06855",
+    "SCID": "068",
+    "owner": "BPUB",
+    "pole_spec": "40-4 Southern Pine",
+    "proposed_spec": " ",
+    "lat": 25.92799881866293,
+    "lon": -97.45071616180968,
+    "mr_level": " "
+  },
+  {
+    "job_name": "BRN02-F31",
     "tag": "06856",
     "SCID": "069",
     "owner": "BPUB",
@@ -446,9 +457,9 @@
     "owner": "BPUB",
     "pole_spec": "45-4 Southern Pine",
     "proposed_spec": " ",
-    "lat": 25.926018969325913,
-    "lon": -97.44677365889551,
-    "mr_level": "Simple"
+    "lat": 25.92601512477103,
+    "lon": -97.44677491618098,
+    "mr_level": "Simple Power"
   },
   {
     "job_name": "BRN02-F31",
@@ -668,7 +679,7 @@
     "proposed_spec": " ",
     "lat": 25.923277534216037,
     "lon": -97.44676172749541,
-    "mr_level": "Simple Power"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN02-F31",
@@ -713,6 +724,50 @@
     "lat": 25.925885893561013,
     "lon": -97.44678429507083,
     "mr_level": "Simple"
+  },
+  {
+    "job_name": "BRN02-F31",
+    "tag": "NT",
+    "SCID": "073",
+    "owner": "AEP",
+    "pole_spec": "35-5 Southern Pine",
+    "proposed_spec": "40-5 Southern Pine",
+    "lat": 25.92326957600689,
+    "lon": -97.4463803695945,
+    "mr_level": "Complex"
+  },
+  {
+    "job_name": "BRN02-F31",
+    "tag": "5151021-4409-786",
+    "SCID": "074",
+    "owner": "AEP",
+    "pole_spec": "40-2 Southern Pine",
+    "proposed_spec": " ",
+    "lat": 25.923264068048574,
+    "lon": -97.44600682510537,
+    "mr_level": "Simple Power"
+  },
+  {
+    "job_name": "BRN02-F31",
+    "tag": "5151-242-4409-762",
+    "SCID": "075",
+    "owner": "AEP",
+    "pole_spec": "45-2 Southern Pine",
+    "proposed_spec": " ",
+    "lat": 25.923249594091217,
+    "lon": -97.44542746795815,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN02-F31",
+    "tag": "51514134409755",
+    "SCID": "076",
+    "owner": "AEP",
+    "pole_spec": " ",
+    "proposed_spec": " ",
+    "lat": 25.923231049330777,
+    "lon": -97.44490468865735,
+    "mr_level": "Simple Power"
   },
   {
     "job_name": "BRN02-F42",
@@ -11503,7 +11558,7 @@
     "proposed_spec": " ",
     "lat": 25.90266784796471,
     "lon": -97.38943699305399,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN02-F53 PLA",
@@ -11514,11 +11569,11 @@
     "proposed_spec": " ",
     "lat": 25.902655625728976,
     "lon": -97.38957132944775,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "5169-209-4407-703",
+    "tag": "51692094407730",
     "SCID": "011",
     "owner": "AEP",
     "pole_spec": "45-2 Southern Pine",
@@ -11529,7 +11584,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "5169-018-4407-720",
+    "tag": "51690184407720",
     "SCID": "012",
     "owner": "AEP",
     "pole_spec": "45-1 Southern Pine",
@@ -11540,7 +11595,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "5168-904-4407-714",
+    "tag": "51689044407714",
     "SCID": "013",
     "owner": "AEP",
     "pole_spec": "45-1 Southern Pine",
@@ -11551,7 +11606,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "4169-393-4407-733",
+    "tag": "41693934407733",
     "SCID": "010",
     "owner": "AEP",
     "pole_spec": "45-2 Southern Pine",
@@ -11562,7 +11617,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "5169-576-4407-736",
+    "tag": "51695764407736",
     "SCID": "009",
     "owner": "AEP",
     "pole_spec": "45-2 Southern Pine",
@@ -11573,7 +11628,7 @@
   },
   {
     "job_name": "BRN02-F53 PLA",
-    "tag": "5169-616-4407-736",
+    "tag": "51696164407736",
     "SCID": "008",
     "owner": "AEP",
     "pole_spec": "45-2 Southern Pine",
@@ -11591,7 +11646,7 @@
     "proposed_spec": " ",
     "lat": 25.916891828728136,
     "lon": -97.38970136441803,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN02-F54 PLA",
@@ -16759,7 +16814,7 @@
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": " ",
-    "lat": 25.924082778458775,
+    "lat": 25.924085458810644,
     "lon": -97.42263000000001,
     "mr_level": "OK to Attach"
   },
@@ -17074,6 +17129,17 @@
   {
     "job_name": "BRN02-F45 PLA",
     "tag": "NT",
+    "SCID": "049",
+    "owner": "MVEC",
+    "pole_spec": " ",
+    "proposed_spec": " ",
+    "lat": 25.924657000000035,
+    "lon": -97.42721829447747,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN02-F45 PLA",
+    "tag": "NT",
     "SCID": "051",
     "owner": "MVEC",
     "pole_spec": "35-5 Southern Pine",
@@ -17205,6 +17271,17 @@
   },
   {
     "job_name": "BRN02-F45 PLA",
+    "tag": "51587184410274",
+    "SCID": "062",
+    "owner": "AEP",
+    "pole_spec": " ",
+    "proposed_spec": " ",
+    "lat": 25.924201363504892,
+    "lon": -97.42262643433166,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN02-F45 PLA",
     "tag": "51586324409104",
     "SCID": "012",
     "owner": "AEP",
@@ -17213,6 +17290,28 @@
     "lat": 25.92129238608706,
     "lon": -97.42282545643265,
     "mr_level": "Simple"
+  },
+  {
+    "job_name": "BRN02-F45 PLA",
+    "tag": "51587214410473",
+    "SCID": "063",
+    "owner": "AEP",
+    "pole_spec": " ",
+    "proposed_spec": " ",
+    "lat": 25.924866797590006,
+    "lon": -97.42260513897682,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN02-F45 PLA",
+    "tag": "51587234410701",
+    "SCID": "064",
+    "owner": "AEP",
+    "pole_spec": " ",
+    "proposed_spec": " ",
+    "lat": 25.925515637510628,
+    "lon": -97.42258897563798,
+    "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN02-F48 PLA",
@@ -17271,9 +17370,9 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": "07521",
+    "tag": "NT",
     "SCID": "084",
-    "owner": "MVEC",
+    "owner": "AEP",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.927275597910292,
@@ -17293,12 +17392,12 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": "07520",
+    "tag": "NT",
     "SCID": "082",
-    "owner": "MVEC",
+    "owner": "AEP",
     "pole_spec": "40-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.926978717313297,
+    "lat": 25.92697962190709,
     "lon": -97.41812948542905,
     "mr_level": "Simple"
   },
@@ -17735,7 +17834,7 @@
     "job_name": "BRN02-F48 PLA",
     "tag": "07529",
     "SCID": "019",
-    "owner": "MVEC",
+    "owner": "AEP",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.931952778749828,
@@ -17802,7 +17901,7 @@
     "tag": "NT",
     "SCID": "014",
     "owner": "AEP",
-    "pole_spec": "35-5 SOUTHERN PINE",
+    "pole_spec": "40-4 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.93182787996311,
     "lon": -97.41873688239927,
@@ -17848,8 +17947,8 @@
     "owner": "MVEC",
     "pole_spec": " ",
     "proposed_spec": " ",
-    "lat": 25.929343000000014,
-    "lon": -97.42549484787916,
+    "lat": 25.929337572546164,
+    "lon": -97.42550909449521,
     "mr_level": " "
   },
   {
@@ -17859,8 +17958,8 @@
     "owner": "MVEC",
     "pole_spec": "35-5 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.929337999999994,
-    "lon": -97.425232,
+    "lat": 25.929334381697302,
+    "lon": -97.4252314970858,
     "mr_level": "OK to Attach"
   },
   {
@@ -18184,14 +18283,14 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": "07525",
+    "tag": "NT",
     "SCID": "093",
-    "owner": "MVEC",
-    "pole_spec": " ",
+    "owner": "AEP",
+    "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.92995716221869,
     "lon": -97.41806175239564,
-    "mr_level": " "
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN02-F48 PLA",
@@ -18250,14 +18349,25 @@
   },
   {
     "job_name": "BRN02-F48 PLA",
-    "tag": "07524",
+    "tag": "NT",
+    "SCID": "097",
+    "owner": "AEP",
+    "pole_spec": "40-3 SOUTHERN PINE",
+    "proposed_spec": " ",
+    "lat": 25.931836660159743,
+    "lon": -97.41895043220781,
+    "mr_level": "Simple"
+  },
+  {
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
     "SCID": "098",
-    "owner": "MVEC",
+    "owner": "AEP",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.929526241699918,
     "lon": -97.41806598128287,
-    "mr_level": " "
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN02-F48 PLA",
@@ -23733,8 +23843,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 Southern Pine",
     "proposed_spec": " ",
-    "lat": 25.926086845927507,
-    "lon": -97.51247923911156,
+    "lat": 25.926094384265703,
+    "lon": -97.51247823328318,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
@@ -23953,8 +24063,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.926107733098558,
-    "lon": -97.51271231260105,
+    "lat": 25.926111954558053,
+    "lon": -97.51271298313284,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
@@ -27110,7 +27220,7 @@
     "owner": "BPUB",
     "pole_spec": "45-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.931074311000046,
+    "lat": 25.931074311000067,
     "lon": -97.49846721103243,
     "mr_level": "Simple Power"
   },
@@ -30940,7 +31050,7 @@
     "proposed_spec": " ",
     "lat": 25.991870055085684,
     "lon": -97.60052613687819,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -30951,7 +31061,7 @@
     "proposed_spec": " ",
     "lat": 25.99231267905445,
     "lon": -97.60094703923188,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -30962,7 +31072,7 @@
     "proposed_spec": " ",
     "lat": 25.99234042105201,
     "lon": -97.60097330637679,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -30973,7 +31083,7 @@
     "proposed_spec": " ",
     "lat": 25.992651567687826,
     "lon": -97.60126791250691,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -30984,7 +31094,7 @@
     "proposed_spec": " ",
     "lat": 25.9929578529712,
     "lon": -97.60155791646486,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -30995,7 +31105,7 @@
     "proposed_spec": " ",
     "lat": 25.993339175667284,
     "lon": -97.60191897029785,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31006,7 +31116,7 @@
     "proposed_spec": " ",
     "lat": 25.991461818671556,
     "lon": -97.60013574467114,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31017,7 +31127,7 @@
     "proposed_spec": " ",
     "lat": 25.991090678537113,
     "lon": -97.59979213452198,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31028,7 +31138,7 @@
     "proposed_spec": "40-4 Southern Pine",
     "lat": 25.990332887900518,
     "lon": -97.59909262381154,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31039,7 +31149,7 @@
     "proposed_spec": " ",
     "lat": 25.989166869627383,
     "lon": -97.59849686351949,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31050,7 +31160,7 @@
     "proposed_spec": " ",
     "lat": 25.987949371108947,
     "lon": -97.59811039322749,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31061,7 +31171,7 @@
     "proposed_spec": " ",
     "lat": 25.987135057808597,
     "lon": -97.59797810071547,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31072,7 +31182,7 @@
     "proposed_spec": "45-4 Southern Pine",
     "lat": 25.98713465596009,
     "lon": -97.59768261071628,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31083,7 +31193,7 @@
     "proposed_spec": "45-4 Southern Pine",
     "lat": 25.987421968534058,
     "lon": -97.59768976324636,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31094,7 +31204,7 @@
     "proposed_spec": " ",
     "lat": 25.98776998001759,
     "lon": -97.59718010997953,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31105,7 +31215,7 @@
     "proposed_spec": " ",
     "lat": 25.987942768552838,
     "lon": -97.59673620430571,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31116,7 +31226,7 @@
     "proposed_spec": " ",
     "lat": 25.986752887628736,
     "lon": -97.59803268389778,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31127,7 +31237,7 @@
     "proposed_spec": " ",
     "lat": 25.986723955321818,
     "lon": -97.59772422986107,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31138,7 +31248,7 @@
     "proposed_spec": " ",
     "lat": 25.986150948847246,
     "lon": -97.59812280952528,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31149,7 +31259,7 @@
     "proposed_spec": " ",
     "lat": 25.985783630403194,
     "lon": -97.59817835266715,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31160,7 +31270,7 @@
     "proposed_spec": " ",
     "lat": 25.985515929059932,
     "lon": -97.59820535349014,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31171,7 +31281,7 @@
     "proposed_spec": " ",
     "lat": 25.98534465714608,
     "lon": -97.59789413272071,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31182,7 +31292,7 @@
     "proposed_spec": " ",
     "lat": 25.985738290876363,
     "lon": -97.59779132464466,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31193,7 +31303,7 @@
     "proposed_spec": " ",
     "lat": 25.98613008521345,
     "lon": -97.59778193691311,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31204,7 +31314,7 @@
     "proposed_spec": " ",
     "lat": 25.984796505660988,
     "lon": -97.59826084880193,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31215,7 +31325,7 @@
     "proposed_spec": " ",
     "lat": 25.98431159081603,
     "lon": -97.59829040337019,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31226,7 +31336,7 @@
     "proposed_spec": " ",
     "lat": 25.983887848128887,
     "lon": -97.59817722917825,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31237,7 +31347,7 @@
     "proposed_spec": " ",
     "lat": 25.98343898363284,
     "lon": -97.59792755513645,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31248,7 +31358,7 @@
     "proposed_spec": " ",
     "lat": 25.98319305186387,
     "lon": -97.5977846411138,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31259,7 +31369,7 @@
     "proposed_spec": " ",
     "lat": 25.983127952191904,
     "lon": -97.59774530203461,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31270,7 +31380,7 @@
     "proposed_spec": " ",
     "lat": 25.984758534758694,
     "lon": -97.5979667650983,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31281,7 +31391,7 @@
     "proposed_spec": " ",
     "lat": 25.984251385640093,
     "lon": -97.59795560091632,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31292,7 +31402,7 @@
     "proposed_spec": " ",
     "lat": 25.983313707273258,
     "lon": -97.59753838214768,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31303,7 +31413,7 @@
     "proposed_spec": " ",
     "lat": 25.98337217633238,
     "lon": -97.59742908213032,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31314,7 +31424,7 @@
     "proposed_spec": " ",
     "lat": 25.983478118516523,
     "lon": -97.59723297680893,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31325,7 +31435,7 @@
     "proposed_spec": " ",
     "lat": 25.98373258282872,
     "lon": -97.59737542347159,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31336,7 +31446,7 @@
     "proposed_spec": " ",
     "lat": 25.983783086067195,
     "lon": -97.59673921353662,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31347,7 +31457,7 @@
     "proposed_spec": " ",
     "lat": 25.983903611979688,
     "lon": -97.5965074336158,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31358,7 +31468,7 @@
     "proposed_spec": " ",
     "lat": 25.98407784989561,
     "lon": -97.5961723254938,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31369,7 +31479,7 @@
     "proposed_spec": " ",
     "lat": 25.984197801071847,
     "lon": -97.59594232607077,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31380,7 +31490,7 @@
     "proposed_spec": " ",
     "lat": 25.984026669067365,
     "lon": -97.59574068871544,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31391,7 +31501,7 @@
     "proposed_spec": " ",
     "lat": 25.983834794481247,
     "lon": -97.59561387985187,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31402,7 +31512,7 @@
     "proposed_spec": " ",
     "lat": 25.984369416836586,
     "lon": -97.59563010654807,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31413,7 +31523,7 @@
     "proposed_spec": " ",
     "lat": 25.98449390747379,
     "lon": -97.59538071779212,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31424,7 +31534,7 @@
     "proposed_spec": " ",
     "lat": 25.98457950048496,
     "lon": -97.59521531493016,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31435,7 +31545,7 @@
     "proposed_spec": " ",
     "lat": 25.984613858225465,
     "lon": -97.5952405723711,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31446,7 +31556,7 @@
     "proposed_spec": "40-5 Southern Pine",
     "lat": 25.98503164109808,
     "lon": -97.59550844117972,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31457,7 +31567,7 @@
     "proposed_spec": " ",
     "lat": 25.98509459653275,
     "lon": -97.59555172883925,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31468,7 +31578,7 @@
     "proposed_spec": " ",
     "lat": 25.985454815718413,
     "lon": -97.59578551766701,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31479,7 +31589,7 @@
     "proposed_spec": " ",
     "lat": 25.985660022854223,
     "lon": -97.59540032272291,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31490,7 +31600,7 @@
     "proposed_spec": " ",
     "lat": 25.984905158017888,
     "lon": -97.5945785742184,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31501,7 +31611,7 @@
     "proposed_spec": " ",
     "lat": 25.984988349557174,
     "lon": -97.5944275863691,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31512,7 +31622,7 @@
     "proposed_spec": " ",
     "lat": 25.985173797842176,
     "lon": -97.59408493416744,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31523,7 +31633,7 @@
     "proposed_spec": "40-5 Southern Pine",
     "lat": 25.98493300669364,
     "lon": -97.5939537678244,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31534,7 +31644,7 @@
     "proposed_spec": "40-5 Southern Pine",
     "lat": 25.984502120413893,
     "lon": -97.5937025852878,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31545,7 +31655,7 @@
     "proposed_spec": " ",
     "lat": 25.984885687406454,
     "lon": -97.59434228822015,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31556,7 +31666,7 @@
     "proposed_spec": " ",
     "lat": 25.985309796317395,
     "lon": -97.59383198868137,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31567,7 +31677,7 @@
     "proposed_spec": " ",
     "lat": 25.982639492030017,
     "lon": -97.59736565225413,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31578,7 +31688,7 @@
     "proposed_spec": "45-3 Southern Pine",
     "lat": 25.98201694067146,
     "lon": -97.59686488794728,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31589,7 +31699,7 @@
     "proposed_spec": " ",
     "lat": 25.981156963337245,
     "lon": -97.59612733295718,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31600,7 +31710,7 @@
     "proposed_spec": " ",
     "lat": 25.980894148777704,
     "lon": -97.59588995745936,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31611,7 +31721,7 @@
     "proposed_spec": " ",
     "lat": 25.980495505438444,
     "lon": -97.59552473131187,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31622,7 +31732,7 @@
     "proposed_spec": " ",
     "lat": 25.9801887811287,
     "lon": -97.59524549935396,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31633,7 +31743,7 @@
     "proposed_spec": " ",
     "lat": 25.980439896809674,
     "lon": -97.59509169866115,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31644,7 +31754,7 @@
     "proposed_spec": " ",
     "lat": 25.98053895504867,
     "lon": -97.59502330233127,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31655,7 +31765,7 @@
     "proposed_spec": " ",
     "lat": 25.980825063164943,
     "lon": -97.59461985802515,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31666,7 +31776,7 @@
     "proposed_spec": " ",
     "lat": 25.98128148973966,
     "lon": -97.59374955094837,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31677,7 +31787,7 @@
     "proposed_spec": " ",
     "lat": 25.98156219052022,
     "lon": -97.59322834766876,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31688,7 +31798,7 @@
     "proposed_spec": " ",
     "lat": 25.981915596180347,
     "lon": -97.59255580065087,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31699,7 +31809,7 @@
     "proposed_spec": " ",
     "lat": 25.979639810385216,
     "lon": -97.594735434359,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31710,7 +31820,7 @@
     "proposed_spec": " ",
     "lat": 25.97956024170982,
     "lon": -97.5946630147156,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31721,7 +31831,7 @@
     "proposed_spec": " ",
     "lat": 25.97926045215194,
     "lon": -97.59438093576148,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31732,7 +31842,7 @@
     "proposed_spec": "45-3 Southern Pine",
     "lat": 25.978984808855397,
     "lon": -97.59413044096246,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31743,7 +31853,7 @@
     "proposed_spec": " ",
     "lat": 25.979237380170733,
     "lon": -97.59399565995946,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31754,7 +31864,7 @@
     "proposed_spec": " ",
     "lat": 25.979280781392227,
     "lon": -97.5939341926559,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31765,7 +31875,7 @@
     "proposed_spec": " ",
     "lat": 25.97945417526779,
     "lon": -97.59370252153411,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31776,7 +31886,7 @@
     "proposed_spec": " ",
     "lat": 25.979564232292493,
     "lon": -97.5935468483802,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31787,7 +31897,7 @@
     "proposed_spec": " ",
     "lat": 25.978684260446435,
     "lon": -97.59386814206518,
-    "mr_level": "Simple Power"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31798,7 +31908,7 @@
     "proposed_spec": " ",
     "lat": 25.97826761836187,
     "lon": -97.5934939739076,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31809,7 +31919,7 @@
     "proposed_spec": "45-5 Southern Pine",
     "lat": 25.977726997129086,
     "lon": -97.59312376128496,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31820,7 +31930,7 @@
     "proposed_spec": "45-2 Southern Pine",
     "lat": 25.977228194957487,
     "lon": -97.59278485946979,
-    "mr_level": "Complex"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31831,7 +31941,7 @@
     "proposed_spec": " ",
     "lat": 25.976741283442436,
     "lon": -97.5925157657353,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31842,7 +31952,7 @@
     "proposed_spec": " ",
     "lat": 25.97606337428423,
     "lon": -97.59215463308959,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31853,7 +31963,7 @@
     "proposed_spec": " ",
     "lat": 25.976166454941495,
     "lon": -97.59193938581615,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31864,7 +31974,7 @@
     "proposed_spec": " ",
     "lat": 25.976082865163434,
     "lon": -97.59183477966457,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31875,7 +31985,7 @@
     "proposed_spec": " ",
     "lat": 25.97640513473394,
     "lon": -97.59122469092578,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31886,7 +31996,7 @@
     "proposed_spec": " ",
     "lat": 25.976653301448273,
     "lon": -97.59074517095387,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31897,7 +32007,7 @@
     "proposed_spec": " ",
     "lat": 25.97687718715094,
     "lon": -97.59031930193717,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31908,7 +32018,7 @@
     "proposed_spec": " ",
     "lat": 25.976977855869116,
     "lon": -97.59027325734567,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31919,7 +32029,7 @@
     "proposed_spec": " ",
     "lat": 25.9769900019798,
     "lon": -97.59012796602867,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31930,7 +32040,7 @@
     "proposed_spec": " ",
     "lat": 25.976806145891562,
     "lon": -97.59000545238446,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31941,7 +32051,7 @@
     "proposed_spec": " ",
     "lat": 25.976587929439983,
     "lon": -97.59004047007689,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31952,7 +32062,7 @@
     "proposed_spec": " ",
     "lat": 25.976662927427757,
     "lon": -97.5899049930578,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31963,7 +32073,7 @@
     "proposed_spec": " ",
     "lat": 25.977337313913257,
     "lon": -97.59048832103896,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31974,7 +32084,7 @@
     "proposed_spec": " ",
     "lat": 25.977711907939074,
     "lon": -97.59071899101424,
-    "mr_level": "Simple Power"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31985,7 +32095,7 @@
     "proposed_spec": " ",
     "lat": 25.978062168111,
     "lon": -97.59093731065913,
-    "mr_level": "Simple Power"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -31996,7 +32106,7 @@
     "proposed_spec": " ",
     "lat": 25.975510373152083,
     "lon": -97.59199153227789,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32007,7 +32117,7 @@
     "proposed_spec": " ",
     "lat": 25.975346407640632,
     "lon": -97.59194861693365,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32018,7 +32128,7 @@
     "proposed_spec": " ",
     "lat": 25.975695277508677,
     "lon": -97.59175531796626,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32029,7 +32139,7 @@
     "proposed_spec": " ",
     "lat": 25.975790789887732,
     "lon": -97.5915489369292,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32040,7 +32150,7 @@
     "proposed_spec": " ",
     "lat": 25.97601879261923,
     "lon": -97.59111847748187,
-    "mr_level": "Simple"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32051,7 +32161,7 @@
     "proposed_spec": " ",
     "lat": 25.976228197735576,
     "lon": -97.59069808106555,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
@@ -32062,14 +32172,14 @@
     "proposed_spec": "35-6 Southern Pine",
     "lat": 25.97643725080902,
     "lon": -97.59032056014671,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029054427998",
     "SCID": "106",
     "owner": "AEP",
-    "pole_spec": "40-4 Southern Pine",
+    "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.974903433245984,
     "lon": -97.5918429772467,
@@ -32077,7 +32187,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029794428000",
     "SCID": "107",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32088,10 +32198,10 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51030324427971",
     "SCID": "108",
     "owner": "AEP",
-    "pole_spec": "40-4 Southern Pine",
+    "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.974962109903952,
     "lon": -97.59139611301013,
@@ -32099,10 +32209,10 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51031924427984",
     "SCID": "109",
     "owner": "AEP",
-    "pole_spec": "35-4 Southern Pine",
+    "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.975155814854357,
     "lon": -97.5910022752925,
@@ -32110,7 +32220,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51033244428210",
     "SCID": "110",
     "owner": "AEP",
     "pole_spec": "40-2 Southern Pine",
@@ -32121,18 +32231,18 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029194427878",
     "SCID": "112",
     "owner": "AEP",
-    "pole_spec": "40-5 Southern Pine",
+    "pole_spec": "40-3 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.97460762732437,
     "lon": -97.59180828304994,
-    "mr_level": "OK to Attach"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029224427602",
     "SCID": "113",
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
@@ -32143,10 +32253,10 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029244427400",
     "SCID": "114",
     "owner": "AEP",
-    "pole_spec": "40-4 Southern Pine",
+    "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.97313183066552,
     "lon": -97.5917143368504,
@@ -32154,7 +32264,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029974427375",
     "SCID": "115",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32165,7 +32275,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51029984427233",
     "SCID": "116",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32176,7 +32286,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51026564427337",
     "SCID": "117",
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
@@ -32187,7 +32297,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51030234427410",
     "SCID": "118",
     "owner": "AEP",
     "pole_spec": "35-4 Southern Pine",
@@ -32198,10 +32308,10 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51031384427468",
     "SCID": "119",
     "owner": "AEP",
-    "pole_spec": "40-4 Southern Pine",
+    "pole_spec": "40-2 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.97310445900434,
     "lon": -97.591054683471,
@@ -32209,7 +32319,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51033054427552",
     "SCID": "120",
     "owner": "AEP",
     "pole_spec": "35-5 Southern Pine",
@@ -32220,7 +32330,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51035034427652",
     "SCID": "121",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32231,18 +32341,18 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51037294427766",
     "SCID": "123",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.973904717646015,
     "lon": -97.58948290898827,
-    "mr_level": "OK to Attach"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51037814427668",
     "SCID": "124",
     "owner": "AEP",
     "pole_spec": "35-5 Southern Pine",
@@ -32253,7 +32363,7 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "S6171",
+    "tag": "51029954427626",
     "SCID": "125",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32264,18 +32374,18 @@
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51035554427561",
     "SCID": "122",
     "owner": "AEP",
-    "pole_spec": "30-5 Southern Pine",
-    "proposed_spec": "35-5 Southern Pine",
+    "pole_spec": "30-6 Southern Pine",
+    "proposed_spec": "35-6 Southern Pine",
     "lat": 25.97335793286364,
     "lon": -97.5899082653564,
     "mr_level": "Complex"
   },
   {
     "job_name": "BRN05-F60_2",
-    "tag": "NT",
+    "tag": "51034544428288",
     "SCID": "111",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -32293,7 +32403,7 @@
     "proposed_spec": " ",
     "lat": 25.97616593046831,
     "lon": -97.59082201238503,
-    "mr_level": "OK to Attach"
+    "mr_level": " "
   },
   {
     "job_name": "BRN05-F48 PLA",
@@ -32825,18 +32935,29 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
-    "SCID": "053",
+    "tag": "50992914435175",
+    "SCID": "054",
     "owner": "AEP",
-    "pole_spec": "40-4 SOUTHERN PINE",
+    "pole_spec": "45-4 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.99485483499257,
-    "lon": -97.6027057685783,
+    "lat": 25.994685983796874,
+    "lon": -97.60267739124102,
     "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50992774435243",
+    "SCID": "053",
+    "owner": "AEP",
+    "pole_spec": "40-4 SOUTHERN PINE",
+    "proposed_spec": " ",
+    "lat": 25.994852122776088,
+    "lon": -97.60270778023506,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN05-F59_1 PLA",
+    "tag": "50992444435415",
     "SCID": "052",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32847,7 +32968,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50992324435474",
     "SCID": "051",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32858,7 +32979,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50991854435715",
     "SCID": "050",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32869,7 +32990,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50991684435797",
     "SCID": "049",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32880,7 +33001,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50991494435899",
     "SCID": "048",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32891,7 +33012,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50991294435997",
     "SCID": "047",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -32902,7 +33023,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50991134436082",
     "SCID": "046",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -32913,7 +33034,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50990934436183",
     "SCID": "045",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32924,7 +33045,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50990714436291",
     "SCID": "044",
     "owner": "AEP",
     "pole_spec": " ",
@@ -32935,7 +33056,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50990134436588",
     "SCID": "043",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32946,7 +33067,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50989744436782",
     "SCID": "042",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32957,7 +33078,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50989564436880",
     "SCID": "041",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32968,7 +33089,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50989354436985",
     "SCID": "040",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -32979,7 +33100,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-898-4437-171",
+    "tag": "50988984437171",
     "SCID": "039",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -32990,7 +33111,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988604437367",
     "SCID": "038",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33001,7 +33122,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988424437460",
     "SCID": "037",
     "owner": "AEP",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -33012,7 +33133,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988224437560",
     "SCID": "036",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33023,7 +33144,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988014437665",
     "SCID": "035",
     "owner": "AEP",
     "pole_spec": " ",
@@ -33034,7 +33155,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50987714437818",
     "SCID": "034",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33045,7 +33166,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50987284438038",
     "SCID": "033",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33056,7 +33177,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50987064438151",
     "SCID": "032",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33067,7 +33188,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50986564438406",
     "SCID": "031",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33078,7 +33199,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50986064438485",
     "SCID": "030",
     "owner": "AEP",
     "pole_spec": "40-3 SOUTHERN PINE",
@@ -33089,7 +33210,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50985764438637",
     "SCID": "029",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33100,7 +33221,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-583-4438-775",
+    "tag": "50985454438794",
     "SCID": "028",
     "owner": "AEP",
     "pole_spec": "40-2 SOUTHERN PINE",
@@ -33111,18 +33232,18 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50985414438989",
     "SCID": "027",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 26.005057028115118,
-    "lon": -97.6048238237836,
+    "lon": -97.60482885292551,
     "mr_level": "Simple"
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50985294439052",
     "SCID": "026",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33133,7 +33254,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50984974439215",
     "SCID": "025",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33144,7 +33265,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50984654439377",
     "SCID": "024",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33155,7 +33276,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50984104439653",
     "SCID": "023",
     "owner": "AEP",
     "pole_spec": " ",
@@ -33166,7 +33287,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50983974439725",
     "SCID": "022",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33177,7 +33298,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50983744439843",
     "SCID": "021",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33188,7 +33309,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50983354440038",
     "SCID": "020",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33199,7 +33320,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50983214440109",
     "SCID": "007",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33210,7 +33331,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-173-4440-352",
+    "tag": "50982344440328",
     "SCID": "005",
     "owner": "AEP",
     "pole_spec": "45-4 SOUTHERN PINE",
@@ -33221,7 +33342,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50982074440688",
     "SCID": "004",
     "owner": "AEP",
     "pole_spec": "35-5 SOUTHERN PINE",
@@ -33232,7 +33353,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50981544440961",
     "SCID": "002",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33243,7 +33364,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-809-6444-145",
+    "tag": "50980964441256",
     "SCID": "001",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33254,7 +33375,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50983764440122",
     "SCID": "008",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33265,7 +33386,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50985164440155",
     "SCID": "009",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33276,7 +33397,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50986414440158",
     "SCID": "010",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33287,7 +33408,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50987904440094",
     "SCID": "011",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33298,7 +33419,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988024440123",
     "SCID": "012",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33309,7 +33430,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988384440203",
     "SCID": "013",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33320,7 +33441,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988794440332",
     "SCID": "014",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33331,7 +33452,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988794440462",
     "SCID": "015",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33342,7 +33463,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988554440633",
     "SCID": "016",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33353,7 +33474,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988304440805",
     "SCID": "017",
     "owner": "AEP",
     "pole_spec": "40-5 SOUTHERN PINE",
@@ -33364,7 +33485,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "NT",
+    "tag": "50988004441013",
     "SCID": "018",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33386,7 +33507,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-148-4440-766",
+    "tag": "50981484440766",
     "SCID": "003",
     "owner": "AEP",
     "pole_spec": "40-2 SOUTHERN PINE",
@@ -33397,7 +33518,7 @@
   },
   {
     "job_name": "BRN05-F59_1 PLA",
-    "tag": "5098-354-4440-230",
+    "tag": "50982544440230",
     "SCID": "006",
     "owner": "AEP",
     "pole_spec": "40-4 SOUTHERN PINE",
@@ -33540,18 +33661,18 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50980574441450",
     "SCID": "023",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
-    "lat": 26.012315367917843,
+    "lat": 26.012315367917868,
     "lon": -97.60634067572057,
     "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50980414441534",
     "SCID": "022",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33562,7 +33683,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50979754441869",
     "SCID": "021",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33573,7 +33694,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50979554441973",
     "SCID": "020",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33584,7 +33705,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50979294442102",
     "SCID": "019",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33595,7 +33716,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50978904442302",
     "SCID": "018",
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
@@ -33606,7 +33727,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50978584442467",
     "SCID": "017",
     "owner": "AEP",
     "pole_spec": "40-3 Southern Pine",
@@ -33617,7 +33738,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50978384442569",
     "SCID": "016",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33628,10 +33749,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "5097-744-4443-006",
+    "tag": "50978034442746",
     "SCID": "015",
     "owner": "AEP",
-    "pole_spec": "45-3 Southern Pine",
+    "pole_spec": "45-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.016251172396693,
     "lon": -97.60714956300082,
@@ -33639,7 +33760,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "5097-659-4443-235",
+    "tag": "50976594443235",
     "SCID": "014",
     "owner": "AEP",
     "pole_spec": "50-3 Southern Pine",
@@ -33650,7 +33771,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50976414443337",
     "SCID": "013",
     "owner": "AEP",
     "pole_spec": "25-5 Southern Pine",
@@ -33661,10 +33782,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50974924443527",
     "SCID": "012",
     "owner": "AEP",
-    "pole_spec": "40-4 Southern Pine",
+    "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.01772312795263,
     "lon": -97.60786375797707,
@@ -33672,40 +33793,40 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50973774443671",
     "SCID": "009",
+    "owner": "AEP",
+    "pole_spec": "50-2 Southern Pine",
+    "proposed_spec": " ",
+    "lat": 26.018121845912418,
+    "lon": -97.60819646362634,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN05-F59_2 PLA",
+    "tag": "50972394443535",
+    "SCID": "010",
+    "owner": "AEP",
+    "pole_spec": "50-4 Southern Pine",
+    "proposed_spec": " ",
+    "lat": 26.017930086150432,
+    "lon": -97.60840468401682,
+    "mr_level": "OK to Attach"
+  },
+  {
+    "job_name": "BRN05-F59_2 PLA",
+    "tag": "50974034443715",
+    "SCID": "008",
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
     "proposed_spec": " ",
-    "lat": 26.01812505974206,
-    "lon": -97.60817053563315,
+    "lat": 26.01823262296348,
+    "lon": -97.60806380601153,
     "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
-    "SCID": "010",
-    "owner": "AEP",
-    "pole_spec": "50-3 Southern Pine",
-    "proposed_spec": " ",
-    "lat": 26.01792740829944,
-    "lon": -97.60839818812329,
-    "mr_level": "OK to Attach"
-  },
-  {
-    "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
-    "SCID": "008",
-    "owner": "AEP",
-    "pole_spec": "45-1 Southern Pine",
-    "proposed_spec": " ",
-    "lat": 26.01823021258426,
-    "lon": -97.60806559420544,
-    "mr_level": "OK to Attach"
-  },
-  {
-    "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972384443776",
     "SCID": "011",
     "owner": "AEP",
     "pole_spec": "45-3 Southern Pine",
@@ -33716,18 +33837,18 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50976244443910",
     "SCID": "007",
     "owner": "AEP",
-    "pole_spec": "45-3 Southern Pine",
+    "pole_spec": "45-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.01867059094779,
     "lon": -97.60758664278642,
-    "mr_level": "Simple Power"
+    "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50978424441501",
     "SCID": "025",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33738,7 +33859,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "826393",
+    "tag": "50978264441393",
     "SCID": "026",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33749,7 +33870,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "810287",
+    "tag": "5097810444287",
     "SCID": "027",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33760,7 +33881,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50977104441301",
     "SCID": "028",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33771,7 +33892,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50976054441315",
     "SCID": "029",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33782,7 +33903,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50974544441336",
     "SCID": "030",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33793,7 +33914,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972934441358",
     "SCID": "031",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33804,7 +33925,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972554441330",
     "SCID": "033",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33815,7 +33936,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972334441171",
     "SCID": "034",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33826,7 +33947,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972154441033",
     "SCID": "035",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33837,7 +33958,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50971964440897",
     "SCID": "036",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33848,18 +33969,18 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50971764440758",
     "SCID": "037",
     "owner": "AEP",
-    "pole_spec": "35-4 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
-    "lat": 26.00981832617095,
+    "lat": 26.009818326170972,
     "lon": -97.60889194670061,
     "mr_level": "OK to Attach"
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "5091574440622",
     "SCID": "038",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33870,7 +33991,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50971384440483",
     "SCID": "039",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33881,10 +34002,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50971184440343",
     "SCID": "040",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.00867672283969,
     "lon": -97.60910177381523,
@@ -33892,10 +34013,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50970994440205",
     "SCID": "041",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.008307887944543,
     "lon": -97.6091709088466,
@@ -33903,7 +34024,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "5090824440084",
     "SCID": "042",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33914,10 +34035,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50970604439931",
     "SCID": "043",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.00755587078321,
     "lon": -97.60929146565493,
@@ -33925,7 +34046,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50970414439792",
     "SCID": "044",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33936,10 +34057,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50970224439656",
     "SCID": "045",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.00680195370933,
     "lon": -97.6094245702773,
@@ -33947,7 +34068,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50970034439519",
     "SCID": "046",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -33958,10 +34079,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50969834439377",
     "SCID": "047",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.006050583921002,
     "lon": -97.60955035650285,
@@ -33969,10 +34090,10 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50969684439267",
     "SCID": "048",
     "owner": "AEP",
-    "pole_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
     "lat": 26.005735695044926,
     "lon": -97.60960768872054,
@@ -33991,7 +34112,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "5097-753-4440-902",
+    "tag": "50977534440902",
     "SCID": "050",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34002,7 +34123,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "579128",
+    "tag": "50975794441128",
     "SCID": "063",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34013,7 +34134,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50975704441067",
     "SCID": "064",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34024,7 +34145,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50975514440931",
     "SCID": "065",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34035,7 +34156,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50975314440790",
     "SCID": "066",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34046,7 +34167,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50975114440646",
     "SCID": "067",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34057,7 +34178,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50974534440235",
     "SCID": "070",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34068,7 +34189,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "444170",
+    "tag": "50974444440170",
     "SCID": "071",
     "owner": "AEP",
     "pole_spec": "40-5 Southern Pine",
@@ -34079,7 +34200,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50974254440037",
     "SCID": "072",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34090,18 +34211,18 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50974054439900",
     "SCID": "073",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
     "proposed_spec": " ",
-    "lat": 26.00742507030482,
-    "lon": -97.60824778799416,
+    "lat": 26.007425873863056,
+    "lon": -97.60824152947917,
     "mr_level": "Simple"
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50973864439762",
     "SCID": "074",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34112,7 +34233,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50973664439621",
     "SCID": "075",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34123,7 +34244,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "509734464439483",
     "SCID": "076",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34134,7 +34255,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50973274439344",
     "SCID": "077",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34145,7 +34266,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "307204",
+    "tag": "5093074439204",
     "SCID": "078",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34156,7 +34277,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972844439043",
     "SCID": "079",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34167,7 +34288,7 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972784438985",
     "SCID": "080",
     "owner": "AEP",
     "pole_spec": "40-4 Southern Pine",
@@ -34200,11 +34321,11 @@
   },
   {
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "NT",
+    "tag": "50972604441362",
     "SCID": "032",
     "owner": "AEP",
-    "pole_spec": "30-5 Southern Pine",
-    "proposed_spec": "35-5 Southern Pine",
+    "pole_spec": "40-4 Southern Pine",
+    "proposed_spec": "45-4 Southern Pine",
     "lat": 26.011505163032083,
     "lon": -97.60860615646378,
     "mr_level": "Complex"
