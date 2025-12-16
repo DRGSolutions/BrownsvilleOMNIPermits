@@ -5418,6 +5418,76 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_007",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "5169-557-4407-697",
+    "SCID": "007",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_008",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51696164407736",
+    "SCID": "008",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_009",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51695764407736",
+    "SCID": "009",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_010",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "41693934407733",
+    "SCID": "010",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_011",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51692094407730",
+    "SCID": "011",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_012",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51690184407720",
+    "SCID": "012",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_013",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51689044407714",
+    "SCID": "013",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG1_005",
     "job_name": "BRN02-F45 PLA",
     "tag": "51586304408924",
