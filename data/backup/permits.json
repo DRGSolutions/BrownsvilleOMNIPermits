@@ -1246,8 +1246,7 @@
     "SCID": "28",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
-    "submitted_at": "11/19/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** SCID CHANGED FROM 28-051 TO 28"
+    "submitted_at": "11/19/2025"
   },
   {
     "permit_id": "BTX-ALICE-PT7C_Seg2_29",
@@ -1446,8 +1445,7 @@
     "SCID": "015",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "JN",
-    "submitted_at": "11/18/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 10975 TO 85969"
+    "submitted_at": "11/18/2025"
   },
   {
     "permit_id": "BTX-ALICE-PT7D_Seg1_016",
@@ -4260,6 +4258,176 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_001",
+    "job_name": "BRN02-F31",
+    "tag": "51507034409016",
+    "SCID": "001",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_002",
+    "job_name": "BRN02-F31",
+    "tag": "51507114409168",
+    "SCID": "002",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_003",
+    "job_name": "BRN02-F31",
+    "tag": "51507164409289",
+    "SCID": "003",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_004",
+    "job_name": "BRN02-F31",
+    "tag": "51507224409421",
+    "SCID": "004",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_005",
+    "job_name": "BRN02-F31",
+    "tag": "51507294409570",
+    "SCID": "005",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_006",
+    "job_name": "BRN02-F31",
+    "tag": "51507394409782",
+    "SCID": "006",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_007",
+    "job_name": "BRN02-F31",
+    "tag": "51505814409788",
+    "SCID": "007",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_008",
+    "job_name": "BRN02-F31",
+    "tag": "51505214409791",
+    "SCID": "008",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_009",
+    "job_name": "BRN02-F31",
+    "tag": "51503664409800",
+    "SCID": "009",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_010",
+    "job_name": "BRN02-F31",
+    "tag": "51504114409798",
+    "SCID": "010",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_023",
+    "job_name": "BRN02-F31",
+    "tag": "51507994411177",
+    "SCID": "023",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_024",
+    "job_name": "BRN02-F31",
+    "tag": "515080444411331",
+    "SCID": "024",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_025",
+    "job_name": "BRN02-F31",
+    "tag": "51508104411527",
+    "SCID": "025",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_073",
+    "job_name": "BRN02-F31",
+    "tag": "51509364409774",
+    "SCID": "073",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_074",
+    "job_name": "BRN02-F31",
+    "tag": "51510564409769",
+    "SCID": "074",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_075",
+    "job_name": "BRN02-F31",
+    "tag": "51512424409762",
+    "SCID": "075",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_076",
+    "job_name": "BRN02-F31",
+    "tag": "51514134409755",
+    "SCID": "076",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F68_BRN02-F46_1_SEG2AEP_043",
     "job_name": "BRN02-F46_1 PLA",
     "tag": "51601954407640",
@@ -5250,6 +5418,76 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_007",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "5169-557-4407-697",
+    "SCID": "007",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_008",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51696164407736",
+    "SCID": "008",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_009",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51695764407736",
+    "SCID": "009",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_010",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "41693934407733",
+    "SCID": "010",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": "BTX05-F74_BRN02-F53_AEPSEG1"
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_011",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51692094407730",
+    "SCID": "011",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_012",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51690184407720",
+    "SCID": "012",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F74_BRN02-F53_AEPSEG1_013",
+    "job_name": "BRN02-F53 PLA",
+    "tag": "51689044407714",
+    "SCID": "013",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG1_005",
     "job_name": "BRN02-F45 PLA",
     "tag": "51586304408924",
@@ -5587,6 +5825,36 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
     "submitted_at": "12/01/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG4_062",
+    "job_name": "BRN02-F45 PLA",
+    "tag": "51587184410274",
+    "SCID": "062",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/16/2025",
+    "notes": "2025-036-4657"
+  },
+  {
+    "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG4_063",
+    "job_name": "BRN02-F45 PLA",
+    "tag": "51587214410473",
+    "SCID": "063",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/16/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG4_064",
+    "job_name": "BRN02-F45 PLA",
+    "tag": "51587234410701",
+    "SCID": "064",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/16/2025",
     "notes": ""
   },
   {
@@ -6546,8 +6814,7 @@
     "SCID": "077",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51538614408535"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_078",
@@ -6556,8 +6823,7 @@
     "SCID": "078",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 01657 TO 51538594408473"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_079",
@@ -6566,8 +6832,7 @@
     "SCID": "079",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51538584408413"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_080",
@@ -6576,8 +6841,7 @@
     "SCID": "080",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51537874408217"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_081",
@@ -6586,8 +6850,7 @@
     "SCID": "081",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51538554408287"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_082",
@@ -6606,8 +6869,7 @@
     "SCID": "083",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5153972-4408596 TO 51539724408596"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_084",
@@ -6616,8 +6878,7 @@
     "SCID": "084",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51540714408593"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_085",
@@ -6626,8 +6887,7 @@
     "SCID": "085",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51541894408589"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_086",
@@ -6636,8 +6896,7 @@
     "SCID": "086",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51542334408588"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_087",
@@ -6646,8 +6905,7 @@
     "SCID": "087",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51543834408583"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_088",
@@ -6656,8 +6914,7 @@
     "SCID": "088",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51545104408579"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_089",
@@ -6666,8 +6923,7 @@
     "SCID": "089",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5154-618-4408-576 TO 51546184408576"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_090",
@@ -6676,8 +6932,7 @@
     "SCID": "090",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51547254408573"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_091",
@@ -6696,8 +6951,7 @@
     "SCID": "092",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5154-991-4408-564 TO 51549914408564"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG1_141",
@@ -6706,8 +6960,7 @@
     "SCID": "141",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51550684408589"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_036",
@@ -6716,8 +6969,7 @@
     "SCID": "036",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 868842 TO 51538684408842"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_037",
@@ -6726,8 +6978,7 @@
     "SCID": "037",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51538714408945"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_038",
@@ -6736,8 +6987,7 @@
     "SCID": "038",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51538044408965"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_039",
@@ -6746,8 +6996,7 @@
     "SCID": "039",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5153874-4409-071 TO 51538744409071"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_041",
@@ -6756,8 +7005,7 @@
     "SCID": "041",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51539884409091"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_042",
@@ -6766,8 +7014,7 @@
     "SCID": "042",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51540474409090"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_057",
@@ -6776,8 +7023,7 @@
     "SCID": "057",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 01637 TO 51539444408945"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_058",
@@ -6786,8 +7032,7 @@
     "SCID": "058",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5154060-4408944 TO 51540604408941"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_059",
@@ -6796,8 +7041,7 @@
     "SCID": "059",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 01639 TO 51540574408850"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG2_060",
@@ -6816,8 +7060,7 @@
     "SCID": "061",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 01641 TO 51541334408847"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG3_066",
@@ -6826,8 +7069,7 @@
     "SCID": "066",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51546374408833"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG3_074",
@@ -6836,8 +7078,7 @@
     "SCID": "074",
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
-    "submitted_at": "11/28/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51554694408806"
+    "submitted_at": "11/28/2025"
   },
   {
     "permit_id": "BTX05-F94_BRN02_F42_SEG3_075",
@@ -7316,8 +7557,7 @@
     "SCID": "025",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT22 TO 51035304441359"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_057",
@@ -7326,8 +7566,7 @@
     "SCID": "057",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM D2279 TO 51035474441504"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_058",
@@ -7336,8 +7575,7 @@
     "SCID": "058",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51035654441649"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_059",
@@ -7356,8 +7594,7 @@
     "SCID": "060",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036004441938"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_061",
@@ -7366,8 +7603,7 @@
     "SCID": "061",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036124442035"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_062",
@@ -7376,8 +7612,7 @@
     "SCID": "062",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036324442194"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_075",
@@ -7386,8 +7621,7 @@
     "SCID": "075",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 6865 TO 51036574442416"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_076",
@@ -7396,8 +7630,7 @@
     "SCID": "076",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036754442439"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_077",
@@ -7406,8 +7639,7 @@
     "SCID": "077",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036974442567"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_078",
@@ -7416,8 +7648,7 @@
     "SCID": "078",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037044442678"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_079",
@@ -7426,8 +7657,7 @@
     "SCID": "079",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51036914442853"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_080",
@@ -7436,8 +7666,7 @@
     "SCID": "080",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037204443104"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_081",
@@ -7446,8 +7675,7 @@
     "SCID": "081",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037244443146"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_082",
@@ -7456,8 +7684,7 @@
     "SCID": "082",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037504443341"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_083",
@@ -7466,8 +7693,7 @@
     "SCID": "083",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037714443542"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_084",
@@ -7476,8 +7702,7 @@
     "SCID": "084",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51037954443719"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_085",
@@ -7486,8 +7711,7 @@
     "SCID": "085",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51038544443924"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_086",
@@ -7496,8 +7720,7 @@
     "SCID": "086",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM S56725670 TO 51038684444037"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG1_087",
@@ -7506,8 +7729,7 @@
     "SCID": "087",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51038564444199"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_001",
@@ -7516,8 +7738,7 @@
     "SCID": "001",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT1 TO 51033044440314"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_002",
@@ -7526,8 +7747,7 @@
     "SCID": "002",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103315 TO 51033154440428"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_003",
@@ -7536,8 +7756,7 @@
     "SCID": "003",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT2 TO 51033304440558"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_004",
@@ -7546,8 +7765,7 @@
     "SCID": "004",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT3 TO 51033394440632"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_005",
@@ -7556,8 +7774,7 @@
     "SCID": "005",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT4 TO 51034324440545"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_006",
@@ -7566,8 +7783,7 @@
     "SCID": "006",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT5 TO 51034234440471"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_007",
@@ -7576,8 +7792,7 @@
     "SCID": "007",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT6 TO 51034474440673"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_008",
@@ -7586,8 +7801,7 @@
     "SCID": "008",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT7 TO 51034704440857"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_009",
@@ -7606,8 +7820,7 @@
     "SCID": "010",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT28 TO 51034734440927"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG2_024",
@@ -7616,23 +7829,22 @@
     "SCID": "024",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT21 TO 51035144441230"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_026",
     "job_name": "BRN05-F52_1",
-    "tag": "416424",
+    "tag": "51034164441424",
     "SCID": "026",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "12/16/2025",
-    "notes": "Proposal 2025-036-4701"
+    "notes": ""
   },
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_032",
     "job_name": "BRN05-F52_1",
-    "tag": "724438",
+    "tag": "51027424441438",
     "SCID": "032",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7642,7 +7854,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_033",
     "job_name": "BRN05-F52_1",
-    "tag": "NT26",
+    "tag": "51027244441168",
     "SCID": "033",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7652,7 +7864,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_034",
     "job_name": "BRN05-F52_1",
-    "tag": "NT27",
+    "tag": "51027244441168",
     "SCID": "034",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7662,7 +7874,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_035",
     "job_name": "BRN05-F52_1",
-    "tag": "688898",
+    "tag": "51026884440898",
     "SCID": "035",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7672,7 +7884,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_038",
     "job_name": "BRN05-F52_1",
-    "tag": "173518",
+    "tag": "51021734441518",
     "SCID": "038",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7682,7 +7894,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_039",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51021544441479",
     "SCID": "039",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7692,7 +7904,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_040",
     "job_name": "BRN05-F52_1",
-    "tag": "13124",
+    "tag": "51021314441247",
     "SCID": "040",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7702,7 +7914,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_041",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51021134441111",
     "SCID": "041",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7712,7 +7924,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_042",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51020954440975",
     "SCID": "042",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7722,7 +7934,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_043",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51020774440839",
     "SCID": "043",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7732,7 +7944,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_044",
     "job_name": "BRN05-F52_1",
-    "tag": "936618",
+    "tag": "51019364441618",
     "SCID": "044",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7742,7 +7954,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_045",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51018094441635",
     "SCID": "045",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7752,7 +7964,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_046",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51016924441650",
     "SCID": "046",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7762,7 +7974,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_047",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51015644441632",
     "SCID": "047",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7772,7 +7984,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_048",
     "job_name": "BRN05-F52_1",
-    "tag": "439586",
+    "tag": "51014394441586",
     "SCID": "048",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7782,7 +7994,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_049",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51013154441604",
     "SCID": "049",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7792,7 +8004,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_050",
     "job_name": "BRN05-F52_1",
-    "tag": "96618",
+    "tag": "51011964441618",
     "SCID": "050",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7802,7 +8014,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_051",
     "job_name": "BRN05-F52_1",
-    "tag": "NT",
+    "tag": "51010834441670",
     "SCID": "051",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7812,7 +8024,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_052",
     "job_name": "BRN05-F52_1",
-    "tag": "969700",
+    "tag": "51009694441700",
     "SCID": "052",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7822,7 +8034,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_053",
     "job_name": "BRN05-F52_1",
-    "tag": "753743",
+    "tag": "51007534441743",
     "SCID": "053",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7832,7 +8044,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_054",
     "job_name": "BRN05-F52_1",
-    "tag": "534783",
+    "tag": "51005344441783",
     "SCID": "054",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7842,7 +8054,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_055",
     "job_name": "BRN05-F52_1",
-    "tag": "304825",
+    "tag": "51003044441825",
     "SCID": "055",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7852,7 +8064,7 @@
   {
     "permit_id": "BTX08-F147_BRN05-F52_1_SEG3AEP_056",
     "job_name": "BRN05-F52_1",
-    "tag": "720187",
+    "tag": "51000614441870",
     "SCID": "056",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -7876,8 +8088,7 @@
     "SCID": "001",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5099-351-4434-790 TO 50993564434845"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_003",
@@ -7886,8 +8097,7 @@
     "SCID": "003",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50993774434739"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_004",
@@ -7896,8 +8106,7 @@
     "SCID": "004",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM A-0652-A-0650 TO 50994004434619"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_005",
@@ -7906,8 +8115,7 @@
     "SCID": "005",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO NT1"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_006",
@@ -7916,8 +8124,7 @@
     "SCID": "006",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50994634434296"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_007",
@@ -7936,8 +8143,7 @@
     "SCID": "008",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50995204434007"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_009",
@@ -7946,8 +8152,7 @@
     "SCID": "009",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM T-2454 TO 50995444433885"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_010",
@@ -7956,8 +8161,7 @@
     "SCID": "010",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50995924433642"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_011",
@@ -7966,8 +8170,7 @@
     "SCID": "011",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-194-431-349 TO 50996804433584"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_018",
@@ -7986,8 +8189,7 @@
     "SCID": "019",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50994354433330"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_020",
@@ -7996,8 +8198,7 @@
     "SCID": "020",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50995044433089"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_021",
@@ -8006,8 +8207,7 @@
     "SCID": "021",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50995304432965"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05_F60_1_SEG1_022",
@@ -8016,8 +8216,7 @@
     "SCID": "022",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50995864432730"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_078",
@@ -8026,8 +8225,7 @@
     "SCID": "078",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51022864435681"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_079",
@@ -8036,8 +8234,7 @@
     "SCID": "079",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51024034435784"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_080",
@@ -8046,8 +8243,7 @@
     "SCID": "080",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5102-465-4435-898 TO 51024654435898"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_081",
@@ -8056,8 +8252,7 @@
     "SCID": "081",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51025264435912"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_082",
@@ -8066,8 +8261,7 @@
     "SCID": "082",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5102-652-4436-070 TO 51026524436070"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_083",
@@ -8076,8 +8270,7 @@
     "SCID": "083",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51027674436249"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_084",
@@ -8086,8 +8279,7 @@
     "SCID": "084",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51027964436468"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_093",
@@ -8096,8 +8288,7 @@
     "SCID": "093",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-110-4438-711 TO 51030984438608"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_094",
@@ -8106,8 +8297,7 @@
     "SCID": "094",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 93-984-438-608 TO 51030764438429"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_095",
@@ -8116,8 +8306,7 @@
     "SCID": "095",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-076-4438-429 TO 51030624438325"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_096",
@@ -8126,8 +8315,7 @@
     "SCID": "096",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-049-4438-228 TO 51030494438228"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_097",
@@ -8136,8 +8324,7 @@
     "SCID": "097",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-045-4438-186 TO 51030454438186"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_098",
@@ -8146,8 +8333,7 @@
     "SCID": "098",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-029-4438-056 TO 51030294438056"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_099",
@@ -8156,8 +8342,7 @@
     "SCID": "099",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM TU450-45-35481 TO 51030134437926"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_100",
@@ -8166,8 +8351,7 @@
     "SCID": "100",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-006-4437-869 TO 51030064437869"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_101",
@@ -8186,8 +8370,7 @@
     "SCID": "102",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51029664437118"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_103",
@@ -8196,8 +8379,7 @@
     "SCID": "103",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51028324436920"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_104",
@@ -8206,8 +8388,7 @@
     "SCID": "104",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51026894436565"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG1_105",
@@ -8216,8 +8397,7 @@
     "SCID": "105",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51026624436487"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_055",
@@ -8226,8 +8406,7 @@
     "SCID": "055",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50993404434926"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_056",
@@ -8256,8 +8435,7 @@
     "SCID": "058",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5099-491-4434-947 TO 50994804434954"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_059",
@@ -8276,8 +8454,7 @@
     "SCID": "060",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50999494435049"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_061",
@@ -8296,8 +8473,7 @@
     "SCID": "062",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51002724435112"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_063",
@@ -8306,8 +8482,7 @@
     "SCID": "063",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51004874435155"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_064",
@@ -8316,8 +8491,7 @@
     "SCID": "064",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51007764435212"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_065",
@@ -8336,8 +8510,7 @@
     "SCID": "066",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-943-4405-145 TO 51009434435245"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_067",
@@ -8356,8 +8529,7 @@
     "SCID": "068",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51012294435303"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_069",
@@ -8366,8 +8538,7 @@
     "SCID": "069",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51011674435321"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_070",
@@ -8376,8 +8547,7 @@
     "SCID": "070",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/26/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51013534435328"
+    "submitted_at": "11/26/2025"
   },
   {
     "permit_id": "BTX08-F150_BRN05-F59_1_SEG2_071",
@@ -8992,7 +9162,7 @@
   {
     "permit_id": "BTX08-F150_BRN05-F59_2_SEG1AEP_049",
     "job_name": "BRN05-F59_2 PLA",
-    "tag": "782099",
+    "tag": "50977824441099",
     "SCID": "049",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
@@ -9226,8 +9396,7 @@
     "SCID": "024",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50996964432353"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRN05-F60_1_SEG3_025",
@@ -9236,8 +9405,7 @@
     "SCID": "025",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50997484432208"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRN05-F60_1_SEG3_026",
@@ -9246,8 +9414,7 @@
     "SCID": "026",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50998144432039"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRN05-F60_1_SEG3_027",
@@ -9256,8 +9423,7 @@
     "SCID": "027",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50998704431913"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_023",
@@ -9266,8 +9432,7 @@
     "SCID": "023",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50996474432507"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_024",
@@ -9276,8 +9441,7 @@
     "SCID": "024",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50996964432353"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_025",
@@ -9286,8 +9450,7 @@
     "SCID": "025",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50997484432208"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_026",
@@ -9296,8 +9459,7 @@
     "SCID": "026",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50998144432039"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_027",
@@ -9306,8 +9468,7 @@
     "SCID": "027",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50998704431913"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_028",
@@ -9316,8 +9477,7 @@
     "SCID": "028",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 50999334431777"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_029",
@@ -9326,8 +9486,7 @@
     "SCID": "029",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51000084431627"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_030",
@@ -9336,8 +9495,7 @@
     "SCID": "030",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51001944431349"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_031",
@@ -9346,8 +9504,7 @@
     "SCID": "031",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51002824431211"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_032",
@@ -9356,8 +9513,7 @@
     "SCID": "032",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51003574431089"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_033",
@@ -9366,8 +9522,7 @@
     "SCID": "033",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-433-4430-950 TO 51004334430950"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_034",
@@ -9376,8 +9531,7 @@
     "SCID": "034",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51005324430792"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_035",
@@ -9386,8 +9540,7 @@
     "SCID": "035",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-607-4430-670 TO 51006074430670"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_036",
@@ -9396,8 +9549,7 @@
     "SCID": "036",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51007044430515"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_037",
@@ -9406,8 +9558,7 @@
     "SCID": "037",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-781-4430-392 TO 51007814430392"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_038",
@@ -9416,8 +9567,7 @@
     "SCID": "038",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51008814430250"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_039",
@@ -9426,8 +9576,7 @@
     "SCID": "039",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5100-954-4430-133 TO 51009544430133"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_040",
@@ -9436,8 +9585,7 @@
     "SCID": "040",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51010464429968"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_041",
@@ -9446,8 +9594,7 @@
     "SCID": "041",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5101-109-4429-867 TO 51011094429867"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG3_042",
@@ -9666,8 +9813,7 @@
     "SCID": "077",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51033704426187"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_078",
@@ -9676,8 +9822,7 @@
     "SCID": "078",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 530928 TO 51035304425928"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_079",
@@ -9686,8 +9831,7 @@
     "SCID": "079",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-618-4426-787 TO 51036184425787"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_080",
@@ -9696,8 +9840,7 @@
     "SCID": "080",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 714633 TO 51037144425633"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_081",
@@ -9706,8 +9849,7 @@
     "SCID": "081",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5103-825-4425-463 TO 51038254425463"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_082",
@@ -9716,8 +9858,7 @@
     "SCID": "082",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51040624425220"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_083",
@@ -9726,8 +9867,7 @@
     "SCID": "083",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51043824425021"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_084",
@@ -9736,8 +9876,7 @@
     "SCID": "084",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5104-586-4414-908 TO 51045864424908"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_085",
@@ -9756,8 +9895,7 @@
     "SCID": "086",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51048394424768"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_087",
@@ -9766,8 +9904,7 @@
     "SCID": "087",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51049604424700"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_088",
@@ -9776,8 +9913,7 @@
     "SCID": "088",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM A151 TO 51050714424639"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_089",
@@ -9786,8 +9922,7 @@
     "SCID": "089",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51052964424514"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_090",
@@ -9796,8 +9931,7 @@
     "SCID": "090",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51055444424376"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_091",
@@ -9806,8 +9940,7 @@
     "SCID": "091",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51056124424313"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_092",
@@ -9816,8 +9949,7 @@
     "SCID": "092",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51057294424275"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_093",
@@ -9826,8 +9958,7 @@
     "SCID": "093",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51057424424268"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_096",
@@ -9836,8 +9967,7 @@
     "SCID": "096",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5106-066-4424-087 TO 51060664424087"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_097",
@@ -9846,8 +9976,7 @@
     "SCID": "097",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM 5106-092-4424-073 TO 51060924424073"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F151_BRNO5-F60_1_SEG6_098",
@@ -9856,25 +9985,24 @@
     "SCID": "098",
     "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
-    "submitted_at": "11/27/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51061234424276"
+    "submitted_at": "11/27/2025"
   },
   {
     "permit_id": "BTX08-F152_BRN05-F49_SEG1AEP_001",
     "job_name": "BRN05-F49 PLA",
     "tag": "51063574423925",
     "SCID": "001",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
-    "notes": ""
+    "notes": "AEP PERMIT CORRESPONDECE RECEIVE REGARDS TO POLES MISSING FROM THE MAP WE SENT THEM. SENT EMAIL TO CR FOR FOLLOW UP 12/16"
   },
   {
     "permit_id": "BTX08-F152_BRN05-F49_SEG1AEP_002",
     "job_name": "BRN05-F49 PLA",
     "tag": "51066464423765",
     "SCID": "002",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9884,7 +10012,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51069274423609",
     "SCID": "003",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9894,7 +10022,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51072144423450",
     "SCID": "004",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9904,7 +10032,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51075134423284",
     "SCID": "005",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9914,7 +10042,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51077734423140",
     "SCID": "006",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9924,7 +10052,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51078994423088",
     "SCID": "007",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9934,7 +10062,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51079344423069",
     "SCID": "008",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9944,7 +10072,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51080774422988",
     "SCID": "009",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9954,7 +10082,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51082084422916",
     "SCID": "010",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9964,7 +10092,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51083394422843",
     "SCID": "011",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9974,7 +10102,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51083564422833",
     "SCID": "012",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9984,7 +10112,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51085684422716",
     "SCID": "013",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -9994,7 +10122,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51087434422619",
     "SCID": "014",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10004,7 +10132,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51089184422522",
     "SCID": "015",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10014,7 +10142,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51090934422425",
     "SCID": "016",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10024,7 +10152,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51092684422328",
     "SCID": "017",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10034,7 +10162,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51094434422232",
     "SCID": "018",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10044,7 +10172,7 @@
     "job_name": "BRN05-F49 PLA",
     "tag": "51096184422134",
     "SCID": "019",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Not Approved - Other Issues",
     "submitted_by": "CR",
     "submitted_at": "12/12/2025",
     "notes": ""
@@ -10056,8 +10184,7 @@
     "SCID": "008",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103288-4440177 | SCID=008 TO BRN05-F50 | TAG=NT | SCID=008\n***ORIGINAL INFORMATION HAS CHANGED*** TAG CHANGED FROM NT TO 51032884440177"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_009",
@@ -10066,8 +10193,7 @@
     "SCID": "009",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=NT | SCID=009 TO BRN05-F50 | TAG=51032564439903 | SCID=009"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_011",
@@ -10076,8 +10202,7 @@
     "SCID": "011",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103156-4439903 | SCID=011 TO BRN05-F50 | TAG=51031564439903 | SCID=011"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_012",
@@ -10086,8 +10211,7 @@
     "SCID": "012",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103233-4439724 | SCID=012 TO BRN05-F50 | TAG=51032334439724 | SCID=012"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_013",
@@ -10096,8 +10220,7 @@
     "SCID": "013",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103212-4439546 | SCID=013 TO BRN05-F50 | TAG=51032124439546 | SCID=013"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_014",
@@ -10106,8 +10229,7 @@
     "SCID": "014",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103190-4439546 | SCID=014 TO BRN05-F50 | TAG=51031904439367 | SCID=014"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_015",
@@ -10116,8 +10238,7 @@
     "SCID": "015",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103168-4439188 | SCID=015 TO BRN05-F50 | TAG=51031684439188 | SCID=015"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_016",
@@ -10126,8 +10247,7 @@
     "SCID": "016",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=5103168-4439188 | SCID=016 TO BRN05-F50 | TAG=51031464439009 | SCID=016"
+    "submitted_at": "11/25/2025"
   },
   {
     "permit_id": "BTX08-F154_BRN05-F50_SEG1_017",
@@ -10146,7 +10266,6 @@
     "SCID": "018",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
-    "submitted_at": "11/25/2025",
-    "notes": "***ORIGINAL INFORMATION HAS CHANGED*** MANUAL PERMIT REASSIGNMENT FROM BRN05-F50 PLA | TAG=510312-4438860 | SCID=018 TO BRN05-F50 | TAG=51031104438711 | SCID=018"
+    "submitted_at": "11/25/2025"
   }
 ]
