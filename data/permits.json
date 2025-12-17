@@ -9830,10 +9830,10 @@
     "job_name": "BRN05-F60_2",
     "tag": "51011304430705",
     "SCID": "060",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Created - NOT Submitted",
     "submitted_by": "CR",
     "submitted_at": "12/17/2025",
-    "notes": ""
+    "notes": "2025-036-4775"
   },
   {
     "permit_id": "BTX08-F151_BRN05-F60_2_AEPSEG3_061",
