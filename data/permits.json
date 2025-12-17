@@ -10267,5 +10267,15 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025"
+  },
+  {
+    "permit_id": "test_001",
+    "job_name": "BRN02-F30 PLA",
+    "tag": "NT",
+    "SCID": "001",
+    "permit_status": "Not Approved - Cannot Attach",
+    "submitted_by": "ZK",
+    "submitted_at": "12/17/2025",
+    "notes": ""
   }
 ]
