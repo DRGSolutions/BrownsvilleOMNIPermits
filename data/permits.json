@@ -11047,15 +11047,5 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025"
-  },
-  {
-    "permit_id": "TEST",
-    "job_name": "BRN02-F30 PLA",
-    "tag": "NT",
-    "SCID": "001",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "zk",
-    "submitted_at": "12/18/2025",
-    "notes": ""
   }
 ]
