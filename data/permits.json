@@ -5592,10 +5592,10 @@
     "job_name": "BRN02-F46_2 PLA",
     "tag": "5161-638-4410-662",
     "SCID": "078",
-    "permit_status": "Submitted - Pending",
+    "permit_status": "Created - NOT Submitted",
     "submitted_by": "CR",
     "submitted_at": "12/18/2025",
-    "notes": ""
+    "notes": "2025-036-4815"
   },
   {
     "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG3_046",
