@@ -6548,6 +6548,136 @@
     "notes": "2025-036-4826"
   },
   {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_013",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "013",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_014",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "014",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_015",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "015",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_016",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "016",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_017",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "017",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_018",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "32774",
+    "SCID": "018",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_019",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "07529",
+    "SCID": "019",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_020",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "32778",
+    "SCID": "020",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_021",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "07531",
+    "SCID": "021",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_022",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "022",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_023",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "023",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_024",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "024",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_097",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "NT",
+    "SCID": "097",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F90_BRN02-F45-PLA_AEPSEG1_005",
     "job_name": "BRN02-F45 PLA",
     "tag": "51586304408924",
