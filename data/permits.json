@@ -2878,6 +2878,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Wild-North-PT8_SEG082",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "51242",
+    "SCID": "082",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "ZK",
+    "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT8_SEG1_001",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "75202",
@@ -3295,16 +3305,6 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG082",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51242",
-    "SCID": "082",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "12/22/2025",
     "notes": ""
   },
   {
@@ -8608,6 +8608,196 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "TM",
     "submitted_at": "12/22/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_036",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51540834410095",
+    "SCID": "036",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_037",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51542664410088",
+    "SCID": "037",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_038",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51545084410083",
+    "SCID": "038",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_039",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51546614410068",
+    "SCID": "039",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_040",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51547814410065",
+    "SCID": "040",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_041",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51548994410062",
+    "SCID": "041",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_042",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51550254410059",
+    "SCID": "042",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_044",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51552654410054",
+    "SCID": "044",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_045",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51554054410056",
+    "SCID": "045",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_046",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51554354410055",
+    "SCID": "046",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_047",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51554904409937",
+    "SCID": "047",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_048",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51555424409821",
+    "SCID": "048",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_049",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51555904409715",
+    "SCID": "049",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_050",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51556124409666",
+    "SCID": "050",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_058",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51543824409840",
+    "SCID": "058",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_059",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51543174409842",
+    "SCID": "059",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_060",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51541954409845",
+    "SCID": "060",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_061",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51540694409848",
+    "SCID": "061",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F95_BRN02-F44-AEPSEG2_062",
+    "job_name": "BRN02-F44 PLA",
+    "tag": "51540674409802",
+    "SCID": "062",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "TM",
+    "submitted_at": "12/23/2025",
     "notes": ""
   },
   {
