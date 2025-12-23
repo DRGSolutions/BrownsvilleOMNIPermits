@@ -4768,6 +4768,86 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_024",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "06192",
+    "SCID": "024",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_024.B",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "NT",
+    "SCID": "024.B",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_035",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "NT",
+    "SCID": "035",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_036",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "NT",
+    "SCID": "036",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_037",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "NT",
+    "SCID": "037",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_038",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "51503874406-966",
+    "SCID": "038",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_039",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "5150-467-4406-965",
+    "SCID": "039",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F100_BRN02-F40_AEPSEG2_040",
+    "job_name": "BRN02-F40 PLA",
+    "tag": "5150-597-4406-961",
+    "SCID": "040",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/23/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F101_BRN02-F31_AEPSEG1_001",
     "job_name": "BRN02-F31",
     "tag": "51507034409016",
