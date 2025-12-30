@@ -27145,7 +27145,7 @@
     "proposed_spec": " ",
     "lat": 25.911619530000003,
     "lon": -97.492513916,
-    "mr_level": "OK to Attach"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BTX-ALICE-PT7D",
@@ -27222,7 +27222,7 @@
     "proposed_spec": " ",
     "lat": 25.91200326100003,
     "lon": -97.49148975458198,
-    "mr_level": "OK to Attach"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BTX-ALICE-PT7D",
@@ -27266,7 +27266,7 @@
     "proposed_spec": " ",
     "lat": 25.911437062000005,
     "lon": -97.49232691904741,
-    "mr_level": "OK to Attach"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BTX-ALICE-PT7D",
@@ -27506,8 +27506,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.91176953871822,
-    "lon": -97.49321621854708,
+    "lat": 25.911770878997295,
+    "lon": -97.4932206887863,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
@@ -27539,8 +27539,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.912435934531953,
-    "lon": -97.49393362332908,
+    "lat": 25.912435976408535,
+    "lon": -97.49393339048366,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
@@ -27550,8 +27550,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.91257378843044,
-    "lon": -97.49407658510914,
+    "lat": 25.912559380159472,
+    "lon": -97.49406131142347,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
@@ -27561,8 +27561,8 @@
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
-    "lat": 25.91273149358906,
-    "lon": -97.49423675966439,
+    "lat": 25.912724121911474,
+    "lon": -97.49423675972578,
     "mr_level": "ATTACHED / NOT ON PERMIT"
   },
   {
