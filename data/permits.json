@@ -3072,7 +3072,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51242",
     "SCID": "082",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "12/22/2025",
     "notes": ""
@@ -3388,6 +3388,56 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX-Wild-North-PT8_SEG2_036",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "51268",
+    "SCID": "036",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/10/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT8_SEG2_037",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "51214",
+    "SCID": "037",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/10/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT8_SEG2_038",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "51212",
+    "SCID": "038",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/10/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT8_SEG2_039",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "80180",
+    "SCID": "039",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/10/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX-Wild-North-PT8_SEG2_040",
+    "job_name": "BTX-Wild-North-PT8",
+    "tag": "51209",
+    "SCID": "040",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "11/10/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX-Wild-North-PT8_SEG2_077",
     "job_name": "BTX-Wild-North-PT8",
     "tag": "63078",
@@ -3448,50 +3498,40 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_036",
+    "permit_id": "BTX-Wild-North-PT8_SEG3_041",
     "job_name": "BTX-Wild-North-PT8",
-    "tag": "51268",
-    "SCID": "036",
+    "tag": "51208",
+    "SCID": "041",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_037",
+    "permit_id": "BTX-Wild-North-PT8_SEG3_042",
     "job_name": "BTX-Wild-North-PT8",
-    "tag": "51214",
-    "SCID": "037",
+    "tag": "51206",
+    "SCID": "042",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_038",
+    "permit_id": "BTX-Wild-North-PT8_SEG3_043",
     "job_name": "BTX-Wild-North-PT8",
-    "tag": "51212",
-    "SCID": "038",
+    "tag": "51205",
+    "SCID": "043",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
   },
   {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_039",
+    "permit_id": "BTX-Wild-North-PT8_SEG3_044",
     "job_name": "BTX-Wild-North-PT8",
-    "tag": "80180",
-    "SCID": "039",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "ZK",
-    "submitted_at": "11/10/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG2_040",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51209",
-    "SCID": "040",
+    "tag": "51204",
+    "SCID": "044",
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
@@ -3502,7 +3542,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51201",
     "SCID": "045",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3512,7 +3552,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51218",
     "SCID": "046",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3522,7 +3562,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51225",
     "SCID": "047",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3532,7 +3572,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51226",
     "SCID": "048",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3542,7 +3582,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51231",
     "SCID": "049",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3552,7 +3592,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51233",
     "SCID": "050",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3562,7 +3602,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51234",
     "SCID": "051",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3572,7 +3612,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51235",
     "SCID": "052",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3582,7 +3622,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51239",
     "SCID": "053",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3592,7 +3632,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51241",
     "SCID": "054",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3602,7 +3642,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51246",
     "SCID": "055",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3612,7 +3652,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51247",
     "SCID": "056",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3622,7 +3662,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51248",
     "SCID": "057",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3632,7 +3672,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51238",
     "SCID": "058",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3642,7 +3682,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51251",
     "SCID": "059",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3652,7 +3692,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51252",
     "SCID": "060",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/10/2025",
     "notes": ""
@@ -3662,7 +3702,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51227",
     "SCID": "079",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "12/18/2025",
     "notes": ""
@@ -3672,7 +3712,7 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51228",
     "SCID": "080",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "12/18/2025",
     "notes": ""
@@ -3682,49 +3722,9 @@
     "job_name": "BTX-Wild-North-PT8",
     "tag": "51229",
     "SCID": "081",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "12/18/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG3_041",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51208",
-    "SCID": "041",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "11/10/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG3_042",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51206",
-    "SCID": "042",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "11/10/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG3_043",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51205",
-    "SCID": "043",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "11/10/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX-Wild-North-PT8_SEG3_044",
-    "job_name": "BTX-Wild-North-PT8",
-    "tag": "51204",
-    "SCID": "044",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "ZK",
-    "submitted_at": "11/10/2025",
     "notes": ""
   },
   {
