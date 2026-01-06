@@ -1610,16 +1610,6 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX-ALICE-PT7C_Seg2_24",
-    "job_name": "BTX-ALICE-PT7C",
-    "tag": "12343",
-    "SCID": "24",
-    "permit_status": "Created - NOT Submitted",
-    "submitted_by": "JN",
-    "submitted_at": "11/19/2025",
-    "notes": ""
-  },
-  {
     "permit_id": "BTX-ALICE-PT7C_Seg2_25",
     "job_name": "BTX-ALICE-PT7C",
     "tag": "50137",
