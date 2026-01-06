@@ -644,7 +644,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11724",
     "SCID": "001",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -654,7 +654,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11725",
     "SCID": "002",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -664,7 +664,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11726",
     "SCID": "003",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -674,7 +674,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11727",
     "SCID": "004",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -684,7 +684,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11728",
     "SCID": "005",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -694,7 +694,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22939",
     "SCID": "006",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -704,7 +704,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "62496",
     "SCID": "007",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -714,7 +714,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22938",
     "SCID": "008",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -724,7 +724,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22937",
     "SCID": "009",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -734,7 +734,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22936",
     "SCID": "010",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -744,7 +744,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22935",
     "SCID": "011",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -754,7 +754,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22934",
     "SCID": "012",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -764,7 +764,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22933",
     "SCID": "013",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -774,7 +774,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22932",
     "SCID": "014",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -784,7 +784,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24025",
     "SCID": "015",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -794,7 +794,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24024",
     "SCID": "016",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -804,7 +804,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24023",
     "SCID": "017",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -814,7 +814,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24022",
     "SCID": "018",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -824,7 +824,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24021",
     "SCID": "019",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -834,7 +834,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24020",
     "SCID": "020",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -844,7 +844,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24019",
     "SCID": "021",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -854,7 +854,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "63771",
     "SCID": "022",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -864,7 +864,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "24017",
     "SCID": "023",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -874,7 +874,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23129",
     "SCID": "025",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -884,7 +884,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23128",
     "SCID": "026",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -894,7 +894,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23127",
     "SCID": "027",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -904,7 +904,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23144",
     "SCID": "028",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -914,7 +914,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23126",
     "SCID": "029",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -924,7 +924,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23125",
     "SCID": "030",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -934,7 +934,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23124",
     "SCID": "031",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -944,7 +944,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23123",
     "SCID": "032",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -954,7 +954,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23114",
     "SCID": "033",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -964,7 +964,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23113",
     "SCID": "034",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -974,7 +974,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23122",
     "SCID": "035",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -984,7 +984,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "62601",
     "SCID": "036",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -994,7 +994,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22951",
     "SCID": "037",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1004,7 +1004,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23116",
     "SCID": "038",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1014,7 +1014,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "22950",
     "SCID": "039",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1024,7 +1024,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23117",
     "SCID": "040",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1034,7 +1034,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "85826",
     "SCID": "041",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1044,7 +1044,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23118",
     "SCID": "042",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1054,7 +1054,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23130",
     "SCID": "043",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1064,7 +1064,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11730",
     "SCID": "044",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1074,7 +1074,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11731",
     "SCID": "045",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1084,7 +1084,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "11732",
     "SCID": "046",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1094,7 +1094,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "12294",
     "SCID": "047",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
@@ -1104,7 +1104,7 @@
     "job_name": "BTX-Alice-PT3",
     "tag": "23119",
     "SCID": "048",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/13/2025",
     "notes": ""
