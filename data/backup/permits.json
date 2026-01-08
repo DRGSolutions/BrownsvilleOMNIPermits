@@ -8148,6 +8148,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F92_BRN02-F60_SEG1AEP_170",
+    "job_name": "BRN02-F60",
+    "tag": "51558304412194",
+    "SCID": "170",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "01/07/2026",
+    "notes": "NOTE: SENT AEP REQUEST TO ADD THIS POLE TO THE ORIGINAL PROPOSAL NUMBER"
+  },
+  {
     "permit_id": "BTX05-F92_BRN02-F60_SEG1AEP_250",
     "job_name": "BRN02-F60",
     "tag": "51558254415364",
