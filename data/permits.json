@@ -1384,7 +1384,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16085",
     "SCID": "001",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1394,7 +1394,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16086",
     "SCID": "002",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1404,7 +1404,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16092",
     "SCID": "003",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1414,7 +1414,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "39363",
     "SCID": "004",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1424,7 +1424,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "16094",
     "SCID": "005",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1434,7 +1434,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12310",
     "SCID": "006",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1444,7 +1444,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33896",
     "SCID": "007",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1454,7 +1454,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33895",
     "SCID": "008",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1464,7 +1464,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33894",
     "SCID": "009",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1474,7 +1474,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33893",
     "SCID": "010",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1484,7 +1484,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33892",
     "SCID": "011",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1494,7 +1494,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33891",
     "SCID": "012",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1504,7 +1504,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33897",
     "SCID": "013",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1514,7 +1514,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "81035",
     "SCID": "014",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1524,7 +1524,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10915",
     "SCID": "015",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1534,7 +1534,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10916",
     "SCID": "016",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1544,7 +1544,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10917",
     "SCID": "017",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1554,7 +1554,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10918",
     "SCID": "018",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1564,7 +1564,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "64992",
     "SCID": "019",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1574,7 +1574,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "64956",
     "SCID": "020",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1584,7 +1584,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "73096",
     "SCID": "21",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1594,7 +1594,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12339",
     "SCID": "22",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1604,7 +1604,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12340",
     "SCID": "23",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1614,7 +1614,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "50137",
     "SCID": "25",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1624,7 +1624,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12344",
     "SCID": "26",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1634,7 +1634,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "12345",
     "SCID": "27",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1644,7 +1644,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "33899",
     "SCID": "28",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025"
   },
@@ -1653,7 +1653,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10927",
     "SCID": "29",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1663,7 +1663,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "73289",
     "SCID": "30",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1673,7 +1673,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10931",
     "SCID": "31",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1683,7 +1683,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "10932",
     "SCID": "32",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
@@ -1693,7 +1693,7 @@
     "job_name": "BTX-ALICE-PT7C",
     "tag": "85155",
     "SCID": "33",
-    "permit_status": "Created - NOT Submitted",
+    "permit_status": "Submitted - Pending",
     "submitted_by": "JN",
     "submitted_at": "11/19/2025",
     "notes": ""
