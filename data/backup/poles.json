@@ -23577,7 +23577,7 @@
     "tag": "12354",
     "SCID": "007",
     "owner": "BPUB",
-    "pole_spec": " ",
+    "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.911110726428184,
     "lon": -97.492517922,
@@ -23731,11 +23731,11 @@
     "tag": "85969",
     "SCID": "015",
     "owner": "BPUB",
-    "pole_spec": " ",
+    "pole_spec": "50-3 SOUTHERN PINE",
     "proposed_spec": " ",
     "lat": 25.9122229093503,
     "lon": -97.49123381199999,
-    "mr_level": "OK to Attach"
+    "mr_level": "Complex"
   },
   {
     "job_name": "BTX-ALICE-PT7D",
@@ -24073,7 +24073,7 @@
     "SCID": "047",
     "owner": "BPUB",
     "pole_spec": "50-3 SOUTHERN PINE",
-    "proposed_spec": " ",
+    "proposed_spec": "55-1 SOUTHERN PINE",
     "lat": 25.912559380159472,
     "lon": -97.49406131142347,
     "mr_level": "ATTACHED / NOT ON PERMIT"
