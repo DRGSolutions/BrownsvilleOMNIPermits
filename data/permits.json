@@ -7448,6 +7448,16 @@
     "notes": "2025-036-4826"
   },
   {
+    "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2",
+    "job_name": "BRN02-F48 PLA",
+    "tag": "51601554413004",
+    "SCID": "092",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/12/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG2_013",
     "job_name": "BRN02-F48 PLA",
     "tag": "51599274413136",
