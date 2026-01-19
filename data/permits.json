@@ -18777,15 +18777,5 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025"
-  },
-  {
-    "permit_id": "test",
-    "job_name": "BRN02-F41 PLA",
-    "tag": "90220",
-    "SCID": "001",
-    "permit_status": "Not Approved - MRE Issues",
-    "submitted_by": "test",
-    "submitted_at": "01/19/2026",
-    "notes": ""
   }
 ]
