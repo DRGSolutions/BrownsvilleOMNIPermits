@@ -6328,30 +6328,30 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_97",
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_097",
     "job_name": "BRN02-F46_2 PLA",
     "tag": "51608964408356",
-    "SCID": "97",
+    "SCID": "097",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
     "submitted_at": "12/20/2025",
     "notes": "2025-036-4815"
   },
   {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_98",
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_098",
     "job_name": "BRN02-F46_2 PLA",
     "tag": "51611004408359",
-    "SCID": "98",
+    "SCID": "098",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
     "submitted_at": "12/20/2025",
     "notes": ""
   },
   {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_99",
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_099",
     "job_name": "BRN02-F46_2 PLA",
     "tag": "51612054408360",
-    "SCID": "99",
+    "SCID": "099",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
     "submitted_at": "12/20/2025",
@@ -7738,7 +7738,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX05-F85_BRN02-F55_SEG4MVEC_060.1",
+    "permit_id": "BTX05-F85_BRN02-F55_SEG4MVEC_060.601",
     "job_name": "BRN02-F55 PLA",
     "tag": "NT",
     "SCID": "060.1",
@@ -7810,7 +7810,7 @@
   {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG1_069",
     "job_name": "BRN02-F48 PLA",
-    "tag": "NT",
+    "tag": "51586644411873",
     "SCID": "069",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
@@ -7820,7 +7820,7 @@
   {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG1_070",
     "job_name": "BRN02-F48 PLA",
-    "tag": "NT",
+    "tag": "51586424411846",
     "SCID": "070",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
@@ -7830,7 +7830,7 @@
   {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG1_071",
     "job_name": "BRN02-F48 PLA",
-    "tag": "NT",
+    "tag": "51586424411846",
     "SCID": "071",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
@@ -7940,7 +7940,7 @@
   {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG1_094",
     "job_name": "BRN02-F48 PLA",
-    "tag": "51587394412077",
+    "tag": "51587374411882",
     "SCID": "094",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
@@ -8000,7 +8000,7 @@
   {
     "permit_id": "BTX05-F89_BRN02-F48_AEPSEG1_101",
     "job_name": "BRN02-F48 PLA",
-    "tag": "NT",
+    "tag": "51587394412077",
     "SCID": "101",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
