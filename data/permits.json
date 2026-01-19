@@ -6268,6 +6268,36 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_097",
+    "job_name": "BRN02-F46_2 PLA",
+    "tag": "51608964408356",
+    "SCID": "097",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/20/2025",
+    "notes": "2025-036-4815"
+  },
+  {
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_098",
+    "job_name": "BRN02-F46_2 PLA",
+    "tag": "51611004408359",
+    "SCID": "098",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/20/2025",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_099",
+    "job_name": "BRN02-F46_2 PLA",
+    "tag": "51612054408360",
+    "SCID": "099",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "12/20/2025",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_100",
     "job_name": "BRN02-F46_2 PLA",
     "tag": "51612934408361",
@@ -6322,36 +6352,6 @@
     "job_name": "BRN02-F46_2 PLA",
     "tag": "51615974408365",
     "SCID": "105",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "CR",
-    "submitted_at": "12/20/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_097",
-    "job_name": "BRN02-F46_2 PLA",
-    "tag": "51608964408356",
-    "SCID": "097",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "CR",
-    "submitted_at": "12/20/2025",
-    "notes": "2025-036-4815"
-  },
-  {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_098",
-    "job_name": "BRN02-F46_2 PLA",
-    "tag": "51611004408359",
-    "SCID": "098",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "CR",
-    "submitted_at": "12/20/2025",
-    "notes": ""
-  },
-  {
-    "permit_id": "BTX05-F68_BRN02-F46_2_AEPSEG2_099",
-    "job_name": "BRN02-F46_2 PLA",
-    "tag": "51612054408360",
-    "SCID": "099",
     "permit_status": "Submitted - Pending",
     "submitted_by": "CR",
     "submitted_at": "12/20/2025",
@@ -18777,5 +18777,15 @@
     "permit_status": "Submitted - Pending",
     "submitted_by": "ZK",
     "submitted_at": "11/25/2025"
+  },
+  {
+    "permit_id": "test",
+    "job_name": "BRN02-F41 PLA",
+    "tag": "90220",
+    "SCID": "001",
+    "permit_status": "Not Approved - MRE Issues",
+    "submitted_by": "test",
+    "submitted_at": "01/19/2026",
+    "notes": ""
   }
 ]
