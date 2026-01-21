@@ -17651,6 +17651,26 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F98_BRN02-F56_SEG1_084",
+    "job_name": "BRN02-F56 PLA",
+    "tag": "51540274412363",
+    "SCID": "084",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "JN",
+    "submitted_at": "01/21/2026",
+    "notes": ""
+  },
+  {
+    "permit_id": "BTX05-F98_BRN02-F56_SEG1_085",
+    "job_name": "BRN02-F56 PLA",
+    "tag": "51540294412431",
+    "SCID": "085",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "JN",
+    "submitted_at": "01/21/2026",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F98_BRN02-F56_SEG2AEP_039",
     "job_name": "BRN02-F56 PLA",
     "tag": "51522344412306",
