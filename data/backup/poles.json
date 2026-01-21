@@ -6046,7 +6046,7 @@
     "pole_spec": "50-3 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.930178221323075,
-    "lon": -97.43969184540367,
+    "lon": -97.43965533754965,
     "mr_level": "OK to Attach"
   },
   {
@@ -7134,7 +7134,7 @@
     "owner": "AEP",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": " ",
-    "lat": 25.916910690169487,
+    "lat": 25.916914710941832,
     "lon": -97.39985772883604,
     "mr_level": "Simple"
   },
@@ -8334,7 +8334,7 @@
     "pole_spec": "35-5 Southern Pine",
     "proposed_spec": " ",
     "lat": 25.908999895240118,
-    "lon": -97.4103770126709,
+    "lon": -97.41037552242746,
     "mr_level": "Simple"
   },
   {
@@ -12343,17 +12343,6 @@
   },
   {
     "job_name": "BRN02-F57 PLA",
-    "tag": "25323",
-    "SCID": "077",
-    "owner": "MVEC",
-    "pole_spec": "40-6 Southern Pine",
-    "proposed_spec": " ",
-    "lat": 25.93365619684862,
-    "lon": -97.43949569969416,
-    "mr_level": "OK to Attach"
-  },
-  {
-    "job_name": "BRN02-F57 PLA",
     "tag": "51524414413656",
     "SCID": "083",
     "owner": "AEP",
@@ -12570,7 +12559,7 @@
     "proposed_spec": " ",
     "lat": 25.93338707574389,
     "lon": -97.43950517811713,
-    "mr_level": "Simple Power"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN02-F57 PLA",
@@ -12680,7 +12669,7 @@
     "proposed_spec": " ",
     "lat": 25.932327474048147,
     "lon": -97.43818712921656,
-    "mr_level": "Simple Power"
+    "mr_level": "Simple"
   },
   {
     "job_name": "BRN02-F57 PLA",
@@ -13168,17 +13157,6 @@
   },
   {
     "job_name": "BRN02-F57 PLA",
-    "tag": "NT",
-    "SCID": "052",
-    "owner": "AEP",
-    "pole_spec": "45-5 Southern Pine",
-    "proposed_spec": " ",
-    "lat": 25.9301596398542,
-    "lon": -97.43926508864284,
-    "mr_level": "OK to Attach"
-  },
-  {
-    "job_name": "BRN02-F57 PLA",
     "tag": "00832",
     "SCID": "054",
     "owner": "MVEC",
@@ -13272,7 +13250,7 @@
     "owner": "MVEC",
     "pole_spec": "40-5 Southern Pine",
     "proposed_spec": " ",
-    "lat": 25.933171553067403,
+    "lat": 25.933170212994803,
     "lon": -97.43733045053172,
     "mr_level": "OK to Attach"
   },
@@ -27051,7 +27029,7 @@
   {
     "job_name": "BRN02-F46_2 PLA",
     "tag": "NT39",
-    "SCID": "110.B.A",
+    "SCID": "113",
     "owner": "MVEC",
     "pole_spec": "40-3 Southern Pine",
     "proposed_spec": " ",

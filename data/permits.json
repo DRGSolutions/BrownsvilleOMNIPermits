@@ -7400,7 +7400,7 @@
   {
     "permit_id": "BTX05-F69_BRN02-F52-SEG4MVEC_141",
     "job_name": "BRN02-F52 PLA",
-    "tag": "SW#4943",
+    "tag": "F 343 4943",
     "SCID": "141",
     "permit_status": "Created - NOT Submitted",
     "submitted_by": "TM",
@@ -17930,7 +17930,7 @@
     "notes": ""
   },
   {
-    "permit_id": "BTX08-F150_BRN05-F59_1_SEG3",
+    "permit_id": "BTX08-F150_BRN05-F59_1_SEG054",
     "job_name": "BRN05-F59_1 PLA",
     "tag": "50992914435175",
     "SCID": "054",
