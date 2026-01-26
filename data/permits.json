@@ -18241,6 +18241,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F96_BRN02-F64-SEG2MVEC_002",
+    "job_name": "BRN02-F64 PLA",
+    "tag": "00990",
+    "SCID": "002",
+    "permit_status": "Created - NOT Submitted",
+    "submitted_by": "TM",
+    "submitted_at": "01/26/2026",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F97_BRN02-F43_AEPSEG1_006",
     "job_name": "BRN02-F43",
     "tag": "51526504411773",
