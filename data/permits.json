@@ -11808,6 +11808,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F90_BRN02-F45-PLASEG5MVEC_020",
+    "job_name": "BRN02-F45 PLA",
+    "tag": "NT",
+    "SCID": "020",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "CR",
+    "submitted_at": "01/21/2026",
+    "notes": ""
+  },
+  {
     "permit_id": "BTX05-F90_BRN02-F45-PLASEG5MVEC_023",
     "job_name": "BRN02-F45 PLA",
     "tag": "00522",
