@@ -12878,6 +12878,16 @@
     "notes": ""
   },
   {
+    "permit_id": "BTX05-F91_BRN02-F47_2_SEG1AEP_009",
+    "job_name": "BRN02-F47_2 PLA",
+    "tag": "51557584412195",
+    "SCID": "009",
+    "permit_status": "Submitted - Pending",
+    "submitted_by": "ZK",
+    "submitted_at": "01/08/2026",
+    "notes": "NOTE: This is for a pole that never got submitted originally on Seg1. Revision sent to AEP to add this pole into the permit."
+  },
+  {
     "permit_id": "BTX05-F91_BRN02-F47_2_SEG1AEP_010",
     "job_name": "BRN02-F47_2 PLA",
     "tag": "51558284412079",
@@ -13886,16 +13896,6 @@
     "submitted_by": "TM",
     "submitted_at": "01/15/2026",
     "notes": ""
-  },
-  {
-    "permit_id": "BTX05-F91_BRN02-F47_2_SEG1AEP_009",
-    "job_name": "BRN02-F47_2 PLA",
-    "tag": "51557584412195",
-    "SCID": "009",
-    "permit_status": "Submitted - Pending",
-    "submitted_by": "ZK",
-    "submitted_at": "01/08/2026",
-    "notes": "NOTE: This is for a pole that never got submitted originally on Seg1. Revision sent to AEP to add this pole into the permit."
   },
   {
     "permit_id": "BTX05-F92_BRN02-F60_SEG1AEP_125",
